@@ -1,0 +1,16 @@
+{
+    "name": "rfid-connector",
+    "version": "1.0.0",
+    "description": "Arduino RFID serial to WebSocket",
+    "main": "connectorm.js",
+    "type": "commonjs",
+    "scripts": {
+        "start": "node connectorm.js"
+    },
+    "dependencies": {
+        "express": "^4.18.2",
+        "serialport": "^12.0.0",
+        "cors": "^2.8.5",
+        "ws": "^8.14.2"
+    }
+}
