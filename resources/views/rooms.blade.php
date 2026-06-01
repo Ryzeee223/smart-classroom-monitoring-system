@@ -42,24 +42,26 @@
             <p>This is where you create a building for colleges</p>
             <hr>
             <input type="text" placeholder="Building name" class="form-control form control-sm">
+            <input type="text" class="form-control" placebolhder="Enter Building code">
             <button class="btn btn-primary btn-sm w-100 h-100">Create Building</button>
         </div>
     </div>
      {{-- Create Rooms --}}
-              <div class="row-mb3 card shadow">
+              <div class="shadow">
                 <div>
                 
                     <h4>Create Rooms</h4> <br>
                     <p>This is where you create a Room</p>
                     <div>
                          <input type="text" placeholder="Enter Classroom code (eg. cc101)" class="form-control form control-sm">
-                        <button class="btn btn-primary btn-sm w-100 h-100">Create Room</button>
+                        <input type="text" class="form-control" placeholder="Enter Classroom name (eg. Computer Lab)">
+                         <button class="btn btn-primary btn-sm w-100 h-100">Create Room</button>
                     </div>
                     <div>
                         
-                     <div class="">
-                       
+                     <div class="row">
                         {{-- Assign rooms to buildings --}}
+
                         <div class="">
                             <div>
                                 {{-- dropdown option for the available classrooms --}}
@@ -81,6 +83,7 @@
             
         </main>
     </div>
+</div>
 </body>
 </html>
 

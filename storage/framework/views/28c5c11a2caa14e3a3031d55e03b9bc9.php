@@ -2,7 +2,7 @@
     $role = (int) (session('user_role') ?? 0);
 ?>
 
-<nav class="app-sidebar" aria-label="Sidebar">
+<nav class="app-sidebar card-bodyl" aria-label="Sidebar">
     <div class="app-sidebar__brand">
         <a class="app-sidebar__brand-link" href="/">eMonitor</a>
 <?php if(session('logged_in')): ?>
@@ -14,7 +14,7 @@
         <?php endif; ?>
     </div>
 
-    <div class="app-sidebar__body" style="max-height: calc(100vh - 160px);">
+    <div class="app-sidebar__body card-body" style="max-height: calc(100vh - 160px);">
         <ul class="nav flex-column">
             
 
@@ -22,7 +22,7 @@
             <?php if($role === 1 ): ?>
                 <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('dashboard') ? 'active fw-bold' : ''); ?>" href="/dashboard">Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('users.index') ? 'active fw-bold' : ''); ?>" href="/users">Users</a></li>
-                <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('course') ? 'active fw-bold' : ''); ?>" href="/course">Courses</a></li>
+                <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('course') ? 'active fw-bold' : ''); ?>" href="/course">Colleges</a></li>
 
                 <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('rooms.*') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('rooms.index')); ?>">Rooms</a></li>
                 <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('settings') ? 'active fw-bold' : ''); ?>" href="/settings">Settings</a></li>
@@ -39,9 +39,9 @@
             
             <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('subjects') ? 'active fw-bold' : ''); ?>" href="/subjects">Subjects</a></li>
             
-            <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('schedules') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('schedules')); ?>">Schedules</a></li>
+            <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('schedules') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('schedules')); ?>">Create Schedules</a></li>
            
-<li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('course') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('course')); ?>">Courses</a></li>
+<li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('course') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('course')); ?>">College</a></li>
             
             <li class="nav-item"><a class="nav-link" href="<?php echo e(route('settings')); ?>">Settings</a></li>
             

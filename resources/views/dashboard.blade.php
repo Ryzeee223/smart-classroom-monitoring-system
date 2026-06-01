@@ -71,6 +71,8 @@
 
         <!-- Main Content Row -->
         <div class="row g-4">
+            {{-- Ensure the Live Classroom and Recent Logs layout stays consistent: Recent Logs should sit at the bottom of the Live Classroom status area. --}}
+
             <!-- Live Classroom Status -->
             <div class="col-lg-8">
                 <div class="card shadow-lg">
@@ -212,12 +214,15 @@
                     </div>
                 @endif
 
-
+                    @if (in_array($viewerRole, [1, 2, 3], true))
+                        
                 <!-- Recent Faculty Assignments -->
                 <div class="card shadow-lg">
                     <div class="card-header bg-info bg-opacity-10">
                         <h5 class="mb-0 fw-bold text-dark small">Recent Faculty Added</h5>
                     </div>
+
+                    
                     <div class="card-body" style="max-height: 300px; overflow-y: auto;">
                         <div class="list-group list-group-flush">
                             @forelse($recent_faculty ?? [] as $faculty)
@@ -239,9 +244,10 @@
                 </div>
             </div>
         </div>
-
-        <!-- Recent Logs -->
+@endif
+                <!-- Recent Logs -->
         <div class="row">
+
             <div class="col-12">
                 <div class="card shadow">
                     <div class="card-header">
