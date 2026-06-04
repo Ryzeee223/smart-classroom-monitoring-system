@@ -22,8 +22,9 @@
             @if($role === 1 )
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold' : '' }}" href="/dashboard">Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('users.index') ? 'active fw-bold' : '' }}" href="/users">Users</a></li>
-                <li class="nav-item"><a class="nav-link {{ request()->routeIs('course') ? 'active fw-bold' : '' }}" href="/course">Colleges</a></li>
-
+                {{-- move me to dean --}}
+                 
+                <li class="nav-item"><a class="nav-link {{ request()->routeIs('college') ? 'active fw-bold' : '' }}" href= "/college">Colleges</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('rooms.*') ? 'active fw-bold' : '' }}" href="{{ route('rooms.index') }}">Rooms</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('settings') ? 'active fw-bold' : '' }}" href="/settings">Settings</a></li>
 
@@ -41,7 +42,7 @@
             {{-- schedule --}}
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('schedules') ? 'active fw-bold' : '' }}" href="{{ route('schedules') }}">Create Schedules</a></li>
            {{-- College --}}
-<li class="nav-item"><a class="nav-link {{ request()->routeIs('course') ? 'active fw-bold' : '' }}" href="{{ route('course') }}">College</a></li>
+<li class="nav-item"><a class="nav-link {{ request()->routeIs('course') ? 'active fw-bold' : '' }}" href="{{ route('course') }}">Course</a></li>
             {{-- settings --}}
             <li class="nav-item"><a class="nav-link" href="{{ route('settings') }}">Settings</a></li>
             

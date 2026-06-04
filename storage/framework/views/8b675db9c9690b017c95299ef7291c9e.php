@@ -47,24 +47,29 @@
         </div>
     </div>
      
-              <div class="  shadow">
+              <div class="shadow">
                 <div>
-                
                     <h4>Create Rooms</h4> <br>
                     <p>This is where you create a Room</p>
                     <div>
                          <input type="text" placeholder="Enter Classroom code (eg. cc101)" class="form-control form control-sm">
                         <input type="text" class="form-control" placeholder="Enter Classroom name (eg. Computer Lab)">
+                        <br>
                          <button class="btn btn-primary btn-sm w-100 h-100">Create Room</button>
                     </div>
                     <div>
                         
-                     <div class="row">
+                    <br>
+                     <div class="card-body">
                         
+                        <h4>Assign Rooms to Building</h4>
+                        <p>This is where you assign rooms on buildings</p>
+                     </div>
 
                         <div class="">
                             <div>
                                 
+
                             </div>
                         </div>
                     </div>

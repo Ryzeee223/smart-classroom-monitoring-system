@@ -30,21 +30,21 @@
                         <h3 class="card-title mb-0">Add New Program</h3>
                     </div>
                     <div class="card-body">
-<form method="POST" action="{{ route('course.store') }}"> 
+<form method="POST" action="{{ route('college.store') }}"> 
                             <div class="mb-3">
-                                <label for="course_code" class="form-label">Program Code</label>
-                                <input type="text" class="form-control" id="course_code" name="course_code" placeholder="e.g., BSCS, BSED">
+                                <label for="course_code" class="form-label">College Abbreviation</label>
+                                <input type="text" class="form-control" id="abbreviation" name="abbreviation" placeholder="e.g., BSCS, BSED">
                             </div>
                             <div class="mb-3">
-                                <label for="course_name" class="form-label">Program Name</label>
-                                <input type="text" class="form-control" id="course_name" name="course_name" placeholder="e.g., Bachelor of Science in Computer Science">
+                                <label for="course_name" class="form-label">College Name</label>
+                                <input type="text" class="form-control" id="college_name" name="college_name" placeholder="e.g., Bachelor of Science in Computer Science">
                             </div>
                             <div class="mb-3">
                                 <label for="description" class="form-label">Description</label>
                                 <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief description of the course"></textarea>
                             </div>
                             @csrf
-                            <button type="submit" class="btn btn-primary">Save Program</button>
+                            <button type="submit" class="btn btn-primary">Save College</button>
                             @if (session('success'))
                                 <div class="alert alert-success mt-3">{{ session('success') }}</div>
                             @endif
@@ -61,18 +61,18 @@
                     <div class="card-body">
                         <p>List of program currently in the system.</p>
                         <ul class="list-group list-group-flush">
-@forelse($courses as $course)
+@forelse($college ?? [] as $college)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <strong>{{ $course->course_code }}</strong> - <strong>{{ $course->course_name }}</strong>
-                                    @if($course->description)<br><small>{{ $course->description }}</small>@endif
+                                    <strong>{{ $college->college_name }}</strong> - <strong>{{ $college->cabbreviation }}</strong>
+                                    @if($college->description)<br><small>{{ $college->description }}</small>@endif
                                 </div>
                                 <div class="d-flex flex-column gap-1">
-                                    <a class="btn btn-sm btn-outline-secondary" href="{{ route('course.edit', $course->id) }}">Edit</a>
-                                    <form method="POST" action="{{ route('course.destroy', $course->id) }}">
+                                    <a class="btn btn-sm btn-outline-secondary" href="{{ route('college.edit', $college->id) }}">Edit</a>
+                                    <form method="POST" action="{{ route('college.destroy', $college->id) }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this course?')">Delete</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this college?')">Delete</button>
                                     </form>
                                 </div>
                             </li>

@@ -17,12 +17,14 @@ return new class extends Migration
             $table->string('last_name')->unique();
             $table->string('employee_ID')->unique();
             $table->string('email')->unique();
-            $table->image('profile_picture');
+            // profile_picture stored as path/string (image() macro not available)
+            $table->string('profile_picture')->nullable();
+
             $table->string('password');
             $table->integer('role');
             $table->string('course')->nullable();
-            $table->string('year_level')->nullable();
-            $table->string('profile_picture')->nullable();
+            // profile_picture already defined above
+
             $table->string('RFID_code')->nullable()->unique();
             $table->tinyInteger('acc_status')->default(1);
             $table->tinyInteger('status')->default(0);
@@ -45,12 +47,13 @@ return new class extends Migration
             $table->string('user_agent')->nullable();
             $table->timestamps();
         });
-
+//course
           Schema::create('Colleges', function (Blueprint $table) {
             $table->id();
             $table->string('course_code')->unique();
             $table->string('course_name')->unique();
             $table->string('description')->nullable();
+            $table->foreignId('college_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
 
@@ -59,9 +62,11 @@ return new class extends Migration
             $table->string('subject_code')->unique();
             $table->string('subject_name');
             $table->text('description')->nullable();
-            $table->foreignId('course_id')->constrained()->onDelete('cascade')->nullable();
+            // Avoid FK error: courses table may not exist in this migration set
+            $table->unsignedBigInteger('course_id')->nullable();
             $table->timestamps();
         });
+
         Schema::create('schedule', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
@@ -92,6 +97,15 @@ Schema::create('Request', function(Blueprint $table) {
         $table->string('reason');
         $table->foreignid('user_request')->constrained('users')->onDelete('cascade');
         $table->timestamps();
+});
+
+//college
+Schema::create('college', function(blueprint $table){
+$table->id('id')->primary();
+$table->string('college_name')->unique();
+$table->string('abbreviation')->unique();
+$table->string('description');
+$table->foreignId('user_id')->constrained('users')->onDelete('cascade');
 });
     }
 

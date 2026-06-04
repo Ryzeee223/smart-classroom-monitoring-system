@@ -4,6 +4,8 @@ use Faker\Guesser\Name;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Http\Controllers\collegecontroller;
+
 
 Route::get('/', function () {
     return view('login');
@@ -76,7 +78,10 @@ Route::get('/dashboard', function () {
     ));
 })->name('dashboard');
 
+Route::get('/college', function(){
+    return view('college');
 
+})->name('college');
 
 
 Route::get('/schedules', [App\Http\Controllers\schedulecontroller::class, 'index'])->name('schedules');
@@ -169,4 +174,6 @@ Route::get('/course/{course}/edit', [App\Http\Controllers\CourseController::clas
 Route::put('/course/{course}', [App\Http\Controllers\CourseController::class, 'update'])->name('course.update');
 Route::delete('/course/{course}', [App\Http\Controllers\CourseController::class, 'destroy'])->name('course.destroy');
 
+Route::get('/college', [App\Http\Controllers\collegecontroller::class, 'index'])->name('college');
+Route::post('/college', [App\Http\Controllers\collegecontroller::class, 'store'])->name('college.store');
 

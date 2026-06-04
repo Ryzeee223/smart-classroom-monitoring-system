@@ -1,1 +1,1 @@
-App\Models\Users::create(['first_name' => 'Eron','last_name'=> 'Tobia','employee_ID' => '22-03940' ,'email' => 'admin@local','role' => '1' ,'password' => Hash::make('password123')]);
+App\Models\Users::create(['first_name' => 'Eron','last_name'=> 'Tobia','employee_ID' => '22-03940' ,'email' => 'admin@local','role' => '1' ,'password' => Hash::make('admin123')]);
