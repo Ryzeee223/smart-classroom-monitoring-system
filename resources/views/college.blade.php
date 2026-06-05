@@ -32,19 +32,31 @@
                     <div class="card-body">
 <form method="POST" action="{{ route('college.store') }}"> 
                             <div class="mb-3">
-                                <label for="course_code" class="form-label">College Abbreviation</label>
-                                <input type="text" class="form-control" id="abbreviation" name="abbreviation" placeholder="e.g., BSCS, BSED">
+<label for="abbreviation" class="form-label">College Abbreviation</label>
+                                <input type="text" class="form-control" id="abbreviation" name="abbreviation" placeholder="e.g., CCIT, CCJE">
                             </div>
                             <div class="mb-3">
-                                <label for="course_name" class="form-label">College Name</label>
-                                <input type="text" class="form-control" id="college_name" name="college_name" placeholder="e.g., Bachelor of Science in Computer Science">
+                                <label for="college_name" class="form-label">College Name</label>
+                                <input type="text" class="form-control" id="college_name" name="college_name" placeholder="e.g., College of Communication and Information Technology">
                             </div>
                             <div class="mb-3">
                                 <label for="description" class="form-label">Description</label>
                                 <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief description of the course"></textarea>
                             </div>
                             @csrf
+
                             <button type="submit" class="btn btn-primary">Save College</button>
+
+                            @if ($errors->any())
+                                <div class="alert alert-danger mt-3">
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
                             @if (session('success'))
                                 <div class="alert alert-success mt-3">{{ session('success') }}</div>
                             @endif
@@ -64,7 +76,7 @@
 @forelse($college ?? [] as $college)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <strong>{{ $college->college_name }}</strong> - <strong>{{ $college->cabbreviation }}</strong>
+                                    <strong>{{ $college->college_name }}</strong> - <strong>{{ $college->abbreviation }}</strong>
                                     @if($college->description)<br><small>{{ $college->description }}</small>@endif
                                 </div>
                                 <div class="d-flex flex-column gap-1">

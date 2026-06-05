@@ -15,7 +15,7 @@ class Course extends Model
         'description',
     ];
 
-    protected $table = 'Colleges';
+    protected $table = 'courses';
 
     public function subjects()
     {

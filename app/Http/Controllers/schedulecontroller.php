@@ -3,11 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use App\Models\Schedule;
-use App\Models\User;
 use App\Models\Subject;
+use App\Models\users;
 
 class schedulecontroller extends Controller
 {
@@ -16,7 +15,12 @@ class schedulecontroller extends Controller
         if (!session('logged_in')) {
             return redirect('/');
         }
-        $faculty_list = \App\Models\users::where('role', 4)->where('acc_status', 1)->get();
+
+        $faculty_list = \App\Models\users::whereIn('role', [2, 3, 4, 5])
+            ->where('acc_status', 1)
+            ->orderBy('first_name')
+            ->orderBy('last_name')
+            ->get();
         $subjects = \App\Models\Subject::all();
         $courses = \App\Models\Course::all();
         if (session('user_role') == 5) {
@@ -43,7 +47,7 @@ class schedulecontroller extends Controller
             'School_year' => 'required',
             'course' => 'nullable',
             'year_level' => 'nullable',
-'section' => 'nullable',
+            'section' => 'nullable',
             'user_id' => 'required|exists:users,id',
         ]);
 
@@ -95,9 +99,9 @@ class schedulecontroller extends Controller
             'Room' => 'required',
             'Semester' => 'required',
             'School_year' => 'required',
-            'course' => 'nullable',
-            'year_level' => 'nullable',
-            'section' => 'nullable',
+            'course' => 'required',
+            'year_level' => 'required',
+            'section' => 'required',
         ]);
 
         $schedule->update($validatedData);

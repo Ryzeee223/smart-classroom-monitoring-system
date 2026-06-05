@@ -48,7 +48,7 @@ return new class extends Migration
             $table->timestamps();
         });
 //course
-          Schema::create('Colleges', function (Blueprint $table) {
+          Schema::create('Programs', function (Blueprint $table) {
             $table->id();
             $table->string('course_code')->unique();
             $table->string('course_name')->unique();
@@ -104,8 +104,8 @@ Schema::create('college', function(blueprint $table){
 $table->id('id')->primary();
 $table->string('college_name')->unique();
 $table->string('abbreviation')->unique();
-$table->string('description');
-$table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+$table->string('description')->nullable();
+
 });
     }
 

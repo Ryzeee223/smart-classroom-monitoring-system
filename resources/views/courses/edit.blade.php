@@ -8,7 +8,7 @@
     <title>Edit Course</title>
 </head>
 <body>
-    @include('sidebar-admin')
+    @include('sidebar')
 
     <style>
         .app-shell{display:flex;}

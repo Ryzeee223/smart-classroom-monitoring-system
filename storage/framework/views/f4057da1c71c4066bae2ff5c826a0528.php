@@ -119,22 +119,23 @@
                     </div>
                 </div>
 
-                <div class="mt-2">
+                    <div class="mt-2">
                     <label class="form-label form-label-sm">College</label>
                     <select name="course" id="collegeSelect" class="form-select form-select-sm">
-                        <option value="" selected>Select College</option>
-                        <?php $courses = $courses ?? collect(); ?>
-                        <?php $__currentLoopData = $courses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="" selected>Select College</option>
+                        <?php $colleges = $colleges ?? collect(); ?>
+                        <?php $__currentLoopData = $colleges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $college): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <?php
-                                $courseId = $course->id ?? $course->course_id ?? '';
-                                $courseName = $course->course_name ?? $course->name ?? $course->course_code ?? $course->code ?? $courseId;
-                                $courseCode = $course->course_code ?? $course->code ?? '';
-                                $label = $courseCode ? $courseCode . ' - ' . $courseName : $courseName;
+                                $collegeId = $college->id ?? '';
+                                $collegeName = $college->college_name ?? $collegeId;
+                                $collegeCode = $college->abbreviation ?? '';
+                                $label = $collegeCode ? $collegeCode . ' - ' . $collegeName : $collegeName;
                             ?>
-                            <option value="<?php echo e($courseName); ?>"><?php echo e($label); ?></option>
+                            <option value="<?php echo e($collegeName); ?>"><?php echo e($label); ?></option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                 </div>
+
                 <div class="mt-2">
                     <label class="form-label form-label-sm">Password</label>
                     <div class="input-group">
@@ -158,7 +159,7 @@
                             <?php if($myRole === 1): ?>
                                 
                                 <option value="2">Dean</option>
-                                <option value="3">Assistant Dean</option>
+                                
                                 
                             <?php elseif($myRole === 2): ?>
                                 
@@ -186,14 +187,14 @@
                         <select class="form-select form-select-sm" name="course" id="adminCourseSelect">
                             <?php $courses = $courses ?? collect(); ?>
                             <option value="">Select Course</option>
-                            <?php $__currentLoopData = $courses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php $__currentLoopData = $colleges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $college): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <?php
-                                    $courseId = $course->id ?? $course->course_id ?? '';
-                                    $courseName = $course->course_name ?? $course->name ?? $course->course_code ?? $course->code ?? $courseId;
-                                    $courseCode = $course->course_code ?? $course->code ?? '';
-                                    $label = $courseCode ? ($courseName . ' (' . $courseCode . ')') : $courseName;
+                                    $collegeId = $college->id ?? '';
+                                    $collegeName = $college->college_name ?? $collegeId;
+                                    $collegeCode = $college->abbreviation ?? '';
+                                    $label = $collegeCode ? ($collegeName . ' (' . $collegeCode . ')') : $collegeName;
                                 ?>
-                                <option value="<?php echo e($courseId); ?>"><?php echo e($label); ?></option>
+                                <option value="<?php echo e($collegeId); ?>"><?php echo e($label); ?></option>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>

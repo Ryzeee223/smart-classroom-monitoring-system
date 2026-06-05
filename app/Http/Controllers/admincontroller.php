@@ -15,14 +15,20 @@ class AdminController extends Controller
         // Role mapping: 1=Admin, 2=Dean, 3=Assistant Dean, 4=Faculty, 5=Program Head
         $account_users = User::whereIn('role', [1,2,3,4,5])->get();
         $faculty_users = User::where('role', [2,3,4,5])->get();
-        // Your migrations create the table as `Colleges`.
+        // Your migrations create the table as `courses`.
         // The model (Course) points to `courses`, so we override the base table here.
-        $courses = Course::query()->from('Colleges')->get();
+        $courses = Course::query()->from('courses')->get();
 
-        return view('users', compact('account_users', 'faculty_users', 'courses'));
+        $colleges = \App\Models\college::query()->select(['id','college_name','abbreviation','description','user_id'])->get();
+
+        return view('users', compact('account_users', 'faculty_users', 'courses', 'colleges'));
     }
 
+
+
+
     public function store(Request $request)
+
     {
         $request->validate([
             'first_name' => 'required|string|max:255',
@@ -40,10 +46,9 @@ class AdminController extends Controller
             'role' => $request->role,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'course' => '',
-            'year_level' => '',
+            'college' => '',
             'profile_picture' => null,
-            'RFID_code' => '',
+            'RFID_code' => null,
             'acc_status' => 1,
             'status' => 0,
         ]);
@@ -145,7 +150,7 @@ class AdminController extends Controller
         $recent_faculty = User::where('role', [2,3,4,5])->latest('created_at')->take(5)->get();
         $faculty_count = User::where('role', [2,3,4,5])->where('acc_status', 1)->count();
         // Pending accounts (acc_status=0) for faculty-related roles only: 2,3,4,5 (exclude admin role 1)
-        $pending_count = User::whereIn('role', [2, 3, 4, 5])->where('acc_status', 0)->count();
+        $pending_count = User::whereIn('role', [2, 3, 4, 5])->where('rfid_code', 0)->count();
         return view('dashboard', compact('recent_faculty', 'role_name', 'faculty_count', 'pending_count'));
 
     }

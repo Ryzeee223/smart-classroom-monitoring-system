@@ -177,3 +177,8 @@ Route::delete('/course/{course}', [App\Http\Controllers\CourseController::class,
 Route::get('/college', [App\Http\Controllers\collegecontroller::class, 'index'])->name('college');
 Route::post('/college', [App\Http\Controllers\collegecontroller::class, 'store'])->name('college.store');
 
+Route::get('/college/{college}/edit', [App\Http\Controllers\collegecontroller::class, 'edit'])->name('college.edit');
+Route::put('/college/{college}', [App\Http\Controllers\collegecontroller::class, 'update'])->name('college.update');
+Route::delete('/college/{college}', [App\Http\Controllers\collegecontroller::class, 'destroy'])->name('college.destroy');
+
+

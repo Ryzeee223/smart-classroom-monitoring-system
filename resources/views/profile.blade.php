@@ -112,7 +112,7 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <h4 class="mb-1">Letter</h4>
-                                            <p class="text-muted mb-3">This is where you will send an excuse letter</p>
+                                            <p class="text-muted mb-3">Submit a Request Letter to the Dean</p>
 
 
                                             <form action="{{ route('profile.request.store') }}" method="POST" class="row g-3">
@@ -136,7 +136,7 @@
                                                         <option value="" selected disabled>Select option</option>
                                                         <option value="Sick leave">Sick leave</option>
                                                         <option value="official business leave">Official Business leave</option>
-                                                        <option value="Summer class">Summer class</option>
+                                                        <option value="Summer class">Request a summer class</option>
                                                     </select>
                                                 </div>
 

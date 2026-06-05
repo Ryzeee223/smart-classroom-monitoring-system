@@ -30,33 +30,21 @@
                         <h3 class="card-title mb-0">Add New Program</h3>
                     </div>
                     <div class="card-body">
-<form method="POST" action="<?php echo e(route('college.store')); ?>"> 
+<form method="POST" action="<?php echo e(route('course.store')); ?>"> 
                             <div class="mb-3">
-<label for="abbreviation" class="form-label">College Abbreviation</label>
-                                <input type="text" class="form-control" id="abbreviation" name="abbreviation" placeholder="e.g., CCIT, CCJE">
+                                <label for="course_code" class="form-label">Program Code</label>
+                                <input type="text" class="form-control" id="course_code" name="course_code" placeholder="e.g., BSCS, BSED">
                             </div>
                             <div class="mb-3">
-                                <label for="college_name" class="form-label">College Name</label>
-                                <input type="text" class="form-control" id="college_name" name="college_name" placeholder="e.g., College of Communication and Information Technology">
+                                <label for="course_name" class="form-label">Program Name</label>
+                                <input type="text" class="form-control" id="course_name" name="course_name" placeholder="e.g., Bachelor of Science in Computer Science">
                             </div>
                             <div class="mb-3">
                                 <label for="description" class="form-label">Description</label>
                                 <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief description of the course"></textarea>
                             </div>
                             <?php echo csrf_field(); ?>
-
-                            <button type="submit" class="btn btn-primary">Save College</button>
-
-                            <?php if($errors->any()): ?>
-                                <div class="alert alert-danger mt-3">
-                                    <ul class="mb-0">
-                                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <li><?php echo e($error); ?></li>
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                    </ul>
-                                </div>
-                            <?php endif; ?>
-
+                            <button type="submit" class="btn btn-primary">Save Program</button>
                             <?php if(session('success')): ?>
                                 <div class="alert alert-success mt-3"><?php echo e(session('success')); ?></div>
                             <?php endif; ?>
@@ -73,18 +61,18 @@
                     <div class="card-body">
                         <p>List of program currently in the system.</p>
                         <ul class="list-group list-group-flush">
-<?php $__empty_1 = true; $__currentLoopData = $college ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $college): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+<?php $__empty_1 = true; $__currentLoopData = $courses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <strong><?php echo e($college->college_name); ?></strong> - <strong><?php echo e($college->abbreviation); ?></strong>
-                                    <?php if($college->description): ?><br><small><?php echo e($college->description); ?></small><?php endif; ?>
+                                    <strong><?php echo e($course->course_code); ?></strong> - <strong><?php echo e($course->course_name); ?></strong>
+                                    <?php if($course->description): ?><br><small><?php echo e($course->description); ?></small><?php endif; ?>
                                 </div>
                                 <div class="d-flex flex-column gap-1">
-                                    <a class="btn btn-sm btn-outline-secondary" href="<?php echo e(route('college.edit', $college->id)); ?>">Edit</a>
-                                    <form method="POST" action="<?php echo e(route('college.destroy', $college->id)); ?>">
+                                    <a class="btn btn-sm btn-outline-secondary" href="<?php echo e(route('course.edit', $course->id)); ?>">Edit</a>
+                                    <form method="POST" action="<?php echo e(route('course.destroy', $course->id)); ?>">
                                         <?php echo csrf_field(); ?>
                                         <?php echo method_field('DELETE'); ?>
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this college?')">Delete</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this course?')">Delete</button>
                                     </form>
                                 </div>
                             </li>
@@ -99,4 +87,4 @@
     </main>
 </body>
 </html>
-<?php /**PATH /Users/macbook/Documents/capstone project/backups/emonitor 3rd phase copy/resources/views/college.blade.php ENDPATH**/ ?>
+<?php /**PATH /Users/macbook/Documents/capstone project/backups/emonitor 3rd phase copy/resources/views/course.blade.php ENDPATH**/ ?>

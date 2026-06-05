@@ -118,22 +118,23 @@
                     </div>
                 </div>
 
-                <div class="mt-2">
+                    <div class="mt-2">
                     <label class="form-label form-label-sm">College</label>
                     <select name="course" id="collegeSelect" class="form-select form-select-sm">
-                        <option value="" selected>Select College</option>
-                        @php $courses = $courses ?? collect(); @endphp
-                        @foreach($courses as $course)
+                            <option value="" selected>Select College</option>
+                        @php $colleges = $colleges ?? collect(); @endphp
+                        @foreach($colleges as $college)
                             @php
-                                $courseId = $course->id ?? $course->course_id ?? '';
-                                $courseName = $course->course_name ?? $course->name ?? $course->course_code ?? $course->code ?? $courseId;
-                                $courseCode = $course->course_code ?? $course->code ?? '';
-                                $label = $courseCode ? $courseCode . ' - ' . $courseName : $courseName;
+                                $collegeId = $college->id ?? '';
+                                $collegeName = $college->college_name ?? $collegeId;
+                                $collegeCode = $college->abbreviation ?? '';
+                                $label = $collegeCode ? $collegeCode . ' - ' . $collegeName : $collegeName;
                             @endphp
-                            <option value="{{ $courseName }}">{{ $label }}</option>
+                            <option value="{{ $collegeName }}">{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
+
                 <div class="mt-2">
                     <label class="form-label form-label-sm">Password</label>
                     <div class="input-group">
@@ -157,7 +158,7 @@
                             @if($myRole === 1)
                                 {{-- Admin can add: Dean, Assistant Dean, Faculty, Program Head --}}
                                 <option value="2">Dean</option>
-                                <option value="3">Assistant Dean</option>
+                                
                                 
                             @elseif($myRole === 2)
                                 {{-- Dean can add: Assistant Dean, Faculty, Program Head --}}
@@ -185,14 +186,14 @@
                         <select class="form-select form-select-sm" name="course" id="adminCourseSelect">
                             @php $courses = $courses ?? collect(); @endphp
                             <option value="">Select Course</option>
-                            @foreach($courses as $course)
+                            @foreach($colleges as $college)
                                 @php
-                                    $courseId = $course->id ?? $course->course_id ?? '';
-                                    $courseName = $course->course_name ?? $course->name ?? $course->course_code ?? $course->code ?? $courseId;
-                                    $courseCode = $course->course_code ?? $course->code ?? '';
-                                    $label = $courseCode ? ($courseName . ' (' . $courseCode . ')') : $courseName;
+                                    $collegeId = $college->id ?? '';
+                                    $collegeName = $college->college_name ?? $collegeId;
+                                    $collegeCode = $college->abbreviation ?? '';
+                                    $label = $collegeCode ? ($collegeName . ' (' . $collegeCode . ')') : $collegeName;
                                 @endphp
-                                <option value="{{ $courseId }}">{{ $label }}</option>
+                                <option value="{{ $collegeId }}">{{ $label }}</option>
                             @endforeach
                         </select>
                     </div>
