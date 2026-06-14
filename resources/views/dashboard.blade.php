@@ -71,7 +71,6 @@
 
         <!-- Main Content Row -->
         <div class="row g-4">
-            {{-- Ensure the Live Classroom and Recent Logs layout stays consistent: Recent Logs should sit at the bottom of the Live Classroom status area. --}}
 
             <!-- Live Classroom Status -->
             <div class="col-lg-8">
@@ -162,6 +161,7 @@
                     $viewerRole = (int) (session('user_role') ?? 0);
                 @endphp
 
+
                 @if(in_array($viewerRole, [2, 3], true))
                     <div class="card shadow-lg mb-3">
                         <div class="card-header">
@@ -248,39 +248,40 @@
         </div>
 @endif
                 <!-- Recent Logs -->
-        <div class="row">
-
-            <div class="col-12">
-                <div class="card shadow">
-                    <div class="card-header">
-                        <h5 class="mb-0 fw-bold">Recent Logs</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Card Number</th>
-                                        <th>Faculty Name</th>
-                                        <th>Room</th>
-                                        <th>Time In</th>
-                                        <th>Time Out</th>
-                                        <th>Course</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                      
-                                    <tr class="table-active">
-                                        <td colspan="6" class="text-center py-4 text-muted">No recent activity. Check back later</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow">
+                            <div class="card-header">
+                                <h5 class="mb-0 fw-bold">Recent Logs</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Card Number</th>
+                                                <th>Faculty Name</th>
+                                                <th>Room</th>
+                                                <th>Time In</th>
+                                                <th>Time Out</th>
+                                                <th>Course</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="table-active">
+                                                <td colspan="6" class="text-center py-4 text-muted">No recent activity. Check back later</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </div>
-        </div>
     </div>
 </body>
 </html>
+
+

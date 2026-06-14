@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Courses;
+use App\Models\college;
+
+use App\Models\Course;
 use Illuminate\Http\Request;
 
 class userscontroller extends Controller
@@ -12,7 +14,8 @@ class userscontroller extends Controller
     {
         $user = User::findOrFail($id);
 
-        $courses = Courses::query()->from('Colleges')->get();
+        // Fill dropdown from college table
+        $courses = college::query()->select(['id','college_name','abbreviation','description'])->get();
 
         return view('users.edit', compact('user', 'courses'));
     }
@@ -22,15 +25,17 @@ class userscontroller extends Controller
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'college_code' => 'nullable|string|max:255',
+            'college' => 'nullable|string|max:255',
         ]);
+
 
         $user = User::findOrFail($id);
 
         $user->update([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
-            'course' => $request->college_code, // store BSIT/BSCS (Colleges.course_code)
+            'college' => $request->college,
+
         ]);
 
         return redirect()->route('users.index')->with('success', 'User updated successfully!');

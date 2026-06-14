@@ -194,7 +194,7 @@
                                     $collegeCode = $college->abbreviation ?? '';
                                     $label = $collegeCode ? ($collegeName . ' (' . $collegeCode . ')') : $collegeName;
                                 ?>
-                                <option value="<?php echo e($collegeId); ?>"><?php echo e($label); ?></option>
+                                <option value="<?php echo e($collegeCode); ?>"><?php echo e($label); ?></option>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>

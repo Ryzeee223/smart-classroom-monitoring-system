@@ -59,6 +59,7 @@
                                     <h4 class="mb-1">{{ $user ? ($user->first_name . ' ' . $user->last_name) : 'Guest' }}</h4>
 
                                     <div class="text-muted">
+                                        <div><Strong>College:</Strong>{{$user->college}}</div>
                                         <div><strong>Employee ID:</strong> {{ $user->employee_ID ?? '-' }}</div>
                                         <div><strong>Role:</strong> {{ $roleName ?? 'Unknown' }}</div>
                                     </div>

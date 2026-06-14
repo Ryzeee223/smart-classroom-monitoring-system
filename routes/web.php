@@ -23,9 +23,10 @@ Route::get('/rooms', function () {
 // {{-- 1=admin 2=dean 3=asst. dean 4=faculty 5=programhead --}}
 Route::get('/dashboard', function () {
     // 1=admin 2=dean 3=asst. dean 4=faculty 5=programhead
-    if (!session('logged_in') || !in_array((int) session('user_role'), [1, 2, 3, 4], true)) {
+    if (!session('logged_in') || !in_array((int) session('user_role'), [1, 2, 3, 4, 5], true)) {
         return redirect('/');
     }
+
 
     $recent_faculty = \App\Models\users::whereIn('role', [2, 3, 4, 5])
         ->latest('created_at')

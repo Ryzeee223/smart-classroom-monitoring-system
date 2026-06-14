@@ -15,16 +15,13 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->string('first_name')->unique();
             $table->string('last_name')->unique();
+            $table->string('middle_name');
             $table->string('employee_ID')->unique();
             $table->string('email')->unique();
-            // profile_picture stored as path/string (image() macro not available)
             $table->string('profile_picture')->nullable();
-
             $table->string('password');
             $table->integer('role');
             $table->string('course')->nullable();
-            // profile_picture already defined above
-
             $table->string('RFID_code')->nullable()->unique();
             $table->tinyInteger('acc_status')->default(1);
             $table->tinyInteger('status')->default(0);
@@ -62,7 +59,6 @@ return new class extends Migration
             $table->string('subject_code')->unique();
             $table->string('subject_name');
             $table->text('description')->nullable();
-            // Avoid FK error: courses table may not exist in this migration set
             $table->unsignedBigInteger('course_id')->nullable();
             $table->timestamps();
         });
@@ -81,11 +77,10 @@ return new class extends Migration
             $table->string('School_year');
             $table->timestamps();
         });
+
                 Schema::create('building', function(Blueprint $table) {
             $table->id('id')->primary();
             $table->string('bldg_name');
-            $table->string('Room_type');
-            $table->string('Room _code');
             $table->foreignId('Colleges_id')->constrained()->onDelete('cascade')->nullable();
             $table->timestamps();
 
@@ -107,6 +102,13 @@ $table->string('abbreviation')->unique();
 $table->string('description')->nullable();
 
 });
+
+Schema::create('room', function(Blueprint $table){
+    $table->id();
+    $table->string('room_name')->unique();
+    $table->enum('room_type', ['Laboratory', 'lecture']);
+    $table->foreignId('room_id')->nullable()->constrained('building')->onDelete('cascade');
+});
     }
 
 
@@ -122,5 +124,7 @@ $table->string('description')->nullable();
         Schema::dropIfExists('users');
         schema::dropIfExists('building');
         Schema::dropIfExists('Request');
+        Schema::dropIfExists('college');
+        Schema::dropIfExists('room');
     }
 };

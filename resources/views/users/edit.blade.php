@@ -56,15 +56,17 @@
 
                             <div class="col-md-12">
                                 <label class="form-label form-label-sm">College</label>
-<select name="college_code" class="form-select form-select-sm" required>
+                                <select name="college_code" class="form-select form-select-sm" required>
                                     <option value="" {{ empty(old('college_code', $user->course)) ? 'selected' : '' }}>Select College</option>
-                                    @foreach($courses as $course)
+
+                                    @foreach($courses as $c)
                                         @php
-                                            $courseCode = $course->course_code ?? $course->code ?? '';
-                                            $courseName = $course->course_name ?? $course->name ?? '';
+                                            $abbr = $c->abbreviation ?? '';
+                                            $name = $c->college_name ?? '';
                                         @endphp
-                                        <option value="{{ $courseCode }}" {{ (string)old('college_code', $user->course) === (string)($courseCode) ? 'selected' : '' }}>
-                                            {{ $courseCode ? $courseCode . ' - ' . $courseName : $courseName }}
+
+                                        <option value="{{ $abbr }}" {{ (string)old('college_code', $user->course) === (string)$abbr ? 'selected' : '' }}>
+                                            {{ $name }}{{ $abbr ? ' (' . $abbr . ')' : '' }}
                                         </option>
                                     @endforeach
                                 </select>

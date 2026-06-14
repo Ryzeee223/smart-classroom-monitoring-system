@@ -42,7 +42,7 @@
             {{-- schedule --}}
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('schedules') ? 'active fw-bold' : '' }}" href="{{ route('schedules') }}">Create Schedules</a></li>
            {{-- College --}}
-<li class="nav-item"><a class="nav-link {{ request()->routeIs('course') ? 'active fw-bold' : '' }}" href="{{ route('course') }}">Course</a></li>
+<li class="nav-item"><a class="nav-link {{ request()->routeIs('course') ? 'active fw-bold' : '' }}" href="{{ route('course') }}">Program</a></li>
             {{-- settings --}}
             <li class="nav-item"><a class="nav-link" href="{{ route('settings') }}">Settings</a></li>
             

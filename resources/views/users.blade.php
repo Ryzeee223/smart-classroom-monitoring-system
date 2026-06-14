@@ -193,7 +193,7 @@
                                     $collegeCode = $college->abbreviation ?? '';
                                     $label = $collegeCode ? ($collegeName . ' (' . $collegeCode . ')') : $collegeName;
                                 @endphp
-                                <option value="{{ $collegeId }}">{{ $label }}</option>
+                                <option value="{{ $collegeCode }}">{{ $label }}</option>
                             @endforeach
                         </select>
                     </div>

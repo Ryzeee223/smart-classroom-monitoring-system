@@ -1,18 +1,8 @@
-# TODO - Leave Requests Access on Dashboard
+# TODO
+- [x] Update College dropdown in `resources/views/users/edit.blade.php` to show values from `college` table
+  - Use `college.abbreviation` as `<option value>`
+  - Show `college.college_name` as displayed text (included abbreviation in parentheses)
+  - Fix selected logic to match the saved value (`$user->course` compared to abbreviation)
+- [ ] (After edit) Manually verify dropdown renders expected college rows
 
-- [ ] Implement dashboard “Access Status / Leave Requests” panel:
-  - Restrict visibility to Dean (role=2) and Assistant Dean (role=3).
-  - Show a list of faculty leave requests: only names in a first list/table.
-  - Reveal the selected faculty’s request content only when the name is clicked (toggle).
-
-- [ ] Add backend data loading for the leave requests (names + requests) into `dashboard` view.
-
-- [ ] Update `routes/web.php` dashboard route to query leave requests and pass to the view.
-
-- [ ] Update `resources/views/dashboard.blade.php` to render the new UI.
-
-- [ ] Quick sanity checks:
-  - No PHP errors in dashboard rendering.
-  - Faculty names appear; clicking reveals letter/reason/date.
-  - Non-dean roles cannot see the panel (and ideally dashboard itself remains protected).
 
