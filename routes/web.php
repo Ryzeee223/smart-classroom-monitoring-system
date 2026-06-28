@@ -101,6 +101,10 @@ Route::get('/myschedule', function () {
     return view('myschedule', compact('current_user', 'schedules', 'courses', 'subjects'));
 })->name('myschedule');
 
+Route::get('/schedtime', function () {
+    return view('schedtime');
+})->name('schedtime');
+
 Route::post('/myschedule/store', function (Illuminate\Http\Request $request) {
     if (!session('logged_in') || !in_array((int) session('user_role'), [2, 3, 4, 5], true)) {
         return redirect('/dashboard');
@@ -139,6 +143,7 @@ Route::post('/myschedule/store', function (Illuminate\Http\Request $request) {
 
     return redirect('/myschedule')->with('success', 'Schedule added successfully!');
 })->name('myschedule.store');
+
 
 Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile');
 Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');

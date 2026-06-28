@@ -240,33 +240,48 @@
                             $all_users = $all_users->merge($account_users ?? []);
                         @endphp
 
+@php
+                            $sessionRole = (int) (session('user_role') ?? 0);
+                        @endphp
+
                         @forelse($all_users as $user)
-                        <tr>
-                            <td>{{ $user->first_name }} {{ $user->last_name }}</td>
-                            <td>
-                                @switch($user->role)
-                                    @case(1) Admin @break
-                                    @case(2) Dean @break
-                                    @case(3) Assistant Dean @break
-                                    @case(4) Faculty @break
-                                    @case(5) Program Head @break
-                                    @default Unknown
-                                @endswitch
-                            </td>
-                            <td><span class="badge {{ $user->acc_status ? 'bg-success' : 'bg-danger' }}">{{ $user->acc_status ? 'Active' : 'Inactive' }}</span></td>
-                            <td>
-                                @if($user->RFID_code)
-                                    <span class="badge bg-success">Assigned</span>
-                                @else
-                                    <span class="badge bg-secondary">Not Assigned</span>
-                                @endif
-                            </td>
-                            <td>
-                                <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-outline-primary" title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                            </td>
-                        </tr>
+                            @php
+                                $uRole = (int) ($user->role ?? 0);
+                                $canView = (
+                                    $sessionRole === 1
+                                        ? $uRole === 2
+                                        : ($sessionRole === 2 ? in_array($uRole, [3,4,5], true) : in_array($uRole, [3,4,5], true))
+                                );
+                            @endphp
+
+                            @continue(!$canView)
+
+                            <tr>
+                                <td>{{ $user->first_name }} {{ $user->last_name }}</td>
+                                <td>
+                                    @switch($user->role)
+                                        @case(1) Admin @break
+                                        @case(2) Dean @break
+                                        @case(3) Assistant Dean @break
+                                        @case(4) Faculty @break
+                                        @case(5) Program Head @break
+                                        @default Unknown
+                                    @endswitch
+                                </td>
+                                <td><span class="badge {{ $user->acc_status ? 'bg-success' : 'bg-danger' }}">{{ $user->acc_status ? 'Active' : 'Inactive' }}</span></td>
+                                <td>
+                                    @if($user->RFID_code)
+                                        <span class="badge bg-success">Assigned</span>
+                                    @else
+                                        <span class="badge bg-secondary">Not Assigned</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <a href="{{ route('users.edit', $user->id) }}" class="btn btn-lg btn-outline-primary fw-semibold" style="padding:0.35rem 0.75rem;" title="Edit">
+                                        <i class="bi bi-pencil" style="font-size:1.1rem;"></i>
+                                    </a>
+                                </td>
+                            </tr>
                         @empty
                         <tr>
                             <td colspan="5" class="text-center text-muted py-4">No User accounts</td>

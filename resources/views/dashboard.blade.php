@@ -29,7 +29,21 @@
             <div class="container p-4" style="padding-top:16px;">
                 
         <!-- Stats Cards -->
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
+        <div id="stats-cards" class="mt-5 align-items-end ms-0">
+            <button type="button"
+                    class="btn btn-sm btn-light position-absolute top-0 end-0 shadow-sm"
+                    aria-label="Open notifications"
+                    style="border-radius:999px; width:36px; height:36px; padding:0; display:flex; align-items:center; justify-content:center;"
+                    data-bs-toggle="modal"
+                    data-bs-target="#notificationsModal">
+                <img src="{{ asset('storage/icons/bell.svg') }}" alt="Notifications" style="width:18px; height:18px; display:block;" />
+
+
+            </button>
+
+
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
+
             <div class="col">
                 <div class="card h-100 shadow border-0">
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
@@ -61,19 +75,23 @@
             <div class="col">
                 <div class="card h-100 shadow border-0">
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
-                        <h6 class="text-muted mb-2">Pending Account</h6>
+                        <h6 class="text-muted mb-2">Pending RFID</h6>
                         <div class="display-4 fw-bold text-warning mb-0">{{ $pending_count ?? 0 }}</div>
                     </div>
                 </div>
             </div>
 
+            </div>
+
+            </div>
         </div>
 
         <!-- Main Content Row -->
         <div class="row g-4">
 
+
             <!-- Live Classroom Status -->
-            <div class="col-lg-8">
+            <div class="col-lg-12 ">
                 <div class="card shadow-lg">
                     <div class="card-header bg-primary bg-opacity-10">
                         <h5 class="mb-0 fw-bold text-dark">Live Classroom Status</h5>
@@ -162,8 +180,9 @@
                 @endphp
 
 
-                @if(in_array($viewerRole, [2, 3], true))
-                    <div class="card shadow-lg mb-3">
+@if(in_array($viewerRole, [2, 3], true))
+                   <!--  <div id="leave-requests-section" class="card shadow-lg mb-3">
+
                         <div class="card-header">
 
                             {{-- change to notif icon combine it with recently added users --}}
@@ -213,13 +232,13 @@
                                 @endforelse
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 @endif
 
                     @if (in_array($viewerRole, [1, 2, 3], true))
                         
                 <!-- Recent Faculty Assignments -->
-                <div class="card shadow-lg">
+                {{-- <div class="card shadow-lg">
                     <div class="card-header bg-info bg-opacity-10">
                         <h5 class="mb-0 fw-bold text-dark small">Recent Faculty Added</h5>
                     </div>
@@ -243,7 +262,7 @@
                             @endforelse
                         </div>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
 @endif
@@ -277,11 +296,16 @@
                             </div>
                         </div>
                     </div>
-                </div>
+            </div>
+            <div >@include('partials.notifications-modal')
 
             </div>
+            
+        </div>
     </div>
 </body>
 </html>
+
+
 
 

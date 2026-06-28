@@ -241,33 +241,48 @@
                             $all_users = $all_users->merge($account_users ?? []);
                         ?>
 
+<?php
+                            $sessionRole = (int) (session('user_role') ?? 0);
+                        ?>
+
                         <?php $__empty_1 = true; $__currentLoopData = $all_users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                        <tr>
-                            <td><?php echo e($user->first_name); ?> <?php echo e($user->last_name); ?></td>
-                            <td>
-                                <?php switch($user->role):
-                                    case (1): ?> Admin <?php break; ?>
-                                    <?php case (2): ?> Dean <?php break; ?>
-                                    <?php case (3): ?> Assistant Dean <?php break; ?>
-                                    <?php case (4): ?> Faculty <?php break; ?>
-                                    <?php case (5): ?> Program Head <?php break; ?>
-                                    <?php default: ?> Unknown
-                                <?php endswitch; ?>
-                            </td>
-                            <td><span class="badge <?php echo e($user->acc_status ? 'bg-success' : 'bg-danger'); ?>"><?php echo e($user->acc_status ? 'Active' : 'Inactive'); ?></span></td>
-                            <td>
-                                <?php if($user->RFID_code): ?>
-                                    <span class="badge bg-success">Assigned</span>
-                                <?php else: ?>
-                                    <span class="badge bg-secondary">Not Assigned</span>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <a href="<?php echo e(route('users.edit', $user->id)); ?>" class="btn btn-sm btn-outline-primary" title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                            </td>
-                        </tr>
+                            <?php
+                                $uRole = (int) ($user->role ?? 0);
+                                $canView = (
+                                    $sessionRole === 1
+                                        ? $uRole === 2
+                                        : ($sessionRole === 2 ? in_array($uRole, [3,4,5], true) : in_array($uRole, [3,4,5], true))
+                                );
+                            ?>
+
+                            <?php if(!$canView) continue; ?>
+
+                            <tr>
+                                <td><?php echo e($user->first_name); ?> <?php echo e($user->last_name); ?></td>
+                                <td>
+                                    <?php switch($user->role):
+                                        case (1): ?> Admin <?php break; ?>
+                                        <?php case (2): ?> Dean <?php break; ?>
+                                        <?php case (3): ?> Assistant Dean <?php break; ?>
+                                        <?php case (4): ?> Faculty <?php break; ?>
+                                        <?php case (5): ?> Program Head <?php break; ?>
+                                        <?php default: ?> Unknown
+                                    <?php endswitch; ?>
+                                </td>
+                                <td><span class="badge <?php echo e($user->acc_status ? 'bg-success' : 'bg-danger'); ?>"><?php echo e($user->acc_status ? 'Active' : 'Inactive'); ?></span></td>
+                                <td>
+                                    <?php if($user->RFID_code): ?>
+                                        <span class="badge bg-success">Assigned</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">Not Assigned</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <a href="<?php echo e(route('users.edit', $user->id)); ?>" class="btn btn-lg btn-outline-primary fw-semibold" style="padding:0.35rem 0.75rem;" title="Edit">
+                                        <i class="bi bi-pencil" style="font-size:1.1rem;"></i>
+                                    </a>
+                                </td>
+                            </tr>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
                             <td colspan="5" class="text-center text-muted py-4">No User accounts</td>

@@ -1,8 +1,3 @@
-# TODO
-- [x] Update College dropdown in `resources/views/users/edit.blade.php` to show values from `college` table
-  - Use `college.abbreviation` as `<option value>`
-  - Show `college.college_name` as displayed text (included abbreviation in parentheses)
-  - Fix selected logic to match the saved value (`$user->course` compared to abbreviation)
-- [ ] (After edit) Manually verify dropdown renders expected college rows
-
-
+- [ ] Make datetime.blade.php show a column layout for days (Monday-Saturday) with start time and end time inputs under each day
+- [ ] Ensure form field names align with backend route 'users.set-datetime'
+- [ ] Quick visual sanity check (run blade rendering / search for expected request keys)

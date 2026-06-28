@@ -109,8 +109,14 @@ Schema::create('room', function(Blueprint $table){
     $table->enum('room_type', ['Laboratory', 'lecture']);
     $table->foreignId('room_id')->nullable()->constrained('building')->onDelete('cascade');
 });
-    }
 
+Schema::create('Scanner', function(Blueprint $table){
+    $table->id();
+    $table->string('RFID_code')->unique();
+    $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+    $table->timestamp('scanned_at')->nullable();
+});
+    }
 
 
     /**
@@ -126,5 +132,6 @@ Schema::create('room', function(Blueprint $table){
         Schema::dropIfExists('Request');
         Schema::dropIfExists('college');
         Schema::dropIfExists('room');
+            Schema::dropIfExists('Scanner');
     }
 };

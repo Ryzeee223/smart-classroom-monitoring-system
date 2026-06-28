@@ -2,7 +2,7 @@
     $role = (int) (session('user_role') ?? 0);
 @endphp
 
-<nav class="app-sidebar card-bodyl" aria-label="Sidebar">
+<nav class="app-sidebar card-body border" aria-label="Sidebar">
     <div class="app-sidebar__brand">
         <a class="app-sidebar__brand-link" href="/">eMonitor</a>
 @if(session('logged_in'))
