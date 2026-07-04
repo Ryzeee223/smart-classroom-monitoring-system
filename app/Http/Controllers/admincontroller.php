@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Course;
+use App\Models\Programs;
+use App\Models\college;
 
 
 class AdminController extends Controller
@@ -15,13 +16,12 @@ class AdminController extends Controller
         // Role mapping: 1=Admin, 2=Dean, 3=Assistant Dean, 4=Faculty, 5=Program Head
         $account_users = User::whereIn('role', [1,2,3,4,5])->get();
         $faculty_users = User::where('role', [2,3,4,5])->get();
-        // Your migrations create the table as `courses`.
-        // The model (Course) points to `courses`, so we override the base table here.
-        $courses = Course::query()->from('courses')->get();
+        
+        $Programs = Programs::query()->from('Programs')->get();
 
-        $colleges = \App\Models\college::query()->select(['id','college_name','abbreviation','description','user_id'])->get();
+        $colleges = \App\Models\college::query()->select(['id','college_name','abbreviation','description'])->get();
 
-        return view('users', compact('account_users', 'faculty_users', 'courses', 'colleges'));
+        return view('users', compact('account_users', 'faculty_users', 'Programs', 'colleges'));
     }
 
 
@@ -42,11 +42,12 @@ class AdminController extends Controller
         User::create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
+            'middle_name' => $request->middle_name,
             'employee_ID' => $request->employee_ID,
             'role' => $request->role,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'college' => '',
+            'college_id' => null,
             'profile_picture' => null,
             'RFID_code' => null,
             'acc_status' => 1,

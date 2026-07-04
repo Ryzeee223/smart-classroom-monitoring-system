@@ -10,17 +10,16 @@
 <body>
 
 <style>
-    .app-shell { display: flex; min-height: 100vh; }
-    .app-shell__content { flex: 1; min-width: 0; margin-left: 260px; }
-    @media (max-width: 767.98px) {
-        .app-shell__content { margin-left: 0; }
-    }
+   body{
+    overflow-x: hidden;
+    
+   }
 </style>
 
 @include('sidebar')
 
-<div class="app-shell">
-    <main class="app-shell__content container mt-4">
+<div class="">
+    <main class=" container mt-4 mb-5" style="margin-left: 35%; width: 50%;">
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}

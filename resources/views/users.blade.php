@@ -11,6 +11,8 @@
         body {
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
             background-color: #f8f9fa;
+            overflow-x: hidden;
+            overflow-y: hidden;
         }
         .account-row .col {
             padding: 0.25rem 0.5rem;
@@ -36,20 +38,15 @@
 </head>
 <body>
 <style>
-    .app-sidebar{position:fixed; top:0; left:0; width:260px; height:100vh;}
-    .app-shell{display:flex; min-height:100vh;}
-    .app-shell__content{flex:1; min-width:0; margin-left:260px;}
-    @media (max-width: 767.98px){
-        .app-shell__content{margin-left:0;}
-    }
+    
 </style>
-<div class="app-shell">
+<div class="mt-5" style=" margin-left:300px; ">
     <div class="d-none d-md-block app-sidebar">
         @include('sidebar')
     </div>
 
     <!-- content -->
-    <div class="app-shell__content">
+    <div class="">
 
     <div class="flex-grow-1" style="min-width: 0;">
 
@@ -86,7 +83,7 @@
 
     <div class="row g-4 mb-4">
         <div class="col-lg-8">
-        <div class="card p-3 shadow-sm bg-white border-0">
+        <div class="card p-3 shadow-sm bg-white border-1" >
             <h2 class="h5 mb-2">Add User</h2>
 
             <form action="{{ route('users.store') }}" method="POST">
@@ -157,7 +154,8 @@
                                 {{-- admin=1||dean=2||asst=3||faculty=4||head=5 --}}
                             @if($myRole === 1)
                                 {{-- Admin can add: Dean, Assistant Dean, Faculty, Program Head --}}
-                                <option value="2">Dean</option>
+                                <option selected value="2">Dean</option>
+                                
                                 
                                 
                             @elseif($myRole === 2)

@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\course;
 use Illuminate\Http\Request;
 use App\Models\Subject;
-use App\Models\Course;
+use App\Models\Programs;
 
 class subjectcontroller extends Controller
 {
     public function index()
     {
-$subjects = Subject::with('course')->get();
-        $courses = Course::all();
-        return view('subjects', compact('subjects', 'courses'));
+$courses = course::with('course')->get();
+        $Programs = Programs::all();
+        return view('subjects', compact('courses', 'Programs'));
     }
 
     public function store(Request $request)
@@ -25,9 +26,9 @@ $subjects = Subject::with('course')->get();
             
         ]);
 
-        Subject::create($request->all());
+        course::create($request->all());
 
-        return redirect()->route('subjects')->with('success', 'Subject created successfully.');
+        return redirect()->route('subjects')->with('success', 'Course created successfully.');
     }
 
     public function edit($id)
@@ -35,9 +36,9 @@ $subjects = Subject::with('course')->get();
         if (!session('logged_in')) {
             return redirect('/');
         }
-        $courses = Course::all();
-        $subject = Subject::findOrFail($id);
-        return view('subjects.edit', compact('subject', 'courses'));
+        $Programs = Programs::all();
+        $course = course::findOrFail($id);
+        return view('course.edit', compact('course', 'Programs'));
     }
 
     public function update(Request $request, $id)
@@ -47,21 +48,21 @@ $subjects = Subject::with('course')->get();
         }
 
         $request->validate([
-            'subject_code' => 'required|string|max:255|unique:subjects,subject_code,' . $id,
-            'subject_name' => 'required|string|max:255',
+            'course_code' => 'required|string|max:255|unique:subjects,subject_code,' . $id,
+            'course_name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'course_id' => 'required|exists:courses,id',
+            'course_id' => 'required|exists:Programs,id',
         ]);
 
-        $subject = Subject::findOrFail($id);
-        $subject->update([
-            'subject_code' => $request->subject_code,
-            'subject_name' => $request->subject_name,
+        $course = course::findOrFail($id);
+        $course->update([
+            'course_code' => $request->course_code,
+            'course_name' => $request->course_name,
             'description' => $request->description ?? '',
             'course_id' => $request->course_id,
         ]);
 
-        return redirect()->route('subjects')->with('success', 'Subject updated successfully!');
+        return redirect()->route('subjects')->with('success', 'Course updated successfully!');
     }
 
     public function destroy($id)
@@ -70,9 +71,9 @@ $subjects = Subject::with('course')->get();
             return redirect('/');
         }
 
-        Subject::findOrFail($id)->delete();
+        course::findOrFail($id)->delete();
 
-        return back()->with('success', 'Subject deleted successfully!');
+        return back()->with('success', 'Course deleted successfully!');
     }
 }
 

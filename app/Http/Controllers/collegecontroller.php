@@ -29,7 +29,8 @@ class collegecontroller extends Controller
             'college_name' => 'required|string|max:128|unique:college,college_name',
             'abbreviation' => 'required|string|max:10|unique:college,abbreviation',
             'description' => 'nullable|string',
-        ], [], [
+        ],[],
+         [
             'college_name' => 'College Name',
             'abbreviation' => 'College Abbreviation',
             'description' => 'Description',
@@ -39,7 +40,7 @@ class collegecontroller extends Controller
             'college_name' => $validated['college_name'],
             'abbreviation' => $validated['abbreviation'],
             'description' => $validated['description'] ?? null,
-            'user_id' => session('user_id'),
+            // 'user_id' => session('user_id') ?? null,
         ]);
 
 

@@ -20,8 +20,8 @@ class college extends Model
     protected $table = 'college';
 
 
-    public function subjects()
+    public function course()
     {
-        return $this->hasMany(Subject::class);
+        return $this->hasMany(course::class);
     }
 }

@@ -22,6 +22,7 @@ protected $fillable = [
         'Room',
         'Semester',
         'School_year',
+        'Programs',
         'course',
         'year_level',
         'section'

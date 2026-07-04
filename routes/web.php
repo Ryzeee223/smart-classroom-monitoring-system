@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Http\Controllers\collegecontroller;
+use App\Http\Controllers\coursecontroller;
+use App\Http\Controllers\ProgramController;
 
 
 Route::get('/', function () {
@@ -93,12 +95,12 @@ Route::get('/myschedule', function () {
     }
 
     $user_id = session('user_id');
-    $current_user = \App\Models\users::find($user_id);
+    $current_user = \App\Models\User::find($user_id);
     $schedules = \App\Models\Schedule::where('user_id', $user_id)->get();
-    $courses = \App\Models\Course::all();
-    $subjects = \App\Models\Subject::all();
+    $Programs = \App\Models\Programs::all();
+    // $course = \App\Models\course::all();
 
-    return view('myschedule', compact('current_user', 'schedules', 'courses', 'subjects'));
+    return view('myschedule', compact('current_user', 'schedules', 'Programs'));
 })->name('myschedule');
 
 Route::get('/schedtime', function () {
@@ -114,12 +116,12 @@ Route::post('/myschedule/store', function (Illuminate\Http\Request $request) {
 
     $validatedData = $request->validate([
         'user_id' => 'required|exists:users,id',
-        'course_id' => 'nullable|exists:courses,id',
+        'course_id' => 'nullable|exists:course,id',
         'year_level' => 'nullable|string',
         'section' => 'nullable|string',
         'Day' => 'required',
         'Time' => 'required',
-        'Subject' => 'required',
+        'course' => 'required',
         'Room' => 'required',
         'Semester' => 'required',
         'School_year' => 'required',
@@ -128,12 +130,12 @@ Route::post('/myschedule/store', function (Illuminate\Http\Request $request) {
     $data = [
         'id' => $id,
         'user_id' => session('user_id'),
-        'Course' => $request->year_level ?? '',
+        'Programs' => $request->year_level ?? '',
         'Year_level' => $request->year_level ?? '',
         'Section' => $request->section ?? '',
         'Day' => $validatedData['Day'],
         'Time' => $validatedData['Time'],
-        'Subject' => $validatedData['Subject'],
+        'course' => $validatedData['course'],
         'Room' => $validatedData['Room'],
         'Semester' => $validatedData['Semester'],
         'School_year' => $validatedData['School_year'],
@@ -144,7 +146,34 @@ Route::post('/myschedule/store', function (Illuminate\Http\Request $request) {
     return redirect('/myschedule')->with('success', 'Schedule added successfully!');
 })->name('myschedule.store');
 
+Route::get('school-year-settings', function () {
+    return view('partials.school-year-settings');
+})->name('school-year-settings');
+Route::post('school-year-settings', function (Illuminate\Http\Request $request) {
+    $validatedData = $request->validate([
+        'school_year' => 'required|string',
+        'semester' => 'required|string',
+    ]);
 
+    // Save the school year and semester to the database or perform any other necessary actions
+    // For example, you can create a new Semester record
+    \App\Models\semyr::create([
+        'Semester' => $validatedData['semester'],
+        'School_year' => $validatedData['school_year'],
+    ]);
+
+    return redirect()->back()->with('success', 'School year and semester settings updated successfully!');
+})->name('school-year-settings.update');
+
+// NOTE: /programs and /course are handled by controllers below.
+// Keep only one route definition per path/name to avoid rendering the wrong page.
+Route::get('/course', function () {
+    return view('course');
+})->name('course');
+
+Route::get('/settings/school-year', [App\Http\Controllers\semyrController::class, 'schoolYearSettings'])->name('settings.school_year');
+Route::post('/settings/change-school-year', [App\Http\Controllers\semyrController::class, 'store'])->name('settings.store_school_year');   
+ 
 Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile');
 Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
 Route::post('/profile/request', [App\Http\Controllers\ProfileController::class, 'storeRequest'])->name('profile.request.store');
@@ -155,11 +184,11 @@ Route::post('/schedules/store', [App\Http\Controllers\schedulecontroller::class,
 Route::put('/schedules/{id}', [App\Http\Controllers\schedulecontroller::class, 'update'])->name('schedules.update');
 Route::delete('/schedules/{id}', [App\Http\Controllers\schedulecontroller::class, 'destroy'])->name('schedules.destroy');
 
-Route::get('/subjects', [\App\Http\Controllers\subjectcontroller::class, 'index'])->name('subjects');
-Route::post('/subjects', [\App\Http\Controllers\subjectcontroller::class, 'store'])->name('subjects.store');
-Route::get('/subjects/{subject}/edit', [\App\Http\Controllers\subjectcontroller::class, 'edit'])->name('subjects.edit');
-Route::put('/subjects/{subject}', [\App\Http\Controllers\subjectcontroller::class, 'update'])->name('subjects.update');
-Route::delete('/subjects/{subject}', [\App\Http\Controllers\subjectcontroller::class, 'destroy'])->name('subjects.destroy');
+Route::get('/programs', [\App\Http\Controllers\ProgramController::class, 'index'])->name('programs');
+Route::post('/programs', [\App\Http\Controllers\ProgramController::class, 'store'])->name('programs.store');
+Route::get('/programs/{programs}/edit', [\App\Http\Controllers\ProgramController::class, 'edit'])->name('programs.edit');
+Route::put('/programs/{programs}', [\App\Http\Controllers\ProgramController::class, 'update'])->name('programs.update');
+Route::delete('/programs/{programs}', [\App\Http\Controllers\ProgramController::class, 'destroy'])->name('programs.destroy');
 
 Route::get('/settings', [App\Http\Controllers\AdminController::class, 'settings'])->name('settings');
 Route::post('/settings/assign_rfid', [App\Http\Controllers\AdminController::class, 'assignRfid'])->name('settings.assign_rfid');
@@ -174,11 +203,11 @@ Route::post('/users', [App\Http\Controllers\AdminController::class, 'store'])->n
 Route::get('/users/{id}/edit', [App\Http\Controllers\userscontroller::class, 'edit'])->name('users.edit');
 Route::put('/users/{id}', [App\Http\Controllers\userscontroller::class, 'update'])->name('users.update');
 
-Route::get('/course', [App\Http\Controllers\CourseController::class, 'index'])->name('course');
-Route::post('/course', [App\Http\Controllers\CourseController::class, 'store'])->name('course.store');
-Route::get('/course/{course}/edit', [App\Http\Controllers\CourseController::class, 'edit'])->name('course.edit');
-Route::put('/course/{course}', [App\Http\Controllers\CourseController::class, 'update'])->name('course.update');
-Route::delete('/course/{course}', [App\Http\Controllers\CourseController::class, 'destroy'])->name('course.destroy');
+Route::get('/course', [App\Http\Controllers\courseController::class, 'index'])->name('course');
+Route::post('/course', [App\Http\Controllers\courseController::class, 'store'])->name('course.store');
+Route::get('/course/{course}/edit', [App\Http\Controllers\courseController::class, 'edit'])->name('course.edit');
+Route::put('/course/{course}', [App\Http\Controllers\courseController::class, 'update'])->name('course.update');
+Route::delete('/course/{course}', [App\Http\Controllers\courseController::class, 'destroy'])->name('course.destroy');
 
 Route::get('/college', [App\Http\Controllers\collegecontroller::class, 'index'])->name('college');
 Route::post('/college', [App\Http\Controllers\collegecontroller::class, 'store'])->name('college.store');

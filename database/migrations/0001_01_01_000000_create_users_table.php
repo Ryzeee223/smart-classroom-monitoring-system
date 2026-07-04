@@ -11,17 +11,30 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::create('college', function(blueprint $table){
+$table->id();
+$table->string('college_name')->unique();
+$table->string('abbreviation')->unique();
+$table->string('description')->nullable();
+});
+
+Schema::create('semyr', function(Blueprint $table){
+    $table->id();
+    $table->string('semester')->unique();
+    $table->string('school_year')->unique();
+    $table->timestamps();
+});
         Schema::create('users', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('first_name')->unique();
-            $table->string('last_name')->unique();
+            $table->id();
+            $table->string('first_name');
+            $table->string('last_name');
             $table->string('middle_name');
             $table->string('employee_ID')->unique();
             $table->string('email')->unique();
             $table->string('profile_picture')->nullable();
             $table->string('password');
             $table->integer('role');
-            $table->string('course')->nullable();
+            $table->foreignId('college_id')->constrained('college')->onDelete('cascade')->nullable();
             $table->string('RFID_code')->nullable()->unique();
             $table->tinyInteger('acc_status')->default(1);
             $table->tinyInteger('status')->default(0);
@@ -44,27 +57,21 @@ return new class extends Migration
             $table->string('user_agent')->nullable();
             $table->timestamps();
         });
-//course
+
+
+
           Schema::create('Programs', function (Blueprint $table) {
             $table->id();
-            $table->string('course_code')->unique();
-            $table->string('course_name')->unique();
+            $table->foreignId('college_id')->constrained('college')->onDelete('cascade');
+            $table->string('Program_abbr')->unique();
+            $table->string('Program_name')->unique();
             $table->string('description')->nullable();
-            $table->foreignId('college_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
 
-        Schema::create('subjects', function (Blueprint $table) {
-            $table->id();
-            $table->string('subject_code')->unique();
-            $table->string('subject_name');
-            $table->text('description')->nullable();
-            $table->unsignedBigInteger('course_id')->nullable();
-            $table->timestamps();
-        });
 
         Schema::create('schedule', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('course');
             $table->string('year_level');
@@ -79,14 +86,13 @@ return new class extends Migration
         });
 
                 Schema::create('building', function(Blueprint $table) {
-            $table->id('id')->primary();
+            $table->id();
             $table->string('bldg_name');
-            $table->foreignId('Colleges_id')->constrained()->onDelete('cascade')->nullable();
             $table->timestamps();
 
 });
 Schema::create('Request', function(Blueprint $table) {
-        $table->id('id')->primary();
+        $table->id();
         $table->integer('request_id');
         $table->string('letter');
         $table->string('reason');
@@ -94,20 +100,12 @@ Schema::create('Request', function(Blueprint $table) {
         $table->timestamps();
 });
 
-//college
-Schema::create('college', function(blueprint $table){
-$table->id('id')->primary();
-$table->string('college_name')->unique();
-$table->string('abbreviation')->unique();
-$table->string('description')->nullable();
-
-});
 
 Schema::create('room', function(Blueprint $table){
     $table->id();
     $table->string('room_name')->unique();
     $table->enum('room_type', ['Laboratory', 'lecture']);
-    $table->foreignId('room_id')->nullable()->constrained('building')->onDelete('cascade');
+    $table->foreignId('room_id')->constrained('building')->onDelete('cascade');
 });
 
 Schema::create('Scanner', function(Blueprint $table){
@@ -124,6 +122,8 @@ Schema::create('Scanner', function(Blueprint $table){
      */
     public function down(): void
     {
+        Schema::dropIfExists('Programs');
+        Schema::dropIfExists('semyr');
         Schema::dropIfExists('schedule');
         Schema::dropIfExists('sessions');
         Schema::dropIfExists('password_reset_tokens');
@@ -132,6 +132,6 @@ Schema::create('Scanner', function(Blueprint $table){
         Schema::dropIfExists('Request');
         Schema::dropIfExists('college');
         Schema::dropIfExists('room');
-            Schema::dropIfExists('Scanner');
+        Schema::dropIfExists('Scanner');
     }
 };

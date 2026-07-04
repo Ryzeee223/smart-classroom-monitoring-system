@@ -15,6 +15,7 @@ class User extends Authenticatable
     protected $fillable = [
         'first_name',
         'last_name',
+        'middle_name',
         'employee_ID',
         'email',
         'password',
@@ -41,4 +42,9 @@ class User extends Authenticatable
             'status' => 'boolean',
         ];
     }
+    public function college()
+{
+    // Tells Laravel that the User belongs to a College via college_id
+    return $this->belongsTo(College::class, 'college_id');
+}
 }

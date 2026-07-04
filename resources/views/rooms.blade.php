@@ -10,57 +10,66 @@
 <body>
 
     <style>
-        .app-shell { display: flex; min-height: 100vh; }
-        .app-shell__content {
-            flex: 1;
-            min-width: 0;
-            margin-left: 260px; /* keep aligned with fixed sidebar */
+        body {
+            font-family: system-ui , "Segoe UI", Roboto, sans-serif;
+            background-color: #f8f9fa;
+            overflow-x: hidden;
         }
-
-        @media (max-width: 767.98px) {
-            .app-shell__content { margin-left: 0; }
+        .buttons {
+        
+        height: 50px;
         }
-
-        /* Fix width / prevent layout stretching on Rooms page */
-        .rooms-page {
-            width: 100%;
-            max-width: 1100px;
-        }
+        
     </style>
 
     @include('sidebar')
 
-    <div class="app-shell">
-        <div class="app-shell__content">
+    <div class="mt-4" style="min-width:50%; margin-left:260px;">
+        <div class="">
             <main class="container rooms-page">
-            <div class="card col-mb4">
+            <div class="col-mb-4">
 <div class="row-md-2">
     <div action="POST">
+
         {{-- Create building --}}
-        <div>
+        <div class="shadow p-3 mb-3 rounded border-1">
             <h4>Create building</h4>
             <p>This is where you create a building for colleges</p>
-            <hr>
-            <input type="text" placeholder="Building name" class="form-control form control-sm">
-            <input type="text" class="form-control" placebolhder="Enter Building code">
-            <button class="btn btn-primary btn-sm w-100 h-100">Create Building</button>
+            <div class="d-grid gap-2 align-items-center">
+                 <input type="text" placeholder="Building name" class="form-control">
+            
+            </div>
+            <br>
+            <div class="d-flex justify-content-center"> 
+                <button class="btn btn-primary btn-sm w-100 buttons">Create Building</button>
+             </div>
+          
         </div>
     </div>
+
      {{-- Create Rooms --}}
-              <div class="shadow">
-                <div>
-                    <h4>Create Rooms</h4> <br>
+            
+                    <div class="shadow p-3 mb-3 bg-white rounded border-1">
+                        <h4>Create Rooms</h4> <br>
                     <p>This is where you create a Room</p>
-                    <div>
+                    <div class="d-grid gap-2 align-items-center">
                          <input type="text" placeholder="Enter Classroom code (eg. cc101)" class="form-control form control-sm">
                         <input type="text" class="form-control" placeholder="Enter Classroom name (eg. Computer Lab)">
-                        <br>
-                         <button class="btn btn-primary btn-sm w-100 h-100">Create Room</button>
-                    </div>
-                    <div>
-                        
+             
+                    </div> 
                     <br>
-                     <div class="card-body">
+                    <div class="d-flex justify-content-center"> 
+                        
+                         <button class="btn btn-primary btn-sm w-100 buttons">Create Room</button>
+                        </div>
+                </div>
+                    
+                    
+
+                   
+                        
+                    
+                     <div class="shadow p-3 mb-3 bg-white rounded border-1">
                         {{-- Assign rooms to buildings --}}
                         <h4>Assign Rooms to Building</h4>
                         <p>This is where you assign rooms on buildings</p>
@@ -76,14 +85,14 @@
                 
                     {{-- Assign Scanner to Rooms --}}
                    
-                </div>
+                
               </div>
               </div>
                 </div>
 
   
 
-            </div>
+         
              
             
         </main>

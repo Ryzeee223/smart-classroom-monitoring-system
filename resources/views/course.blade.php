@@ -5,85 +5,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}" rel="stylesheet">
     <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
-    <title>eMonitor - Programs</title>
+    <title>emonitor</title>
 </head>
 <body>
-    @include('sidebar')
-
     <style>
-        /* match dashboard-admin layout so sidebar occupies its space */
-        .app-shell{display:flex;}
-        .app-shell__content{flex:1; min-width:0; margin-left:260px;}
-        @media (max-width: 767.98px){
-            .app-shell__content{margin-left:0;}
+        /* Ensure content doesn’t overlap the fixed sidebar (matches dashboard-admin/course patterns) */
+        .app-shell { display: flex; min-height: 100vh; }
+        .app-shell__content { flex: 1; min-width: 0; margin-left: 260px; }
+        @media (max-width: 767.98px) {
+            .app-shell__content { margin-left: 0; }
         }
     </style>
 
     <div class="app-shell">
-    <main class="app-shell__content container mt-4 mb-5 p-4 gap-4">
-        <div class="row">
-            <div class="col-12 col-lg-6 mb-4">
-                <div class="card shadow">
-                    <div class="card-header">
-                        
-                        <!-- create -->
-                        <h3 class="card-title mb-0">Add New Program</h3>
+        @include('sidebar')
+
+        <main class="app-shell__content container mt-4 mb-5 p-4">
+            <div class="row g-4">
+                <div class="col-12 col-lg-6">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">Add Course</h5>
+                            <form action="{{ route('course.store') }}" method="POST">
+                                @csrf
+
+                                <div class="mb-3">
+                                    <label for="course_id" class="form-label">Course</label>
+                                    <select name="course_id" id="course_id" class="form-select" required>
+                                        <option value="">College</option>
+                                        @foreach($Programs as $Program)
+                                            <option value="{{ $Program->Program_id }}">{{ $Program->Program_name }} ({{ $Program->Program_code }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <input type="text" name="course_code" placeholder="course Code" class="form-control" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <input type="text" name="course_name" placeholder="Course Name" class="form-control" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <input type="text" name="description" class="form-control">
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">Add Course</button>
+                            </form>
+                        </div>
                     </div>
-                    <div class="card-body">
-<form method="POST" action="{{ route('course.store') }}"> 
-                            <div class="mb-3">
-                                <label for="course_code" class="form-label">Program Code</label>
-                                <input type="text" class="form-control" id="course_code" name="course_code" placeholder="e.g., BSCS, BSED">
+                </div>
+
+                <div class="col-12 col-lg-6">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">Course List</h5>
+
+                            <div class="table-responsive">
+                                <table class="table table-sm align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Course</th>
+                                            <th>Code</th>
+                                            <th>Name</th>
+                                            <th>Desc</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($course as $course)
+                                            <tr>
+                                                <td>{{ $course->course_name ?? 'N/A' }}</td>
+                                                <td>{{ $course->course_code }}</td>
+                                                <td>{{ $course->course_name }}</td>
+                                                <td>{{ Str::limit($course->description, 30) }}</td>
+                                                <td class="text-nowrap">
+                                                    <a href="{{ route('courses.edit', $course->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                                    <form method="POST" action="{{ route('courses.destroy', $course->id) }}" class="d-inline" onsubmit="return confirm('Are you sure?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5" class="text-center">No course yet</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="mb-3">
-                                <label for="course_name" class="form-label">Program Name</label>
-                                <input type="text" class="form-control" id="course_name" name="course_name" placeholder="e.g., Bachelor of Science in Computer Science">
-                            </div>
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Description</label>
-                                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief description of the course"></textarea>
-                            </div>
-                            @csrf
-                            <button type="submit" class="btn btn-primary">Save Program</button>
-                            @if (session('success'))
-                                <div class="alert alert-success mt-3">{{ session('success') }}</div>
-                            @endif
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-lg-6 mb-4">
-                <!-- list -->
-                <div class="card shadow">
-                    <div class="card-header">
-                        <h3 class="card-title mb-0">Existing program</h3>
-                    </div>
-                    <div class="card-body">
-                        <p>List of program currently in the system.</p>
-                        <ul class="list-group list-group-flush">
-@forelse($courses as $course)
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong>{{ $course->course_code }}</strong> - <strong>{{ $course->course_name }}</strong>
-                                    @if($course->description)<br><small>{{ $course->description }}</small>@endif
-                                </div>
-                                <div class="d-flex flex-column gap-1">
-                                    <a class="btn btn-sm btn-outline-secondary" href="{{ route('course.edit', $course->id) }}">Edit</a>
-                                    <form method="POST" action="{{ route('course.destroy', $course->id) }}">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this course?')">Delete</button>
-                                    </form>
-                                </div>
-                            </li>
-@empty
-                            <li class="list-group-item text-muted">No program yet.</li>
-@endforelse
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
+        </main>
+    </div>
 </body>
 </html>
+

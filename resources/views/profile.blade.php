@@ -19,9 +19,7 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center gap-3">
                                 @php
-                                    // Build profile image URL safely.
-                                    // profile_picture is stored as a path like: profile_pictures/<file>
-                                    // but older records may store only a filename.
+                                  
                                     $profileUrl = null;
                                     if (isset($user) && $user && !empty($user->profile_picture)) {
                                         $pic = $user->profile_picture;
@@ -42,6 +40,7 @@
                                         3 => 'Assistant Dean',
                                         4 => 'Faculty',
                                         5 => 'Program Head',
+                                        
                                     ];
 
                                     $roleName = $user && isset($roleMap[$user->role])
@@ -59,7 +58,7 @@
                                     <h4 class="mb-1">{{ $user ? ($user->first_name . ' ' . $user->last_name) : 'Guest' }}</h4>
 
                                     <div class="text-muted">
-                                        <div><Strong>College:</Strong>{{$user->college}}</div>
+                                        <div><Strong>College:</Strong>{{ $user->college->abbreviation ?? 'No College Assigned' }}</div>
                                         <div><strong>Employee ID:</strong> {{ $user->employee_ID ?? '-' }}</div>
                                         <div><strong>Role:</strong> {{ $roleName ?? 'Unknown' }}</div>
                                     </div>

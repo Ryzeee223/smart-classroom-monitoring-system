@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Schedule;
-use App\Models\Subject;
-use App\Models\users;
+use App\Models\course;
+use App\Models\programs;
+use App\Models\User;
 
 class schedulecontroller extends Controller
 {
@@ -16,24 +17,36 @@ class schedulecontroller extends Controller
             return redirect('/');
         }
 
-        $faculty_list = \App\Models\users::whereIn('role', [2, 3, 4, 5])
+        $faculty_list = \App\Models\User::whereIn('role', [2, 3, 4, 5])
             ->where('acc_status', 1)
             ->orderBy('first_name')
             ->orderBy('last_name')
             ->get();
-        $subjects = \App\Models\Subject::all();
-        $courses = \App\Models\Course::all();
+    
+    
+   
+       $schoolYears = \App\Models\semyr::query()
+            ->orderBy('id')
+            ->get()
+            ->pluck('school_year')
+            ->unique()
+            ->values(); 
+
         if (session('user_role') == 5) {
             $user_id = session('user_id');
             $schedules = Schedule::where('user_id', $user_id)->get();
         } else {
             $schedules = Schedule::all();
+            $course = course::all();
         }
-        return view('schedules', compact('schedules', 'faculty_list', 'subjects', 'courses'));
+
+        return view('schedules', compact('schedules', 'faculty_list', 'course', 'schoolYears'));
+    
+    
     }
 
     public function store(Request $request)
-    {
+{
         if (!session('logged_in')) {
             return redirect('/');
         }
@@ -45,7 +58,8 @@ class schedulecontroller extends Controller
             'Room' => 'required',
             'Semester' => 'required',
             'School_year' => 'required',
-            'course' => 'nullable',
+            'Programs' => 'required',
+            'course' => 'required',
             'year_level' => 'nullable',
             'section' => 'nullable',
             'user_id' => 'required|exists:users,id',
@@ -61,9 +75,9 @@ class schedulecontroller extends Controller
             'Room' => $validatedData['Room'],
             'Semester' => $validatedData['Semester'],
             'School_year' => $validatedData['School_year'],
-            'course' => $request->course,
-            'year_level' => $request->year_level,
-            'section' => $request->section,
+            'Programs' => $validatedData['Programs'],
+            'year_level' => $validatedData['year_level'],
+            'section' => $validatedData['section'],
         ]);
 
         return redirect()->back()->with('success', 'Schedule added successfully!');
@@ -99,7 +113,7 @@ class schedulecontroller extends Controller
             'Room' => 'required',
             'Semester' => 'required',
             'School_year' => 'required',
-            'course' => 'required',
+            'Programs' => 'required',
             'year_level' => 'required',
             'section' => 'required',
         ]);
@@ -109,4 +123,5 @@ class schedulecontroller extends Controller
         return redirect()->back()->with('success', 'Schedule updated successfully!');
     }
 }
+
 

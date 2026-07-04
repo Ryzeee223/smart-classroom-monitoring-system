@@ -53,7 +53,7 @@ s<!DOCTYPE html>
                                 <tbody>
                                     @forelse($schedules as $schedule)
                                     <tr>
-                                        <td>{{ $schedule->Subject ?? 'N/A' }}</td>
+                                        <td>{{ $schedule->course ?? 'N/A' }}</td>
                                         <td>{{ $schedule->Day ?? 'N/A' }}</td>
                                         <td>{{ $schedule->Time ?? 'N/A' }}</td>
                                         <td>{{ $schedule->Room ?? 'N/A' }}</td>

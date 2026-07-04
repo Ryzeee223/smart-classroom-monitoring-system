@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-
+use App\Models\college;
 class ProfileController extends Controller
 {
     public function show()
@@ -22,6 +22,8 @@ class ProfileController extends Controller
             ->orderByDesc('created_at')
             ->get() : collect();
 
+$user = $userId ? User::with('college')->find($userId) : null;
+
         return view('profile', compact('user', 'requests'));
     }
 
@@ -33,13 +35,10 @@ class ProfileController extends Controller
 
         $userId = session('user_id');
         $user = User::findOrFail($userId);
+           
 
-        // Normalize profile_picture: if you have older values that store only filename,
-        // convert them to the path format used by the uploader.
-        // (Expected: profile_pictures/<filename>.jpg)
         if ($user->profile_picture && !str_contains($user->profile_picture, 'profile_pictures/')) {
-            // If it looks like a filename only, prefix it.
-            // This keeps existing uploads working.
+           
             $user->profile_picture = 'profile_pictures/' . ltrim($user->profile_picture, '/');
         }
 
@@ -70,7 +69,8 @@ class ProfileController extends Controller
 
         return redirect()->route('profile')->with('success', 'Profile photo updated successfully!');
     }
-
+   
+    
     public function storeRequest(Request $request)
     {
         if (!session('logged_in')) {
@@ -105,6 +105,9 @@ class ProfileController extends Controller
 
         return redirect()->route('profile')->with('success', 'Request submitted successfully!');
     }
+
+    
+    
 }
 
 

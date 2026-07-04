@@ -6,46 +6,44 @@
     <title>Dashboard - eMonitor</title>
     <link href="{{ asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}" rel="stylesheet">
     <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
-    <style>
-        body {
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-            background-color: #f8f9fa;
-        }
-    </style>
+
 </head>
 <body>
-    <div class="app-shell">
-        <style>
-            .app-shell__content{margin-left:260px;}
-            @media (max-width: 767.98px){
-                .app-shell__content{margin-left:0;}
-            }
-        </style>
+<style>
+body {
+    overflow-x: hidden;
+    overflow-y:hidden;
+}
+</style>
 
         <!-- nav bar -->
-        @include('sidebar')
+    @include('sidebar')
 
-        <main class="app-shell__content" role="main">
+    <main role="main" style="margin-left:260px;">
+
             <div class="container p-4" style="padding-top:16px;">
                 
-        <!-- Stats Cards -->
-        <div id="stats-cards" class="mt-5 align-items-end ms-0">
+                <div class="mb-2 d-flex justify-content-end " style="radius:10px;">
             <button type="button"
-                    class="btn btn-sm btn-light position-absolute top-0 end-0 shadow-sm"
+                    class="btn btn-sm btn-light shadow-sm rounded-circle d-flex align-items-center justify-content-center "
+                    style="margin-right:50px; z-index: 10;"
                     aria-label="Open notifications"
-                    style="border-radius:999px; width:36px; height:36px; padding:0; display:flex; align-items:center; justify-content:center;"
                     data-bs-toggle="modal"
                     data-bs-target="#notificationsModal">
-                <img src="{{ asset('storage/icons/bell.svg') }}" alt="Notifications" style="width:18px; height:18px; display:block;" />
+                <img src="{{ asset('storage/icons/bell.svg') }}" alt="Notifications" style="width:18px; height:18px; display:block;"/>
+             </button>
+                </div>
+                <br>
 
-
-            </button>
-
-
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
+              <!-- Stats Cards -->
+        <div id="stats-cards" class="mt-2 position-relative">
+      
+        </div>
+    
+            <div class="row justify-content-center row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
 
             <div class="col">
-                <div class="card h-100 shadow border-0">
+                <div class="card h-100 shadow border-1">
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
                         <h6 class="text-muted mb-2">Rooms</h6>
                         <div class="display-4 fw-bold text-primary mb-0">4</div>
@@ -54,7 +52,7 @@
             </div>
 
             <div class="col">
-                <div class="card h-100 shadow border-0">
+                <div class="card h-100 shadow border-1">
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
                         <h6 class="text-muted mb-2">Occupied</h6>
                         <div class="display-4 fw-bold text-success mb-0">0</div>
@@ -62,7 +60,7 @@
                 </div>
             </div>
             <div class="col">
-                <div class="card h-100 shadow border-0">
+                <div class="card h-100 shadow border-1">
 
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
                         <h6 class="text-muted mb-2">Faculty</h6>
@@ -73,7 +71,7 @@
             </div>
 
             <div class="col">
-                <div class="card h-100 shadow border-0">
+                <div class="card h-100 shadow border-1">
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
                         <h6 class="text-muted mb-2">Pending RFID</h6>
                         <div class="display-4 fw-bold text-warning mb-0">{{ $pending_count ?? 0 }}</div>
@@ -87,7 +85,7 @@
         </div>
 
         <!-- Main Content Row -->
-        <div class="row g-4">
+        <div class="row g-3 mb-5 " style="overflow-y:auto; max-height:calc(100vh - 300px);">
 
 
             <!-- Live Classroom Status -->
@@ -100,9 +98,12 @@
                     {{-- add a tab on top for building --}}
                     <div class="card-body p-0">
                         <p class="p-4 pb-3 text-muted small">Rooms update automatically as Faculty tap registered RFID Cards.</p>
+                       <div class="card-body" style=""> <h3>Building A</h3>
+                       </div>
                         <div class="row row-cols-1 row-cols-md-2 g-3 px-4 pb-4">
-                            <div class="col">
-                                <div class="card shadow-sm h-100 border-0">
+                            
+                            <div class="col ">
+                                <div class="card shadow-sm h-100 border-1">
                                     <div class="card-body p-3">
                                         <div class="d-flex justify-content-between align-items-start mb-1">
                                             <div>
@@ -117,53 +118,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col">
-                                <div class="card shadow-sm h-100 border-0">
-                                    <div class="card-body p-3">
-                                        <div class="d-flex justify-content-between align-items-start mb-1">
-                                            <div>
-                                                <h6 class="mb-1 fw-bold small">Computer Lab</h6>
-                                                <p class="mb-0 text-muted fs-6">CC104</p>
-                                            </div>
-                                            <span class="badge bg-success rounded-pill px-2 py-1 fs-6">Vacant</span>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer p-2 pt-1 bg-transparent border-0">
-                                        <p class="mb-0 text-muted fs-6"><small class="fw-bold text-uppercase">Faculty:</small> None</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="card shadow-sm h-100 border-0">
-                                    <div class="card-body p-3">
-                                        <div class="d-flex justify-content-between align-items-start mb-1">
-                                            <div>
-                                                <h6 class="mb-1 fw-bold small">Computer Lab</h6>
-                                                <p class="mb-0 text-muted fs-6">CC205</p>
-                                            </div>
-                                            <span class="badge bg-success rounded-pill px-2 py-1 fs-6">Vacant</span>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer p-2 pt-1 bg-transparent border-0">
-                                        <p class="mb-0 text-muted fs-6"><small class="fw-bold text-uppercase">Faculty:</small> None</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="card shadow-sm h-100 border-0">
-                                    <div class="card-body p-3">
-                                        <div class="d-flex justify-content-between align-items-start mb-1">
-                                            <div>
-                                                <h6 class="mb-1 fw-bold small">Computer Lab</h6>
-                                                <p class="mb-0 text-muted fs-6">CC206</p>
-                                            </div>
-                                            <span class="badge bg-success rounded-pill px-2 py-1 fs-6">Vacant</span>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer p-2 pt-1 bg-transparent border-0">
-                                        <p class="mb-0 text-muted fs-6"><small class="fw-bold text-uppercase">Faculty:</small> None</p>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -264,11 +218,18 @@
                     </div>
                 </div> --}}
             </div>
-        </div>
+</div>
 @endif
-                <!-- Recent Logs -->
-                <div class="row">
-                    <div class="col-12">
+
+                    
+
+                </div>
+
+                <div>
+                    @include('partials.notifications-modal')
+                </div>
+            <!-- Recent Logs (inside Right Column) -->
+                    <div class="col-lg-12 mt-3 width-100">
                         <div class="card shadow">
                             <div class="card-header">
                                 <h5 class="mb-0 fw-bold">Recent Logs</h5>
@@ -296,11 +257,6 @@
                             </div>
                         </div>
                     </div>
-            </div>
-            <div >@include('partials.notifications-modal')
-
-            </div>
-            
         </div>
     </div>
 </body>
