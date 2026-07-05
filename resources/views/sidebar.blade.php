@@ -59,7 +59,22 @@
         </ul>
     </div>
 
-    {{-- this should show the profile name of the user --}}
+{{-- this should show the profile name of the user + active school year/semester --}}
+@php
+    $latestSemyr = \App\Models\semyr::query()->latest('id')->first();
+@endphp
+
+@if(session('logged_in'))
+    <div class="text-center mb-2" style="font-size: .85rem; color:#6c757d;">
+        @if($latestSemyr)
+            <div><strong>{{ $latestSemyr->school_year }}</strong></div>
+            <div>{{ $latestSemyr->semester }}</div>
+        @else
+            <div>School year / semester not set</div>
+        @endif
+    </div>
+@endif
+
 <div class="btn btn-outline-dark w-100 nav-item text-center">
     <a class="nav-link {{ request()->routeIs('profile') ? 'active fw-bold' : '' }}" href="{{ route('profile') }}">Profile</a>
 </div>

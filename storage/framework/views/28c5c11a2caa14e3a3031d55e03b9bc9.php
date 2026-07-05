@@ -59,7 +59,22 @@
         </ul>
     </div>
 
-    
+
+<?php
+    $latestSemyr = \App\Models\semyr::query()->latest('id')->first();
+?>
+
+<?php if(session('logged_in')): ?>
+    <div class="text-center mb-2" style="font-size: .85rem; color:#6c757d;">
+        <?php if($latestSemyr): ?>
+            <div><strong><?php echo e($latestSemyr->school_year); ?></strong></div>
+            <div><?php echo e($latestSemyr->semester); ?></div>
+        <?php else: ?>
+            <div>School year / semester not set</div>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
+
 <div class="btn btn-outline-dark w-100 nav-item text-center">
     <a class="nav-link <?php echo e(request()->routeIs('profile') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('profile')); ?>">Profile</a>
 </div>

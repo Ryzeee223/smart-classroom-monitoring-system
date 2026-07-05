@@ -20,8 +20,8 @@ $table->string('description')->nullable();
 
 Schema::create('semyr', function(Blueprint $table){
     $table->id();
-    $table->string('semester')->unique();
-    $table->string('school_year')->unique();
+    $table->string('semester');
+    $table->string('school_year');
     $table->timestamps();
 });
         Schema::create('users', function (Blueprint $table) {
@@ -64,7 +64,8 @@ Schema::create('semyr', function(Blueprint $table){
             $table->string('year_level');
             $table->string('section');
             $table->enum('Day', ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']);
-            $table->string('Time');
+            $table->time('start_time');
+            $table->time('end_time');
             $table->string('Subject');
             $table->string('Room');
             $table->string('Semester');
@@ -78,14 +79,7 @@ Schema::create('semyr', function(Blueprint $table){
             $table->timestamps();
 
 });
-Schema::create('Request', function(Blueprint $table) {
-        $table->id();
-        $table->integer('request_id');
-        $table->string('letter');
-        $table->string('reason');
-        $table->foreignid('user_request')->constrained('users')->onDelete('cascade');
-        $table->timestamps();
-});
+
 
 Schema::create('course', function (Blueprint $table) {
             $table->id();
@@ -123,7 +117,6 @@ Schema::create('Scanner', function(Blueprint $table){
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('users');
         schema::dropIfExists('building');
-        Schema::dropIfExists('Request');
         Schema::dropIfExists('room');
         Schema::dropIfExists('Scanner');
         Schema::dropIfExists('course');

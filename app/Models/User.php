@@ -44,7 +44,7 @@ class User extends Authenticatable
     }
     public function college()
 {
-    // Tells Laravel that the User belongs to a College via college_id
+    
     return $this->belongsTo(College::class, 'college_id');
 }
 }

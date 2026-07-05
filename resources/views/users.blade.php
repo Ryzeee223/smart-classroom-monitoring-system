@@ -150,9 +150,9 @@
                     </select>
 
                     {{-- Always submit the college_id for backend enforcement --}}
-                    @if(in_array($sessionRole, [2, 3], true))
-                        <input type="hidden" name="college_id" value="{{ $currentCollegeId }}">
-                    @endif
+                    {{-- this should work only on dean and not on admins since they dont have college --}}
+                    <input type="hidden" name="college_id" value="{{ $currentCollegeId }}">
+                    
                 </div>
 
 

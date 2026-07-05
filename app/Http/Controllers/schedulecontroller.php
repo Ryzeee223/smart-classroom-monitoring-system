@@ -53,7 +53,8 @@ class schedulecontroller extends Controller
 
         $validatedData = $request->validate([
             'Day' => 'required',
-            'Time' => 'required',
+            'start_time' => 'required',
+            'end_time' => 'required',
             'Subject' => 'required',
             'Room' => 'required',
             'Semester' => 'required',
@@ -70,7 +71,10 @@ class schedulecontroller extends Controller
             'id' => $id,
             'user_id' => $validatedData['user_id'],
             'Day' => $validatedData['Day'],
-            'Time' => $validatedData['Time'],
+            'Start_time' => $validatedData['Start_time'],
+            'End_time' => $validatedData['End_time'],
+            // Keep legacy combined Time column too (if DB still has it)
+            'Time' => $validatedData['Start_time'] . '-' . $validatedData['End_time'],
             'Subject' => $validatedData['Subject'],
             'Room' => $validatedData['Room'],
             'Semester' => $validatedData['Semester'],
@@ -108,7 +112,8 @@ class schedulecontroller extends Controller
 
         $validatedData = $request->validate([
             'Day' => 'required',
-            'Time' => 'required',
+            'Start_time' => 'required',
+            'End_time' => 'required',
             'Subject' => 'required',
             'Room' => 'required',
             'Semester' => 'required',
@@ -117,6 +122,9 @@ class schedulecontroller extends Controller
             'year_level' => 'required',
             'section' => 'required',
         ]);
+
+        // Keep legacy combined Time column too (if DB still has it)
+        $validatedData['Time'] = $validatedData['Start_time'] . '-' . $validatedData['End_time'];
 
         $schedule->update($validatedData);
 

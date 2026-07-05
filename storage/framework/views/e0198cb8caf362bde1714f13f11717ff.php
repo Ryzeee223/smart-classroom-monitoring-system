@@ -34,18 +34,24 @@
                                         $sessionRole = (int) (session('user_role') ?? 0);
                                         $currentUser = \App\Models\User::find(session('user_id'));
                                         $currentCollegeId = (int) ($currentUser?->college_id ?? 0);
+                                        $currentCollegeName = $currentCollegeId
+                                            ? (\App\Models\college::query()->where('id', $currentCollegeId)->value('college_name'))
+                                            : null;
                                     ?>
 
                                     <input type="hidden" name="college_id" value="<?php echo e($currentCollegeId); ?>">
 
-                                    <label class="form-label">College</label>
-                                    <div class="form-control-plaintext">
+                                    <label for="college_id" class="form-label">College</label>
+                                    <select id="college_id" class="form-select" disabled>
                                         <?php if($currentCollegeId): ?>
-                                            Assigned to your college (ID: <?php echo e($currentCollegeId); ?>)
+                                            <option value="<?php echo e($currentCollegeId); ?>" selected>
+                                                <?php echo e($currentCollegeName ?? ('Assigned to your college (ID: ' . $currentCollegeId . ')')); ?>
+
+                                            </option>
                                         <?php else: ?>
-                                            No assigned college. Please contact Admin.
+                                            <option selected>No assigned college. Please contact Admin.</option>
                                         <?php endif; ?>
-                                    </div>
+                                    </select>
                                 </div>
 
                                 <div class="mb-3">
@@ -91,8 +97,8 @@
                                                 <td><?php echo e($course->course_name); ?></td>
                                                 <td><?php echo e(Str::limit($course->description, 30)); ?></td>
                                                 <td class="text-nowrap">
-                                                    <a href="<?php echo e(route('courses.edit', $course->id)); ?>" class="btn btn-sm btn-primary">Edit</a>
-                                                    <form method="POST" action="<?php echo e(route('courses.destroy', $course->id)); ?>" class="d-inline" onsubmit="return confirm('Are you sure?')">
+                                                    <a href="<?php echo e(route('course.edit', $course->id)); ?>" class="btn btn-sm btn-primary">Edit</a>
+                                                    <form method="POST" action="<?php echo e(route('course.destroy', $course->id)); ?>" class="d-inline" onsubmit="return confirm('Are you sure?')">
                                                         <?php echo csrf_field(); ?>
                                                         <?php echo method_field('DELETE'); ?>
                                                         <button type="submit" class="btn btn-sm btn-danger">Delete</button>

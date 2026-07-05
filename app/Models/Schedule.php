@@ -13,11 +13,13 @@ class Schedule extends Model
 
     protected $primaryKey = 'id';
 
-protected $fillable = [
+    protected $fillable = [
         'id',
         'user_id',
         'Day',
         'Time',
+        'start_time',
+        'end_time',
         'Subject',
         'Room',
         'Semester',

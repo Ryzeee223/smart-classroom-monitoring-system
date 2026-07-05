@@ -37,6 +37,7 @@ class AdminController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
             'role' => 'required|integer',
+            'college_id' => 'nullable|exists:college,id',
         ]);
 
         User::create([
@@ -47,7 +48,7 @@ class AdminController extends Controller
             'role' => $request->role,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'college_id' => null,
+            'college_id' => $request->college_id,
             'profile_picture' => null,
             'RFID_code' => null,
             'acc_status' => 1,

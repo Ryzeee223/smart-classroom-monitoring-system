@@ -34,18 +34,23 @@
                                         $sessionRole = (int) (session('user_role') ?? 0);
                                         $currentUser = \App\Models\User::find(session('user_id'));
                                         $currentCollegeId = (int) ($currentUser?->college_id ?? 0);
+                                        $currentCollegeName = $currentCollegeId
+                                            ? (\App\Models\college::query()->where('id', $currentCollegeId)->value('college_name'))
+                                            : null;
                                     @endphp
 
                                     <input type="hidden" name="college_id" value="{{ $currentCollegeId }}">
 
-                                    <label class="form-label">College</label>
-                                    <div class="form-control-plaintext">
+                                    <label for="college_id" class="form-label">College</label>
+                                    <select id="college_id" class="form-select" disabled>
                                         @if($currentCollegeId)
-                                            Assigned to your college (ID: {{ $currentCollegeId }})
+                                            <option value="{{ $currentCollegeId }}" selected>
+                                                {{ $currentCollegeName ?? ('Assigned to your college (ID: ' . $currentCollegeId . ')') }}
+                                            </option>
                                         @else
-                                            No assigned college. Please contact Admin.
+                                            <option selected>No assigned college. Please contact Admin.</option>
                                         @endif
-                                    </div>
+                                    </select>
                                 </div>
 
                                 <div class="mb-3">
@@ -91,8 +96,8 @@
                                                 <td>{{ $course->course_name }}</td>
                                                 <td>{{ Str::limit($course->description, 30) }}</td>
                                                 <td class="text-nowrap">
-                                                    <a href="{{ route('courses.edit', $course->id) }}" class="btn btn-sm btn-primary">Edit</a>
-                                                    <form method="POST" action="{{ route('courses.destroy', $course->id) }}" class="d-inline" onsubmit="return confirm('Are you sure?')">
+                                                    <a href="{{ route('course.edit', $course->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                                    <form method="POST" action="{{ route('course.destroy', $course->id) }}" class="d-inline" onsubmit="return confirm('Are you sure?')">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-sm btn-danger">Delete</button>

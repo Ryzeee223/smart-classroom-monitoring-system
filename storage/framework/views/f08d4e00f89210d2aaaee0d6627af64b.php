@@ -36,6 +36,28 @@
                                 <?php echo csrf_field(); ?>
 
                                 <div class="row">
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <?php
+                                            $latestSemyr = \App\Models\semyr::query()->latest('id')->first();
+                                        ?>
+                                        <label class="form-label">Semester</label>
+                                        <select class="form-select" name="Semester" required disabled>
+                                            <option value="<?php echo e($latestSemyr->semester ?? ''); ?>"><?php echo e($latestSemyr->semester ?? 'Current Semester'); ?></option>
+                                        </select>
+                                        <input type="hidden" name="Semester" value="<?php echo e($latestSemyr->semester ?? ''); ?>">
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">School Year</label>
+                                        <select class="form-select" name="School_year" required disabled>
+                                            <option value="<?php echo e($latestSemyr->school_year ?? ''); ?>"><?php echo e($latestSemyr->school_year ?? 'Current School Year'); ?></option>
+                                        </select>
+                                        <input type="hidden" name="School_year" value="<?php echo e($latestSemyr->school_year ?? ''); ?>">
+                                    </div>
+                                </div>
+
+                                <div class="row">
                                     <div class="col-md-6">
                                         
                                         <label class="form-label">Faculty</label>
@@ -51,7 +73,6 @@
                                     </div>
 
                                     
-
                                     <div class="col-md-3">
                                         <label class="form-label">Year Level</label>
                                         <select class="form-select" name="year_level" required>
@@ -73,15 +94,6 @@
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </select>
                                     </div>
-                                    
-                                    <!-- Semester selection -->
-                                    <div class="col-md-3">
-                                        <label class="form-label">Semester</label>
-                                        <select class="form-select" name="Semester" required>
-                                            <option value="">Semester</option>
-                                            
-                                        </select>
-                                    </div>
                                 </div>
 
                                 <div class="row mt-3">
@@ -100,7 +112,7 @@
 
                                     
                                     <div class="col-md-3">
-                                        <label class="form-label">Time</label>
+                                        <label class="form-label">Start Time</label>
                                         <?php
                                             $timeSlots = [
                                                 '7:30-8:30','7:30-9:30','7:30-10-:30','7:30-11:30','7:30-12:30',
@@ -117,11 +129,30 @@
                                                 '4:30-5:30','4:30-6:00',
                                                 '5:00-6:00'
                                             ];
+
+                                            $startTimes = collect($timeSlots)->map(function($slot){
+                                                return explode('-', $slot)[0] ?? '';
+                                            })->filter()->unique()->values();
+
+                                            $endTimes = collect($timeSlots)->map(function($slot){
+                                                $parts = explode('-', $slot);
+                                                return $parts[1] ?? '';
+                                            })->filter()->unique()->values();
                                         ?>
-                                        <select class="form-select" name="Time" required>
-                                            <option value="">Select Time</option>
-                                            <?php $__currentLoopData = $timeSlots; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $slot): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                <option value="<?php echo e($slot); ?>"><?php echo e($slot); ?></option>
+                                        <select class="form-select" name="Start_time" required>
+                                            <option value="">Select Start Time</option>
+                                            <?php $__currentLoopData = $startTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $start): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <option value="<?php echo e($start); ?>"><?php echo e($start); ?></option>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">End Time</label>
+                                        <select class="form-select" name="End_time" required>
+                                            <option value="">Select End Time</option>
+                                            <?php $__currentLoopData = $endTimes->sort()->values(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $end): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <option value="<?php echo e($end); ?>"><?php echo e($end); ?></option>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </select>
                                     </div>
@@ -139,22 +170,7 @@
                                     </div>
                                 </div>
 
-                                <div class="row mt-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">School Year</label>
-                                        <select class="form-select" name="School_year" required>
-                                            <option value="">Select school year</option>
-                                            <?php $__currentLoopData = $schoolYears; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sy): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                <option value="<?php echo e($sy); ?>" <?php echo e(session('active_school_year') === $sy ? 'selected' : ''); ?>>
-                                                    <?php echo e($sy); ?>
-
-                                                </option>
-                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                        </select>
-                                    </div>
-
-                                    
-                                </div>
+                                
 
                                 <div class="mt-4">
                                     <button type="submit" class="btn btn-primary w-100" onclick="return confirm('Save this schedule?')">
@@ -204,7 +220,12 @@
                                                     <div class="d-flex justify-content-between align-items-start">
                                                         <div>
                                                             <strong><?php echo e($schedule->course); ?></strong><br>
-                                                            <small class="text-muted"><?php echo e($schedule->Day); ?> | <?php echo e($schedule->Time); ?> | <?php echo e($schedule->Room); ?></small><br>
+                                                            <small class="text-muted">
+                                                                <?php echo e($schedule->Day); ?> |
+                                                                <?php echo e($schedule->Start_time); ?>-<?php echo e($schedule->End_time); ?> |
+                                                                <?php echo e($schedule->Room); ?>
+
+                                                            </small><br>
                                                             <small class="text-muted">
                                                                 <?php echo e($schedule->Programs ?? 'N/A'); ?> <?php echo e($schedule->year_level ?? ''); ?> <?php echo e($schedule->section ?? ''); ?>
 
@@ -250,7 +271,7 @@
                                                                         </div>
 
                                                                         <div class="col-md-6">
-                                                                            <label class="form-label">Time</label>
+                                                                            <label class="form-label">Start Time</label>
                                                                             <?php
                                                                                 $timeSlots = [
                                                                                     '7:30-8:30','7:30-9:30','7:30-10-:30','7:30-11:30','7:30-12:30',
@@ -267,11 +288,34 @@
                                                                                     '4:30-5:30','4:30-6:00',
                                                                                     '5:00-6:00'
                                                                                 ];
+
+                                                                                $startTimes = collect($timeSlots)->map(function($slot){
+                                                                                    return explode('-', $slot)[0] ?? '';
+                                                                                })->filter()->unique()->values();
+
+                                                                                $endTimes = collect($timeSlots)->map(function($slot){
+                                                                                    $parts = explode('-', $slot);
+                                                                                    return $parts[1] ?? '';
+                                                                                })->filter()->unique()->values();
                                                                             ?>
-                                                                            <select class="form-select" name="Time" required>
-                                                                                <?php $__currentLoopData = $timeSlots; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $slot): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                                    <option value="<?php echo e($slot); ?>" <?php echo e($schedule->Time == $slot ? 'selected' : ''); ?>>
-                                                                                        <?php echo e($slot); ?>
+                                                                            <select class="form-select" name="Start_time" required>
+                                                                                <option value="">Select Start Time</option>
+                                                                                <?php $__currentLoopData = $startTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $start): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                                    <option value="<?php echo e($start); ?>" <?php echo e($schedule->start_time == $start ? 'selected' : ''); ?>>
+                                                                                        <?php echo e($start); ?>
+
+                                                                                    </option>
+                                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                            </select>
+                                                                        </div>
+
+                                                                        <div class="col-md-6 mt-2">
+                                                                            <label class="form-label">End Time</label>
+                                                                            <select class="form-select" name="End_time" required>
+                                                                                <option value="">Select End Time</option>
+                                                                                <?php $__currentLoopData = $endTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $end): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                                    <option value="<?php echo e($end); ?>" <?php echo e($schedule->end_time == $end ? 'selected' : ''); ?>>
+                                                                                        <?php echo e($end); ?>
 
                                                                                     </option>
                                                                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

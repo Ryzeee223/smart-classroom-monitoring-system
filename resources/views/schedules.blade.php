@@ -36,6 +36,28 @@
                                 @csrf
 
                                 <div class="row">
+                                    {{-- Semester / School Year (top) --}}
+                                    <div class="col-md-6 mb-3">
+                                        @php
+                                            $latestSemyr = \App\Models\semyr::query()->latest('id')->first();
+                                        @endphp
+                                        <label class="form-label">Semester</label>
+                                        <select class="form-select" name="Semester" required disabled>
+                                            <option value="{{ $latestSemyr->semester ?? '' }}">{{ $latestSemyr->semester ?? 'Current Semester' }}</option>
+                                        </select>
+                                        <input type="hidden" name="Semester" value="{{ $latestSemyr->semester ?? '' }}">
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">School Year</label>
+                                        <select class="form-select" name="School_year" required disabled>
+                                            <option value="{{ $latestSemyr->school_year ?? '' }}">{{ $latestSemyr->school_year ?? 'Current School Year' }}</option>
+                                        </select>
+                                        <input type="hidden" name="School_year" value="{{ $latestSemyr->school_year ?? '' }}">
+                                    </div>
+                                </div>
+
+                                <div class="row">
                                     <div class="col-md-6">
                                         {{-- Faculty selection --}}
                                         <label class="form-label">Faculty</label>
@@ -49,8 +71,7 @@
                                         </select>
                                     </div>
 
-                                    
-
+                                    {{-- year level --}}
                                     <div class="col-md-3">
                                         <label class="form-label">Year Level</label>
                                         <select class="form-select" name="year_level" required>
@@ -72,15 +93,6 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    
-                                    <!-- Semester selection -->
-                                    <div class="col-md-3">
-                                        <label class="form-label">Semester</label>
-                                        <select class="form-select" name="Semester" required>
-                                            <option value="">Semester</option>
-                                            
-                                        </select>
-                                    </div>
                                 </div>
 
                                 <div class="row mt-3">
@@ -99,7 +111,7 @@
 
                                     {{-- time --}}
                                     <div class="col-md-3">
-                                        <label class="form-label">Time</label>
+                                        <label class="form-label">Start Time</label>
                                         @php
                                             $timeSlots = [
                                                 '7:30-8:30','7:30-9:30','7:30-10-:30','7:30-11:30','7:30-12:30',
@@ -116,11 +128,30 @@
                                                 '4:30-5:30','4:30-6:00',
                                                 '5:00-6:00'
                                             ];
+
+                                            $startTimes = collect($timeSlots)->map(function($slot){
+                                                return explode('-', $slot)[0] ?? '';
+                                            })->filter()->unique()->values();
+
+                                            $endTimes = collect($timeSlots)->map(function($slot){
+                                                $parts = explode('-', $slot);
+                                                return $parts[1] ?? '';
+                                            })->filter()->unique()->values();
                                         @endphp
-                                        <select class="form-select" name="Time" required>
-                                            <option value="">Select Time</option>
-                                            @foreach($timeSlots as $slot)
-                                                <option value="{{ $slot }}">{{ $slot }}</option>
+                                        <select class="form-select" name="Start_time" required>
+                                            <option value="">Select Start Time</option>
+                                            @foreach($startTimes as $start)
+                                                <option value="{{ $start }}">{{ $start }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">End Time</label>
+                                        <select class="form-select" name="End_time" required>
+                                            <option value="">Select End Time</option>
+                                            @foreach($endTimes->sort()->values() as $end)
+                                                <option value="{{ $end }}">{{ $end }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -138,21 +169,7 @@
                                     </div>
                                 </div>
 
-                                <div class="row mt-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">School Year</label>
-                                        <select class="form-select" name="School_year" required>
-                                            <option value="">Select school year</option>
-                                            @foreach($schoolYears as $sy)
-                                                <option value="{{ $sy }}" {{ session('active_school_year') === $sy ? 'selected' : '' }}>
-                                                    {{ $sy }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    
-                                </div>
+                                
 
                                 <div class="mt-4">
                                     <button type="submit" class="btn btn-primary w-100" onclick="return confirm('Save this schedule?')">
@@ -202,7 +219,11 @@
                                                     <div class="d-flex justify-content-between align-items-start">
                                                         <div>
                                                             <strong>{{ $schedule->course }}</strong><br>
-                                                            <small class="text-muted">{{ $schedule->Day }} | {{ $schedule->Time }} | {{ $schedule->Room }}</small><br>
+                                                            <small class="text-muted">
+                                                                {{ $schedule->Day }} |
+                                                                {{ $schedule->Start_time }}-{{ $schedule->End_time }} |
+                                                                {{ $schedule->Room }}
+                                                            </small><br>
                                                             <small class="text-muted">
                                                                 {{ $schedule->Programs ?? 'N/A' }} {{ $schedule->year_level ?? '' }} {{ $schedule->section ?? '' }}
                                                                 | {{ $schedule->Semester ?? 'N/A' }} {{ $schedule->School_year ?? 'N/A' }}
@@ -246,7 +267,7 @@
                                                                         </div>
 
                                                                         <div class="col-md-6">
-                                                                            <label class="form-label">Time</label>
+                                                                            <label class="form-label">Start Time</label>
                                                                             @php
                                                                                 $timeSlots = [
                                                                                     '7:30-8:30','7:30-9:30','7:30-10-:30','7:30-11:30','7:30-12:30',
@@ -263,11 +284,33 @@
                                                                                     '4:30-5:30','4:30-6:00',
                                                                                     '5:00-6:00'
                                                                                 ];
+
+                                                                                $startTimes = collect($timeSlots)->map(function($slot){
+                                                                                    return explode('-', $slot)[0] ?? '';
+                                                                                })->filter()->unique()->values();
+
+                                                                                $endTimes = collect($timeSlots)->map(function($slot){
+                                                                                    $parts = explode('-', $slot);
+                                                                                    return $parts[1] ?? '';
+                                                                                })->filter()->unique()->values();
                                                                             @endphp
-                                                                            <select class="form-select" name="Time" required>
-                                                                                @foreach($timeSlots as $slot)
-                                                                                    <option value="{{ $slot }}" {{ $schedule->Time == $slot ? 'selected' : '' }}>
-                                                                                        {{ $slot }}
+                                                                            <select class="form-select" name="Start_time" required>
+                                                                                <option value="">Select Start Time</option>
+                                                                                @foreach($startTimes as $start)
+                                                                                    <option value="{{ $start }}" {{ $schedule->start_time == $start ? 'selected' : '' }}>
+                                                                                        {{ $start }}
+                                                                                    </option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        </div>
+
+                                                                        <div class="col-md-6 mt-2">
+                                                                            <label class="form-label">End Time</label>
+                                                                            <select class="form-select" name="End_time" required>
+                                                                                <option value="">Select End Time</option>
+                                                                                @foreach($endTimes as $end)
+                                                                                    <option value="{{ $end }}" {{ $schedule->end_time == $end ? 'selected' : '' }}>
+                                                                                        {{ $end }}
                                                                                     </option>
                                                                                 @endforeach
                                                                             </select>

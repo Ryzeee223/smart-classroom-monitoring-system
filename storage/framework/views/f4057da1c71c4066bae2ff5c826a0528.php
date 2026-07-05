@@ -152,9 +152,9 @@
                     </select>
 
                     
-                    <?php if(in_array($sessionRole, [2, 3], true)): ?>
-                        <input type="hidden" name="college_id" value="<?php echo e($currentCollegeId); ?>">
-                    <?php endif; ?>
+                    
+                    <input type="hidden" name="college_id" value="<?php echo e($currentCollegeId); ?>">
+                    
                 </div>
 
 
