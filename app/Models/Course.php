@@ -10,18 +10,18 @@ class course extends Model
     use HasFactory;
 protected $table = 'course';
     protected $fillable = [
+        'college_id',
         'course_code',
         'course_name',
         'description',
-        'course_id',
     ];
 
     public function course()
     {
         return $this->hasMany(course::class);
     }
-    public function Programs()
+    public function college()
     {
-        return $this->belongsTo(Programs::class, 'program_id');
+        return $this->belongsTo(college::class, 'college_id');
     }
 }

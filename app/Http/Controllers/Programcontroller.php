@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Programs;
+use App\Models\User;
 
 
 class ProgramController extends Controller
@@ -14,12 +15,17 @@ class ProgramController extends Controller
             return redirect('/');
         }
 
-        $Programs = Programs::all();
+        // Dean/Assistant Dean should only see programs within their own college
+        $userId = session('user_id');
+        $user = User::find($userId);
 
-        // Needed by resources/views/programs.blade.php
-        $college = \App\Models\college::all();
+        if (in_array((int) session('user_role'), [2, 3], true) && $user?->college_id) {
+            $Programs = Programs::where('college_id', $user->college_id)->get();
+        } else {
+            $Programs = Programs::all();
+        }
 
-        return view('programs', compact('Programs', 'college'));
+        return view('programs', compact('Programs'));
     }
 
     public function store(Request $request)
@@ -28,14 +34,33 @@ class ProgramController extends Controller
             return redirect('/');
         }
 
+        $userId = session('user_id');
+        $user = User::find($userId);
+
+        $role = (int) session('user_role');
+        if (!in_array($role, [1, 2, 3], true)) {
+            abort(403);
+        }
+
         $request->validate([
-            'Program_id' => 'required|string|max:255|unique:programs,program_abbr',
-            'Program_name' => 'required|string|max:255',
+            'program_abbr' => 'required|string|max:255|unique:Programs,Program_abbr',
+            'program_name' => 'required|string|max:255|unique:Programs,Program_name',
             'description' => 'nullable|string',
+            'college_id' => 'required|integer|exists:college,id',
         ]);
 
+
+        // Prevent forging: dean/assistant dean can only create inside their assigned college
+        $collegeId = (int) $request->input('college_id');
+        if (in_array($role, [2, 3], true)) {
+            $collegeId = (int) ($user?->college_id ?? 0);
+            if (!$collegeId) {
+                abort(403, 'No assigned college for your account.');
+            }
+        }
+
         Programs::create([
-            'college_id' => $request->college_abbr,
+            'college_id' => $collegeId,
             'Program_abbr' => $request->program_abbr,
             'Program_name' => $request->program_name,
             'description' => $request->description ?? '',
@@ -64,7 +89,7 @@ class ProgramController extends Controller
         $Program = Programs::findOrFail($id);
 
         $request->validate([
-            'program_abbr' => 'required|string|max:255|unique:programs,program_abbr,' . $Program->id,
+            'program_abbr' => 'required|string|max:255|unique:Programs,program_abbr,' . $Program->id,
             'program_name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
@@ -75,7 +100,7 @@ class ProgramController extends Controller
             'description' => $request->description ?? '',
         ]);
 
-        return redirect()->route('programs')->with('success', 'Course updated successfully!');
+        return redirect()->route('program')->with('success', 'Course updated successfully!');
     }
 
     public function destroy($id)

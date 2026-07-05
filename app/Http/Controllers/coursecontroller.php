@@ -4,33 +4,57 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\course;
-use App\Models\Programs;
-use App\Models\college;
 
 class coursecontroller extends Controller
 {
     public function index()
     {
-        $course = course::with('Programs')->get();
-        $Programs = Programs::all();
-        return view('course', compact('course', 'Programs'));
+        $sessionRole = (int) (session('user_role') ?? 0);
+        $currentUser = \App\Models\User::find(session('user_id'));
+        $currentCollegeId = (int) ($currentUser?->college_id ?? 0);
 
-        $college = college::all();
-        return view('course', compact('course', 'Programs', 'college'));
+        $query = course::query();
+        if (in_array($sessionRole, [2, 3], true) && $currentCollegeId) {
+            $query->where('college_id', $currentCollegeId);
+        }
+
+        $course = $query->get();
+
+        return view('course', compact('course'));
     }
 
     public function store(Request $request)
     {
+        $sessionRole = (int) (session('user_role') ?? 0);
+        $currentUser = \App\Models\User::find(session('user_id'));
+
+        if (!in_array($sessionRole, [1, 2, 3], true)) {
+            abort(403);
+        }
+
         $request->validate([
-            
-            'course_code' => 'required|unique:course',
-            'course_name' => 'required',
-            'description' => 'nullable',
-            'program_id' => 'required|exists:programs,id'
-            
+            'college_id' => 'required|integer|exists:college,id',
+            'course_code' => 'required|unique:course,course_code',
+            'course_name' => 'required|string|max:255',
+            'description' => 'nullable|string',
         ]);
 
-        course::create($request->all());
+        $collegeId = (int) $request->input('college_id');
+
+        // Prevent forging: dean/assistant dean can only store inside their assigned college
+        if (in_array($sessionRole, [2, 3], true)) {
+            $collegeId = (int) ($currentUser?->college_id ?? 0);
+            if (!$collegeId) {
+                abort(403, 'No assigned college for your account.');
+            }
+        }
+
+        course::create([
+            'college_id' => $collegeId,
+            'course_code' => $request->course_code,
+            'course_name' => $request->course_name,
+            'description' => $request->description ?? '',
+        ]);
 
         return redirect()->route('course')->with('success', 'Course created successfully.');
     }
@@ -40,9 +64,8 @@ class coursecontroller extends Controller
         if (!session('logged_in')) {
             return redirect('/');
         }
-        $Programs = Programs::all();
         $course = course::findOrFail($id);
-        return view('courses.edit', compact('course', 'Programs'));
+        return view('courses.edit', compact('course'));
     }
 
     public function update(Request $request, $id)
@@ -52,18 +75,29 @@ class coursecontroller extends Controller
         }
 
         $request->validate([
+            'college_id' => 'required|integer|exists:college,id',
             'course_code' => 'required|string|max:255|unique:course,course_code,' . $id,
             'course_name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'program_id' => 'required|exists:programs,id',
         ]);
 
         $course = course::findOrFail($id);
+        // Prevent forging: keep college_id as the logged-in user's assigned college for dean/assistant dean
+        $collegeId = (int) $request->input('college_id');
+        $sessionRole = (int) (session('user_role') ?? 0);
+        $currentUser = \App\Models\User::find(session('user_id'));
+        if (in_array($sessionRole, [2, 3], true)) {
+            $collegeId = (int) ($currentUser?->college_id ?? 0);
+            if (!$collegeId) {
+                abort(403, 'No assigned college for your account.');
+            }
+        }
+
         $course->update([
+            'college_id' => $collegeId,
             'course_code' => $request->course_code,
             'course_name' => $request->course_name,
             'description' => $request->description ?? '',
-            'program_id' => $request->program_id,
         ]);
 
         return redirect()->route('course')->with('success', 'Course updated successfully!');

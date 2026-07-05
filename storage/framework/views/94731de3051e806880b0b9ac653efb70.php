@@ -30,30 +30,52 @@
                         <h3 class="card-title mb-0">Add New Program</h3>
                     </div>
                     <div class="card-body">
-<form method="POST" action="<?php echo e(route('programs.store')); ?>"> 
-    
+<form method="POST" action="<?php echo e(route('programs.store')); ?>">
+
+    <?php
+        $currentUser = \App\Models\User::find(session('user_id'));
+        $currentCollegeId = $currentUser?->college_id;
+    ?>
+
+    <input type="hidden" name="college_id" value="<?php echo e($currentCollegeId); ?>">
+
+    <?php
+        $currentCollege = null;
+        if ($currentCollegeId) {
+            $currentCollege = \App\Models\college::find($currentCollegeId);
+        }
+        $currentCollegeName = $currentCollege?->college_name ?? '';
+    ?>
+
     <div class="mb-3">
-        <label for="college" class="form-label">College</label>
-        <select class="form-select" id="college" name="college_id" required>
-            
-<?php $__currentLoopData = $college; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $college): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <option value="<?php echo e($college->abbr); ?>"><?php echo e($college->college_name); ?></option>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        <label for="college_id" class="form-label">College</label>
+        <select class="form-select" id="college_id_display" disabled>
+            <option value="" selected>
+                <?php echo e($currentCollegeName ?: ('Assigned college ID: ' . $currentCollegeId)); ?>
+
+            </option>
+        </select>
+        
+        <input type="hidden" name="college_id" value="<?php echo e($currentCollegeId); ?>">
     </div>
-                            <div class="mb-3">
-                                <label for="program_code" class="form-label">Program Abbreviation</label>
-                                <input type="text" class="form-control" id="Program_abbr" name="Program_abbr" placeholder="e.g., BSCS, BSED">
-                            </div>
-                            <div class="mb-3">
-                                <label for="program_name" class="form-label">Program Name</label>
-                                <input type="text" class="form-control" id="Program_name" name="Program_name" placeholder="e.g., Bachelor of Science in Computer Science">
-                            </div>
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Description</label>
-                                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief description of the course"></textarea>
-                            </div>
-                            <?php echo csrf_field(); ?>
-                            <button type="submit" class="btn btn-primary">Save Program</button>
+
+    <div class="mb-3">
+        <label for="program_abbr" class="form-label">Program Abbreviation</label>
+        <input type="text" class="form-control" id="program_abbr" name="program_abbr" placeholder="e.g., BSCS, BSED" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="program_name" class="form-label">Program Name</label>
+        <input type="text" class="form-control" id="program_name" name="program_name" placeholder="e.g., Bachelor of Science in Computer Science" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief description of the course"></textarea>
+    </div>
+
+    <?php echo csrf_field(); ?>
+    <button type="submit" class="btn btn-primary">Save Program</button>
                             <?php if(session('success')): ?>
                                 <div class="alert alert-success mt-3"><?php echo e(session('success')); ?></div>
                             <?php endif; ?>
@@ -73,7 +95,7 @@
 <?php $__empty_1 = true; $__currentLoopData = $Programs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $program): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <strong><?php echo e($program->program_code); ?></strong> - <strong><?php echo e($program->program_name); ?></strong>
+                                    <strong><?php echo e($program->Program_abbr); ?></strong> - <strong><?php echo e($program->Program_name); ?></strong>
                                     <?php if($program->description): ?><br><small><?php echo e($program->description); ?></small><?php endif; ?>
                                 </div>
                                 <div class="d-flex flex-column gap-1">

@@ -184,11 +184,11 @@ Route::post('/schedules/store', [App\Http\Controllers\schedulecontroller::class,
 Route::put('/schedules/{id}', [App\Http\Controllers\schedulecontroller::class, 'update'])->name('schedules.update');
 Route::delete('/schedules/{id}', [App\Http\Controllers\schedulecontroller::class, 'destroy'])->name('schedules.destroy');
 
-Route::get('/programs', [\App\Http\Controllers\ProgramController::class, 'index'])->name('programs');
+Route::get('/programs', [\App\Http\Controllers\ProgramController::class, 'index'])->name('program');
 Route::post('/programs', [\App\Http\Controllers\ProgramController::class, 'store'])->name('programs.store');
-Route::get('/programs/{programs}/edit', [\App\Http\Controllers\ProgramController::class, 'edit'])->name('programs.edit');
-Route::put('/programs/{programs}', [\App\Http\Controllers\ProgramController::class, 'update'])->name('programs.update');
-Route::delete('/programs/{programs}', [\App\Http\Controllers\ProgramController::class, 'destroy'])->name('programs.destroy');
+Route::get('/programs/{programs}/edit', [\App\Http\Controllers\ProgramController::class, 'edit'])->name('program.edit');
+Route::put('/programs/{programs}', [\App\Http\Controllers\ProgramController::class, 'update'])->name('program.update');
+Route::delete('/programs/{programs}', [\App\Http\Controllers\ProgramController::class, 'destroy'])->name('program.destroy');
 
 Route::get('/settings', [App\Http\Controllers\AdminController::class, 'settings'])->name('settings');
 Route::post('/settings/assign_rfid', [App\Http\Controllers\AdminController::class, 'assignRfid'])->name('settings.assign_rfid');

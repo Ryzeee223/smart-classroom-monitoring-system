@@ -30,14 +30,22 @@
                                 @csrf
 
                                 <div class="mb-3">
-                                    <label for="course_id" class="form-label">Course</label>
-                                    <select name="course_id" id="course_id" class="form-select" required>
-                                        <option value="">College</option>
-                                        @foreach($Programs as $Program)
-                                            <option value="{{ $Program->Program_id }}">{{ $Program->Program_name }} ({{ $Program->Program_code }})
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    @php
+                                        $sessionRole = (int) (session('user_role') ?? 0);
+                                        $currentUser = \App\Models\User::find(session('user_id'));
+                                        $currentCollegeId = (int) ($currentUser?->college_id ?? 0);
+                                    @endphp
+
+                                    <input type="hidden" name="college_id" value="{{ $currentCollegeId }}">
+
+                                    <label class="form-label">College</label>
+                                    <div class="form-control-plaintext">
+                                        @if($currentCollegeId)
+                                            Assigned to your college (ID: {{ $currentCollegeId }})
+                                        @else
+                                            No assigned college. Please contact Admin.
+                                        @endif
+                                    </div>
                                 </div>
 
                                 <div class="mb-3">

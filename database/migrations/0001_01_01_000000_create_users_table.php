@@ -58,22 +58,9 @@ Schema::create('semyr', function(Blueprint $table){
             $table->timestamps();
         });
 
-
-
-          Schema::create('Programs', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('college_id')->constrained('college')->onDelete('cascade');
-            $table->string('Program_abbr')->unique();
-            $table->string('Program_name')->unique();
-            $table->string('description')->nullable();
-            $table->timestamps();
-        });
-
-
         Schema::create('schedule', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('course');
             $table->string('year_level');
             $table->string('section');
             $table->enum('Day', ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']);
@@ -100,6 +87,14 @@ Schema::create('Request', function(Blueprint $table) {
         $table->timestamps();
 });
 
+Schema::create('course', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('college_id')->constrained('college')->onDelete('cascade');
+            $table->string('course_code')->unique();
+            $table->string('course_name')->unique();
+            $table->text('description')->nullable();
+            $table->timestamps();
+        });
 
 Schema::create('room', function(Blueprint $table){
     $table->id();
@@ -122,7 +117,6 @@ Schema::create('Scanner', function(Blueprint $table){
      */
     public function down(): void
     {
-        Schema::dropIfExists('Programs');
         Schema::dropIfExists('semyr');
         Schema::dropIfExists('schedule');
         Schema::dropIfExists('sessions');
@@ -130,8 +124,8 @@ Schema::create('Scanner', function(Blueprint $table){
         Schema::dropIfExists('users');
         schema::dropIfExists('building');
         Schema::dropIfExists('Request');
-        Schema::dropIfExists('college');
         Schema::dropIfExists('room');
         Schema::dropIfExists('Scanner');
+        Schema::dropIfExists('course');
     }
 };

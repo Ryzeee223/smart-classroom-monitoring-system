@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - eMonitor</title>
-    <link href="{{ asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="<?php echo e(asset('bootstrap-5.3.8-dist/css/bootstrap.min.css')); ?>" rel="stylesheet">
     <link rel="stylesheet" href="bootstrap-icons-1.10.5/bootstrap-icons.css">
-    <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="<?php echo e(asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js')); ?>"></script>
     <style>
         body {
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -42,7 +42,7 @@
 </style>
 <div class="mt-5" style=" margin-left:300px; ">
     <div class="d-none d-md-block app-sidebar">
-        @include('sidebar')
+        <?php echo $__env->make('sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     </div>
 
     <!-- content -->
@@ -52,7 +52,7 @@
 
         <!-- nav bar (mobile only) -->
         <div class="d-md-none mb-3">
-            @include('sidebar')
+            <?php echo $__env->make('sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
         </div>
 
         <!-- main content -->
@@ -61,23 +61,24 @@
             <h1 class="mb-4">Users Management</h1>
 
 
-         @if (session('success'))
+         <?php if(session('success')): ?>
          <div class="alert alert-success alert-dismissible fade show" role="alert">
-             {{ session('success') }}
+             <?php echo e(session('success')); ?>
+
              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
          </div>
-         @endif
+         <?php endif; ?>
 
-         @if ($errors->any())
+         <?php if($errors->any()): ?>
          <div class="alert alert-danger" role="alert">
              <strong>Could not save user:</strong>
              <ul class="mb-0">
-                 @foreach ($errors->all() as $error)
-                     <li>{{ $error }}</li>
-                 @endforeach
+                 <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                     <li><?php echo e($error); ?></li>
+                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
              </ul>
          </div>
-         @endif
+         <?php endif; ?>
 
     <!-- Add Users -->
 
@@ -86,12 +87,12 @@
         <div class="card p-3 shadow-sm bg-white border-1" >
             <h2 class="h5 mb-2">Add User</h2>
 
-            <form action="{{ route('users.store') }}" method="POST">
-                 @csrf
+            <form action="<?php echo e(route('users.store')); ?>" method="POST">
+                 <?php echo csrf_field(); ?>
                 <div class="row g-3">
                     <div class="col-md">
 
-                        {{-- Fill-up form basic info  --}}
+                        
                         <label class="form-label form-label-sm">First Name</label>
                         <input type="text" class="form-control form-control-sm" name="first_name" id="first_name-lead" placeholder="Enter first name">
                     </div>
@@ -115,44 +116,45 @@
                     </div>
                 </div>
 
-                @php
+                <?php
                     $sessionRole = (int) (session('user_role') ?? 0);
                     $currentUser = \App\Models\User::find(session('user_id'));
                     $currentCollegeId = (int) ($currentUser?->college_id ?? 0);
                     $currentCollege = $currentCollegeId ? \App\Models\college::find($currentCollegeId) : null;
                     $currentCollegeName = $currentCollege?->college_name ?? '';
-                @endphp
+                ?>
 
                 <div class="mt-2">
                     <label class="form-label form-label-sm">College</label>
 
-                    <select name="course" id="collegeSelect" class="form-select form-select-sm" {{ in_array($sessionRole, [2, 3], true) ? 'disabled' : '' }}>
+                    <select name="course" id="collegeSelect" class="form-select form-select-sm" <?php echo e(in_array($sessionRole, [2, 3], true) ? 'disabled' : ''); ?>>
                         <option value="" selected>
-                            @if(in_array($sessionRole, [2, 3], true))
-                                {{ $currentCollegeName ?: 'Assigned college' }}
-                            @else
+                            <?php if(in_array($sessionRole, [2, 3], true)): ?>
+                                <?php echo e($currentCollegeName ?: 'Assigned college'); ?>
+
+                            <?php else: ?>
                                 Select College
-                            @endif
+                            <?php endif; ?>
                         </option>
 
-                        @unless(in_array($sessionRole, [2, 3], true))
-                            @php $colleges = $colleges ?? collect(); @endphp
-                            @foreach($colleges as $college)
-                                @php
+                        <?php if (! (in_array($sessionRole, [2, 3], true))): ?>
+                            <?php $colleges = $colleges ?? collect(); ?>
+                            <?php $__currentLoopData = $colleges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $college): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php
                                     $collegeId = $college->id ?? '';
                                     $collegeName = $college->college_name ?? $collegeId;
                                     $collegeCode = $college->abbreviation ?? '';
                                     $label = $collegeCode ? $collegeCode . ' - ' . $collegeName : $collegeName;
-                                @endphp
-                                <option value="{{ $collegeName }}">{{ $label }}</option>
-                            @endforeach
-                        @endunless
+                                ?>
+                                <option value="<?php echo e($collegeName); ?>"><?php echo e($label); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php endif; ?>
                     </select>
 
-                    {{-- Always submit the college_id for backend enforcement --}}
-                    @if(in_array($sessionRole, [2, 3], true))
-                        <input type="hidden" name="college_id" value="{{ $currentCollegeId }}">
-                    @endif
+                    
+                    <?php if(in_array($sessionRole, [2, 3], true)): ?>
+                        <input type="hidden" name="college_id" value="<?php echo e($currentCollegeId); ?>">
+                    <?php endif; ?>
                 </div>
 
 
@@ -170,30 +172,30 @@
                         <label class="form-label form-label-sm">Role</label>
                         <select class="form-select form-select-sm" name="role" id="role-lead">
                             <option selected>Select role</option>
-                            @php
+                            <?php
                                 
                                 $myRole = (int) (session('user_role') ?? 0);
-                            @endphp
+                            ?>
 
-                                {{-- admin=1||dean=2||asst=3||faculty=4||head=5 --}}
-                            @if($myRole === 1)
-                                {{-- Admin can add: Dean, Assistant Dean, Faculty, Program Head --}}
+                                
+                            <?php if($myRole === 1): ?>
+                                
                                 <option selected value="2">Dean</option>
                                 
                                 
                                 
-                            @elseif($myRole === 2)
-                                {{-- Dean can add: Assistant Dean, Faculty, Program Head --}}
+                            <?php elseif($myRole === 2): ?>
+                                
                                 <option value="3">Assistant Dean</option>
                                 <option value="4">Faculty</option>
                                 <option value="5">Program Head</option>
-                            @elseif($myRole === 3)
-                                {{-- Assistant Dean can add: Faculty, Program Head --}}
+                            <?php elseif($myRole === 3): ?>
+                                
                                 <option value="4">Faculty</option>
                                 <option value="5">Program Head</option>
-                            @else
-                                {{-- Faculty & Program Head cannot add roles --}}
-                            @endif
+                            <?php else: ?>
+                                
+                            <?php endif; ?>
                         </select>
                     </div>
                     <div class="col-md d-flex align-items-end">
@@ -201,22 +203,22 @@
                     </div>
                 </div>
                 
-                {{-- Course dropdown: show only when creating a Dean --}}
+                
                     <div class="row g-2 mt-2" id="adminCourseRow" style="display:none;">
                     <div class="col-md">
                         <label class="form-label form-label-sm">Course (for Admin)</label>
                         <select class="form-select form-select-sm" name="course" id="adminCourseSelect">
-                            @php $courses = $courses ?? collect(); @endphp
+                            <?php $courses = $courses ?? collect(); ?>
                             <option value="">Select Course</option>
-                            @foreach($colleges as $college)
-                                @php
+                            <?php $__currentLoopData = $colleges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $college): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php
                                     $collegeId = $college->id ?? '';
                                     $collegeName = $college->college_name ?? $collegeId;
                                     $collegeCode = $college->abbreviation ?? '';
                                     $label = $collegeCode ? ($collegeName . ' (' . $collegeCode . ')') : $collegeName;
-                                @endphp
-                                <option value="{{ $collegeCode }}">{{ $label }}</option>
-                            @endforeach
+                                ?>
+                                <option value="<?php echo e($collegeCode); ?>"><?php echo e($label); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
                 </div>
@@ -257,58 +259,58 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @php
+                        <?php
                             $all_users = collect();
                             $all_users = $all_users->merge($account_users ?? []);
-                        @endphp
+                        ?>
 
-@php
+<?php
                             $sessionRole = (int) (session('user_role') ?? 0);
-                        @endphp
+                        ?>
 
-                        @forelse($all_users as $user)
-                            @php
+                        <?php $__empty_1 = true; $__currentLoopData = $all_users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                            <?php
                                 $uRole = (int) ($user->role ?? 0);
                                 $canView = (
                                     $sessionRole === 1
                                         ? $uRole === 2
                                         : ($sessionRole === 2 ? in_array($uRole, [3,4,5], true) : in_array($uRole, [3,4,5], true))
                                 );
-                            @endphp
+                            ?>
 
-                            @continue(!$canView)
+                            <?php if(!$canView) continue; ?>
 
                             <tr>
-                                <td>{{ $user->first_name }} {{ $user->last_name }}</td>
+                                <td><?php echo e($user->first_name); ?> <?php echo e($user->last_name); ?></td>
                                 <td>
-                                    @switch($user->role)
-                                        @case(1) Admin @break
-                                        @case(2) Dean @break
-                                        @case(3) Assistant Dean @break
-                                        @case(4) Faculty @break
-                                        @case(5) Program Head @break
-                                        @default Unknown
-                                    @endswitch
+                                    <?php switch($user->role):
+                                        case (1): ?> Admin <?php break; ?>
+                                        <?php case (2): ?> Dean <?php break; ?>
+                                        <?php case (3): ?> Assistant Dean <?php break; ?>
+                                        <?php case (4): ?> Faculty <?php break; ?>
+                                        <?php case (5): ?> Program Head <?php break; ?>
+                                        <?php default: ?> Unknown
+                                    <?php endswitch; ?>
                                 </td>
-                                <td><span class="badge {{ $user->acc_status ? 'bg-success' : 'bg-danger' }}">{{ $user->acc_status ? 'Active' : 'Inactive' }}</span></td>
+                                <td><span class="badge <?php echo e($user->acc_status ? 'bg-success' : 'bg-danger'); ?>"><?php echo e($user->acc_status ? 'Active' : 'Inactive'); ?></span></td>
                                 <td>
-                                    @if($user->RFID_code)
+                                    <?php if($user->RFID_code): ?>
                                         <span class="badge bg-success">Assigned</span>
-                                    @else
+                                    <?php else: ?>
                                         <span class="badge bg-secondary">Not Assigned</span>
-                                    @endif
+                                    <?php endif; ?>
                                 </td>
                                 <td>
-                                    <a href="{{ route('users.edit', $user->id) }}" class="btn btn-lg btn-outline-primary fw-semibold" style="padding:0.35rem 0.75rem;" title="Edit">
+                                    <a href="<?php echo e(route('users.edit', $user->id)); ?>" class="btn btn-lg btn-outline-primary fw-semibold" style="padding:0.35rem 0.75rem;" title="Edit">
                                         <i class="bi bi-pencil" style="font-size:1.1rem;"></i>
                                     </a>
                                 </td>
                             </tr>
-                        @empty
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
                             <td colspan="5" class="text-center text-muted py-4">No User accounts</td>
                         </tr>
-                        @endforelse
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -323,3 +325,4 @@
 
 
 
+<?php /**PATH /Users/macbook/Documents/capstone project/backups/emonitor 3rd phase copy/resources/views/users.blade.php ENDPATH**/ ?>

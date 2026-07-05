@@ -30,30 +30,51 @@
                         <h3 class="card-title mb-0">Add New Program</h3>
                     </div>
                     <div class="card-body">
-<form method="POST" action="{{ route('programs.store') }}"> 
-    
+<form method="POST" action="{{ route('programs.store') }}">
+
+    @php
+        $currentUser = \App\Models\User::find(session('user_id'));
+        $currentCollegeId = $currentUser?->college_id;
+    @endphp
+
+    <input type="hidden" name="college_id" value="{{ $currentCollegeId }}">
+
+    @php
+        $currentCollege = null;
+        if ($currentCollegeId) {
+            $currentCollege = \App\Models\college::find($currentCollegeId);
+        }
+        $currentCollegeName = $currentCollege?->college_name ?? '';
+    @endphp
+
     <div class="mb-3">
-        <label for="college" class="form-label">College</label>
-        <select class="form-select" id="college" name="college_id" required>
-            {{-- for college, it should be depending on the college of the dean --}}
-@foreach($college as $college)
-                <option value="{{ $college->abbr }}">{{ $college->college_name }}</option>
-            @endforeach
+        <label for="college_id" class="form-label">College</label>
+        <select class="form-select" id="college_id_display" disabled>
+            <option value="" selected>
+                {{ $currentCollegeName ?: ('Assigned college ID: ' . $currentCollegeId) }}
+            </option>
+        </select>
+        {{-- actual value sent to backend --}}
+        <input type="hidden" name="college_id" value="{{ $currentCollegeId }}">
     </div>
-                            <div class="mb-3">
-                                <label for="program_code" class="form-label">Program Abbreviation</label>
-                                <input type="text" class="form-control" id="Program_abbr" name="Program_abbr" placeholder="e.g., BSCS, BSED">
-                            </div>
-                            <div class="mb-3">
-                                <label for="program_name" class="form-label">Program Name</label>
-                                <input type="text" class="form-control" id="Program_name" name="Program_name" placeholder="e.g., Bachelor of Science in Computer Science">
-                            </div>
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Description</label>
-                                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief description of the course"></textarea>
-                            </div>
-                            @csrf
-                            <button type="submit" class="btn btn-primary">Save Program</button>
+
+    <div class="mb-3">
+        <label for="program_abbr" class="form-label">Program Abbreviation</label>
+        <input type="text" class="form-control" id="program_abbr" name="program_abbr" placeholder="e.g., BSCS, BSED" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="program_name" class="form-label">Program Name</label>
+        <input type="text" class="form-control" id="program_name" name="program_name" placeholder="e.g., Bachelor of Science in Computer Science" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief description of the course"></textarea>
+    </div>
+
+    @csrf
+    <button type="submit" class="btn btn-primary">Save Program</button>
                             @if (session('success'))
                                 <div class="alert alert-success mt-3">{{ session('success') }}</div>
                             @endif
@@ -73,7 +94,7 @@
 @forelse($Programs as $program)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <strong>{{ $program->program_code }}</strong> - <strong>{{ $program->program_name }}</strong>
+                                    <strong>{{ $program->Program_abbr }}</strong> - <strong>{{ $program->Program_name }}</strong>
                                     @if($program->description)<br><small>{{ $program->description }}</small>@endif
                                 </div>
                                 <div class="d-flex flex-column gap-1">

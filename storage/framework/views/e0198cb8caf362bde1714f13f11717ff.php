@@ -30,14 +30,22 @@
                                 <?php echo csrf_field(); ?>
 
                                 <div class="mb-3">
-                                    <label for="course_id" class="form-label">Course</label>
-                                    <select name="course_id" id="course_id" class="form-select" required>
-                                        <option value="">College</option>
-                                        <?php $__currentLoopData = $Programs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $Program): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <option value="<?php echo e($Program->Program_id); ?>"><?php echo e($Program->Program_name); ?> (<?php echo e($Program->Program_code); ?>)
-                                            </option>
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                    </select>
+                                    <?php
+                                        $sessionRole = (int) (session('user_role') ?? 0);
+                                        $currentUser = \App\Models\User::find(session('user_id'));
+                                        $currentCollegeId = (int) ($currentUser?->college_id ?? 0);
+                                    ?>
+
+                                    <input type="hidden" name="college_id" value="<?php echo e($currentCollegeId); ?>">
+
+                                    <label class="form-label">College</label>
+                                    <div class="form-control-plaintext">
+                                        <?php if($currentCollegeId): ?>
+                                            Assigned to your college (ID: <?php echo e($currentCollegeId); ?>)
+                                        <?php else: ?>
+                                            No assigned college. Please contact Admin.
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
 
                                 <div class="mb-3">
