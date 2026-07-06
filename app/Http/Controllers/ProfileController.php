@@ -12,19 +12,21 @@ class ProfileController extends Controller
         if (!session('logged_in')) {
             return redirect('/');
         }
-
+ 
         $userId = session('user_id');
         $user = $userId ? User::find($userId) : null;
-
+       
         // Load requests for this user (for the profile display)
         $requests = $userId ? \Illuminate\Support\Facades\DB::table('requests')
             ->where('user_request', $userId)
             ->orderByDesc('created_at')
             ->get() : collect();
 
+$college = $user && $user->college_id ? college::find($user->college_id) : null;
+
 $user = $userId ? User::with('college')->find($userId) : null;
 
-        return view('profile', compact('user', 'requests'));
+        return view('profile', compact('user', 'requests', 'college'));
     }
 
     public function update(Request $request)

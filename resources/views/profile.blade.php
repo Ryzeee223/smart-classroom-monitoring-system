@@ -46,6 +46,14 @@
                                     $roleName = $user && isset($roleMap[$user->role])
                                         ? $roleMap[$user->role]
                                         : ($user->role ?? null);
+
+                                    // Get the college name if the user has a college_id
+                                   $currentCollegeId = (int) ($currentUser?->college_id ?? 0);
+                    $currentCollege = $currentCollegeId ? \App\Models\college::find($currentCollegeId) : null;
+                    $currentCollegeName = $currentCollege?->college_name ?? '';
+
+                                   
+                                    
                                 @endphp
 
                                 <img
@@ -58,7 +66,7 @@
                                     <h4 class="mb-1">{{ $user ? ($user->first_name . ' ' . $user->last_name) : 'Guest' }}</h4>
 
                                     <div class="text-muted">
-                                        <div><Strong>College:</Strong>{{ $user->college->abbreviation ?? 'No College Assigned' }}</div>
+                                        <div><Strong>College:</Strong>{{$currentCollegeId ?? 'No College Assigned' }}</div>
                                         <div><strong>Employee ID:</strong> {{ $user->employee_ID ?? '-' }}</div>
                                         <div><strong>Role:</strong> {{ $roleName ?? 'Unknown' }}</div>
                                     </div>

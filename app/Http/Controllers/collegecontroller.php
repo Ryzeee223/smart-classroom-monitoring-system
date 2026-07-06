@@ -40,7 +40,7 @@ class collegecontroller extends Controller
             'college_name' => $validated['college_name'],
             'abbreviation' => $validated['abbreviation'],
             'description' => $validated['description'] ?? null,
-            // 'user_id' => session('user_id') ?? null,
+            'user_id' => session('user_id') ?? null,
         ]);
 
 

@@ -40,5 +40,15 @@ class userscontroller extends Controller
 
         return redirect()->route('users.index')->with('success', 'User updated successfully!');
     }
+     public function destroy($id)
+    {
+        if (!session('logged_in')) {
+            return redirect('/');
+        }
+
+        User::findOrFail($id)->delete();
+    
+        return back()->with('success', 'User deleted successfully!');
+    }
 }
 

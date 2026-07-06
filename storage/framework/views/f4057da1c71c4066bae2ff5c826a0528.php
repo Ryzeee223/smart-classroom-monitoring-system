@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - eMonitor</title>
+    <title>Users - eMonitor</title>
     <link href="<?php echo e(asset('bootstrap-5.3.8-dist/css/bootstrap.min.css')); ?>" rel="stylesheet">
     <link rel="stylesheet" href="bootstrap-icons-1.10.5/bootstrap-icons.css">
     <script src="<?php echo e(asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js')); ?>"></script>
@@ -90,32 +90,7 @@
             <form action="<?php echo e(route('users.store')); ?>" method="POST">
                  <?php echo csrf_field(); ?>
                 <div class="row g-3">
-                    <div class="col-md">
-
-                        
-                        <label class="form-label form-label-sm">First Name</label>
-                        <input type="text" class="form-control form-control-sm" name="first_name" id="first_name-lead" placeholder="Enter first name">
-                    </div>
-                    <div class="col-md">
-                        <label class="form-label form-label-sm">Middle Name</label>
-                        <input type="text" class="form-control form-control-sm" name="middle_name" id="last_name-lead" placeholder="Enter last name">
-                    </div>
-                    <div class="form-label form-label-sm">Last Name
-                    <input type="text" class="form-control form control-sm" name="last_name" id="middle_name-lead" placeholder="Enter middle name">
-                </div>
-            </div>
-
-                <div class="row g-2 mt-2">
-                    <div class="col-md">
-                        <label class="form-label form-label-sm">Employee ID</label>
-                        <input type="text" class="form-control form-control-sm" name="employee_ID" id="employee_ID-lead" placeholder="Enter employee ID">
-                    </div>
-                    <div class="col-md">
-                        <label class="form-label form-label-sm">Email</label>
-                        <input type="email" class="form-control form-control-sm" name="email" id="email-lead" placeholder="Enter email">
-                    </div>
-                </div>
-
+                    
                 <?php
                     $sessionRole = (int) (session('user_role') ?? 0);
                     $currentUser = \App\Models\User::find(session('user_id'));
@@ -127,47 +102,34 @@
                 <div class="mt-2">
                     <label class="form-label form-label-sm">College</label>
 
-                    <select name="course" id="collegeSelect" class="form-select form-select-sm" <?php echo e(in_array($sessionRole, [2, 3], true) ? 'disabled' : ''); ?>>
-                        <option value="" selected>
-                            <?php if(in_array($sessionRole, [2, 3], true)): ?>
+                    <select name="college_id" id="collegeSelect" class="form-select form-select-sm" <?php echo e(in_array($sessionRole, [2, 3], true) ? 'disabled' : ''); ?>>
+                        <?php if(in_array($sessionRole, [2, 3], true)): ?>
+                            <option value="<?php echo e($currentCollegeId); ?>" selected>
                                 <?php echo e($currentCollegeName ?: 'Assigned college'); ?>
 
-                            <?php else: ?>
-                                Select College
-                            <?php endif; ?>
-                        </option>
-
-                        <?php if (! (in_array($sessionRole, [2, 3], true))): ?>
-                            <?php $colleges = $colleges ?? collect(); ?>
+                            </option>
+                        <?php else: ?>
+                            <option value="" selected>Select College</option>
+                            <?php $college = $college ?? collect(); ?>
                             <?php $__currentLoopData = $colleges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $college): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <?php
-                                    $collegeId = $college->id ?? '';
+                                    $collegeId = $college->id;
                                     $collegeName = $college->college_name ?? $collegeId;
                                     $collegeCode = $college->abbreviation ?? '';
                                     $label = $collegeCode ? $collegeCode . ' - ' . $collegeName : $collegeName;
                                 ?>
-                                <option value="<?php echo e($collegeName); ?>"><?php echo e($label); ?></option>
+                                <option value="<?php echo e($collegeId); ?>"><?php echo e($label); ?></option>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         <?php endif; ?>
                     </select>
 
                     
                     
-                    <input type="hidden" name="college_id" value="<?php echo e($currentCollegeId); ?>">
-                    
+                    <?php if(in_array($sessionRole, [2, 3], true)): ?>
+                        <input type="hidden" name="college_id" value="<?php echo e($currentCollegeId); ?>">
+                    <?php endif; ?>
                 </div>
-
-
-                <div class="mt-2">
-                    <label class="form-label form-label-sm">Password</label>
-                    <div class="input-group">
-                        <input type="password" class="form-control form-control-sm" name="password" id="password-lead" placeholder="Enter password">
-                        <button class="btn btn-outline-secondary btn-sm" type="button" id="togglePassword-lead">
-                            <i class="bi bi-eye"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="row g-2 mt-2">
+                      <div class="row g-2 mt-2">
                     <div class="col-md">
                         <label class="form-label form-label-sm">Role</label>
                         <select class="form-select form-select-sm" name="role" id="role-lead">
@@ -198,29 +160,56 @@
                             <?php endif; ?>
                         </select>
                     </div>
-                    <div class="col-md d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary btn-sm w-100 h-100">Add User</button>
+                
+                </div>
+                    <div class="col-md">
+
+                        
+                        <label class="form-label form-label-sm">First Name</label>
+                        <input type="text" class="form-control form-control-sm" name="first_name" id="first_name-lead" placeholder="Enter first name">
+                    </div>
+                    <div class="col-md">
+                        <label class="form-label form-label-sm">Middle Name</label>
+                        <input type="text" class="form-control form-control-sm" name="middle_name" id="last_name-lead" placeholder="Enter last name">
+                    </div>
+                    <div class="form-label form-label-sm">Last Name
+                    <input type="text" class="form-control form control-sm" name="last_name" id="middle_name-lead" placeholder="Enter middle name">
+                </div>
+            </div>
+
+                <div class="row g-2 mt-2">
+                    <div class="col-md">
+                        
+                        <label class="form-label form-label-sm">Employee ID</label>
+                        <input type="text" class="form-control form-control-sm" name="employee_ID" id="employee_ID-lead" placeholder="Enter employee ID">
+                    </div>
+
+                    
+                    <div class="col-md">
+                        <label class="form-label form-label-sm">Email</label>
+                        <input type="email" class="form-control form-control-sm" name="email" id="email-lead" placeholder="Enter email">
                     </div>
                 </div>
-                
-                
-                    <div class="row g-2 mt-2" id="adminCourseRow" style="display:none;">
-                    <div class="col-md">
-                        <label class="form-label form-label-sm">Course (for Admin)</label>
-                        <select class="form-select form-select-sm" name="course" id="adminCourseSelect">
-                            <?php $courses = $courses ?? collect(); ?>
-                            <option value="">Select Course</option>
-                            <?php $__currentLoopData = $colleges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $college): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <?php
-                                    $collegeId = $college->id ?? '';
-                                    $collegeName = $college->college_name ?? $collegeId;
-                                    $collegeCode = $college->abbreviation ?? '';
-                                    $label = $collegeCode ? ($collegeName . ' (' . $collegeCode . ')') : $collegeName;
-                                ?>
-                                <option value="<?php echo e($collegeCode); ?>"><?php echo e($label); ?></option>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        </select>
+
+                <div class="mt-2">
+                    <label class="form-label form-label-sm">Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control form-control-sm" name="password" id="password-lead" placeholder="Enter password">
+                        <button class="btn btn-outline-secondary btn-sm" type="button" id="togglePassword-lead">
+                            
+                        </button>
                     </div>
+                </div>
+                <div class="row g-2 mt-2">
+                   
+                    
+                </div>
+                <div class="col-md d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary btn-sm w-100 h-100">Add User</button>
+                    </div>
+               
+                    <div class="row g-2 mt-2" id="adminCourseRow" style="display:none;">
+                    
                 </div>
 
                 <script>
@@ -300,10 +289,18 @@
                                         <span class="badge bg-secondary">Not Assigned</span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
-                                    <a href="<?php echo e(route('users.edit', $user->id)); ?>" class="btn btn-lg btn-outline-primary fw-semibold" style="padding:0.35rem 0.75rem;" title="Edit">
-                                        <i class="bi bi-pencil" style="font-size:1.1rem;"></i>
-                                    </a>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column align-items-center gap-2">
+                                        <a href="<?php echo e(route('users.edit', $user->id)); ?>" class="btn btn-sm btn-outline-primary fw-semibold" title="Edit">
+                                            Edit
+                                        </a>
+
+                                        <form method="POST" action="<?php echo e(route('users.destroy', $user->id)); ?>" onsubmit="return confirm('Delete this user?')" class="m-0">
+                                            <?php echo csrf_field(); ?>
+                                            <?php echo method_field('DELETE'); ?>
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">Delete</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>

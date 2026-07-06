@@ -199,9 +199,9 @@ Route::post('/settings/reset_user_password', [App\Http\Controllers\AdminControll
 
 Route::get('/users', [App\Http\Controllers\AdminController::class, 'index'])->name('users.index');
 Route::post('/users', [App\Http\Controllers\AdminController::class, 'store'])->name('users.store');
-
 Route::get('/users/{id}/edit', [App\Http\Controllers\userscontroller::class, 'edit'])->name('users.edit');
 Route::put('/users/{id}', [App\Http\Controllers\userscontroller::class, 'update'])->name('users.update');
+Route::delete('/users/{id}', [App\Http\Controllers\userscontroller::class, 'destroy'])->name('users.destroy');
 
 Route::get('/course', [App\Http\Controllers\courseController::class, 'index'])->name('course');
 Route::post('/course', [App\Http\Controllers\courseController::class, 'store'])->name('course.store');
