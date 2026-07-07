@@ -29,14 +29,15 @@
             <main class="container rooms-page">
             <div class="col-mb-4">
 <div class="row-md-2">
-    <div action="POST">
-
+    <div >
+<form method="POST" action="{{ route("storeBldg.store") }}">
+    @csrf
         {{-- Create building --}}
         <div class="shadow p-3 mb-3 rounded border-1">
             <h4>Create building</h4>
             <p>This is where you create a building for colleges</p>
             <div class="d-grid gap-2 align-items-center">
-                 <input type="text" placeholder="Building name" class="form-control">
+                 <input type="text" placeholder="Building name" class="form-control" name="bldg_name" id="bldg_name">
             
             </div>
             <br>
@@ -45,6 +46,7 @@
              </div>
           
         </div>
+    </form>
     </div>
 
      {{-- Create Rooms --}}

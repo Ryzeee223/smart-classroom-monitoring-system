@@ -217,3 +217,5 @@ Route::put('/college/{college}', [App\Http\Controllers\collegecontroller::class,
 Route::delete('/college/{college}', [App\Http\Controllers\collegecontroller::class, 'destroy'])->name('college.destroy');
 
 
+Route::post('/rooms/store', [App\Http\Controllers\room_bldg_controller::class, 'storeRoom'])->name('storeRoom.store');
+Route::post('/buildings/store', [App\Http\Controllers\room_bldg_controller::class, 'storeBldg'])->name('storeBldg.store');

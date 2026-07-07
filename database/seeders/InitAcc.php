@@ -26,7 +26,7 @@ class InitAcc extends Seeder
         'last_name' => 'Tobia',
         'middle_name' => 'P.',
         'employee_ID' => '22-03940',
-        'college_id' => '1',
+        'college_id' => '0',
         'role' => '1',
         'email' => 'admin@local',
         'password' => Hash::make ('admin123'),

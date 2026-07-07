@@ -130,6 +130,8 @@ class schedulecontroller extends Controller
 
         return redirect()->back()->with('success', 'Schedule updated successfully!');
     }
+
+    // this is where the algorithm for checking schedule conflicts will be implemented
 }
 
 
