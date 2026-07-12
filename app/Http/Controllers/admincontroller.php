@@ -60,7 +60,6 @@ class AdminController extends Controller
 
         User::create([
             'first_name' => $request->first_name,
-
             'last_name' => $request->last_name,
             'middle_name' => $request->middle_name,
             'employee_ID' => $request->employee_ID,

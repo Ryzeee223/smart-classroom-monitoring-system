@@ -87,24 +87,23 @@ class schedulecontroller extends Controller
             'user_id' => ['required', 'exists:users,id'],
         ]);
 
-        // Convert checkbox array to a storable string (schedule.Day is varchar(20))
-       
+        // Convert checkbox array to a storable string (schedule.Day is varchar)
+        $dayValue = is_array($validatedData['Day'])
+            ? implode(', ', $validatedData['Day'])
+            : (string) $validatedData['Day'];
 
-        $id = Str::uuid()->toString();
+        // Do not set `id` manually; DB column is auto-increment (BIGINT) in the migration.
         Schedule::create([
-            'id' => $id,
             'user_id' => $validatedData['user_id'],
             'year_level' => $validatedData['year_level'],
             'section' => $validatedData['section'],
-            'Day' => $validatedData['Day'],
+            'Day' => $dayValue,
             'start_time' => $validatedData['Start_time'],
             'end_time' => $validatedData['End_time'],
             'Subject' => $validatedData['Course'],
             'Room' => $validatedData['Room'],
             'Semester' => $validatedData['Semester'],
             'School_year' => $validatedData['School_year'],
-
-
         ]);
 
         return redirect()->back()->with('success', 'Schedule added successfully!');
@@ -145,11 +144,11 @@ class schedulecontroller extends Controller
             'section' => ['required'],
         ]);
 
-        $dayValue = is_array($validatedData['Day']) ? implode(', ', $validatedData['Day']) : (string) $validatedData['Day'];
+        
 
         // schedule table columns are lowercase start_time/end_time
         $schedule->update([
-            'Day' => $dayValue,
+            'Day' => $validatedData['Day'],
             'start_time' => $validatedData['Start_time'],
             'end_time' => $validatedData['End_time'],
             'Subject' => $validatedData['Course'],

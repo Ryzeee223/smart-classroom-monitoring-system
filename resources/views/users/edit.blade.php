@@ -61,6 +61,11 @@
 
                                     @foreach($courses as $c)
                                         @php
+                                            $collegeId = (int) ($c->id ?? 0);
+                                            // Hide the first-created college (id=1) from user editing choices.
+                                            if ($collegeId === 1) {
+                                                continue;
+                                            }
                                             $abbr = $c->abbreviation ?? '';
                                             $name = $c->college_name ?? '';
                                         @endphp

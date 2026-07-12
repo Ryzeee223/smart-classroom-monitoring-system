@@ -113,7 +113,11 @@
                             <?php $college = $college ?? collect(); ?>
                             <?php $__currentLoopData = $colleges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $college): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <?php
-                                    $collegeId = $college->id;
+                                    $collegeId = (int) ($college->id ?? 0);
+                                    // Hide the first-created college (id=1) from all user assignment choices.
+                                    if ($collegeId === 1) {
+                                        continue;
+                                    }
                                     $collegeName = $college->college_name ?? $collegeId;
                                     $collegeCode = $college->abbreviation ?? '';
                                     $label = $collegeCode ? $collegeCode . ' - ' . $collegeName : $collegeName;

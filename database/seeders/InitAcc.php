@@ -17,6 +17,12 @@ class InitAcc extends Seeder
     public function run(): void
     {
         college::create([
+            'college_name' => 'Admin',
+            'abbreviation' => 'admin',
+            'description' => '',
+        ]);
+
+        college::create([
             'college_name' => 'College of Communication and Information technology',
             'abbreviation' => 'CCIT',
             'description' => '',
@@ -26,7 +32,7 @@ class InitAcc extends Seeder
         'last_name' => 'Tobia',
         'middle_name' => 'P.',
         'employee_ID' => '22-03940',
-        'college_id' => '0',
+        'college_id' => '1',
         'role' => '1',
         'email' => 'admin@local',
         'password' => Hash::make ('admin123'),
@@ -38,7 +44,7 @@ class InitAcc extends Seeder
         'last_name' => 'Domenden',
         'middle_name' => 'S.',
         'employee_ID' => '22-2222',
-        'college_id' => '1',
+        'college_id' => '2',
         'role' => '2',
         'email' => 'dean@local',
         'password' => Hash::make ('admin123'),
@@ -49,7 +55,7 @@ class InitAcc extends Seeder
         'last_name' => 'Castillo',
         'middle_name' => 'M.',
         'employee_ID' => '33-3333',
-        'college_id' => '1',
+        'college_id' => '2',
         'role' => '3',
         'email' => 'asstdean@local',
         'password' => Hash::make ('admin123'),
@@ -61,7 +67,7 @@ class InitAcc extends Seeder
         'last_name' => 'Palamo',
         'middle_name' => 'M.',
         'employee_ID' => '44-4444',
-        'college_id' => '1',
+        'college_id' => '2',
         'role' => '4',
         'email' => 'faculty@local',
         'password' => Hash::make ('admin123'),
@@ -72,7 +78,7 @@ class InitAcc extends Seeder
         'last_name' => 'Doe',
         'middle_name' => 'M.',
         'employee_ID' => '55-5555',
-        'college_id' => '1',
+        'college_id' => '2',
         'role' => '5',
         'email' => 'programhead@local',
         'password' => Hash::make ('admin123'),

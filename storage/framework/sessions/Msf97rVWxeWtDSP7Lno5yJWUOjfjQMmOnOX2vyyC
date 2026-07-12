@@ -1,1 +1,1 @@
-a:6:{s:6:"_token";s:40:"GC228D69SfFnsdzdzrWWHQ5Ysv3lUICr3fVKICe7";s:9:"_previous";a:2:{s:3:"url";s:31:"http://localhost:8000/schedules";s:5:"route";s:9:"schedules";}s:6:"_flash";a:2:{s:3:"old";a:0:{}s:3:"new";a:0:{}}s:9:"logged_in";b:1;s:7:"user_id";i:2;s:9:"user_role";i:2;}
+a:6:{s:6:"_flash";a:2:{s:3:"new";a:0:{}s:3:"old";a:0:{}}s:6:"_token";s:40:"ahObt696aEuyKTXGjS9UTcST32YBzUoI6IWVHYRY";s:9:"_previous";a:2:{s:3:"url";s:31:"http://localhost:8000/schedules";s:5:"route";s:9:"schedules";}s:9:"logged_in";b:1;s:7:"user_id";i:2;s:9:"user_role";i:2;}

@@ -12,8 +12,8 @@ class userscontroller extends Controller
     {
         $user = User::findOrFail($id);
 
-        // Fill dropdown from college table
-        $courses = college::query()->select(['id','college_name','abbreviation','description'])->get();
+        // Fill dropdown from college table (hide the first-created college: id=1)
+        $courses = college::query()->select(['id','college_name','abbreviation','description'])->where('id', '!=', 1)->get();
 
         return view('users.edit', compact('user', 'courses'));
     }
@@ -23,8 +23,9 @@ class userscontroller extends Controller
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'college' => 'nullable|string|max:255',
+            'college_code' => 'nullable|string|max:255',
         ]);
+
 
 
         $user = User::findOrFail($id);
@@ -32,7 +33,7 @@ class userscontroller extends Controller
         $user->update([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
-            'college' => $request->college,
+            'college' => $request->college_code,
 
         ]);
 

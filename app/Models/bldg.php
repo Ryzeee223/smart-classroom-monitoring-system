@@ -9,6 +9,7 @@ class bldg extends Model
     use HasFactory;
 
     protected $fillable =[
+        'bldg_abbr',
         'bldg_name',
         
     ];

@@ -61,6 +61,11 @@
 
                                     <?php $__currentLoopData = $courses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $c): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <?php
+                                            $collegeId = (int) ($c->id ?? 0);
+                                            // Hide the first-created college (id=1) from user editing choices.
+                                            if ($collegeId === 1) {
+                                                continue;
+                                            }
                                             $abbr = $c->abbreviation ?? '';
                                             $name = $c->college_name ?? '';
                                         ?>

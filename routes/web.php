@@ -16,9 +16,11 @@ Route::get('/', function () {
 Route::post('/', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login');
 Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 
-Route::get('/rooms', function () {
-    return view('rooms');
-})->name('rooms.index');
+// Route::get('/rooms', function () {
+//     return view('rooms');
+// })->name('rooms.index');
+
+
 
 
 
@@ -217,5 +219,8 @@ Route::put('/college/{college}', [App\Http\Controllers\collegecontroller::class,
 Route::delete('/college/{college}', [App\Http\Controllers\collegecontroller::class, 'destroy'])->name('college.destroy');
 
 
-Route::post('/rooms/store', [App\Http\Controllers\room_bldg_controller::class, 'storeRoom'])->name('storeRoom.store');
+Route::post('/rooms/', [App\Http\Controllers\room_bldg_controller::class, 'storeRoom'])->name('storeRoom.store');
+Route::get('/rooms/', [App\Http\Controllers\room_bldg_controller::class, 'show'])->name('rooms.index');
+
 Route::post('/buildings/store', [App\Http\Controllers\room_bldg_controller::class, 'storeBldg'])->name('storeBldg.store');
+Route::get('/buildings/{id}/building', [App\Http\Controllers\room_bldg_controller::class, 'show']);

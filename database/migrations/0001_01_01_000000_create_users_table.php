@@ -60,6 +60,7 @@ Schema::create('semyr', function(Blueprint $table){
 
         Schema::create('schedule', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('programs_id')->constrained('programs')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('year_level');
             $table->string('section');
@@ -75,7 +76,9 @@ Schema::create('semyr', function(Blueprint $table){
 
                 Schema::create('building', function(Blueprint $table) {
             $table->id();
+            $table->foreignId('college_id')->constrained('college')->onDelete('cascade');
             $table->string('bldg_name');
+            $table->string('bldg_abbr');
             $table->timestamps();
 
 });
@@ -93,7 +96,7 @@ Schema::create('course', function (Blueprint $table) {
 Schema::create('room', function(Blueprint $table){
     $table->id();
     $table->string('room_name')->unique();
-    $table->enum('room_type', ['Laboratory', 'lecture']);
+    $table->string('room_type');
     $table->foreignId('room_id')->constrained('building')->onDelete('cascade');
 });
 

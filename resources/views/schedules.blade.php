@@ -263,6 +263,15 @@
                                                                     </div>
 
                                                                     <div class="row">
+                                                                        <div class="col-md-12 mb-3">
+                                                                            <label class="form-label">Program</label>
+                                                                            <select class="form-select">
+                                                                                <option value="">Select Program</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row">
                                                                         <div class="col-md-6 mb-3">
                                                                             <label class="form-label">Start Time</label>
                                                                             <select class="form-select" name="Start_time" required>
@@ -287,10 +296,15 @@
                                                                     </div>
 
                                                                     <div class="row">
-                                                                        <div class="col-md-6 mb-3">
-                                                                            <label class="form-label">Day</label>
-                                                                            <input type="text" class="form-control" name="Day" value="{{ is_array($schedule->Day) ? implode(', ', $schedule->Day) : $schedule->Day }}">
-                                                                        </div>
+                                                                        <label class="form-label">Day</label>
+                                        <div class="d-flex flex-wrap gap-3 mt-1">
+                                            @foreach(['Monday','Tuesday','Wednesday','Thursday','Friday'] as $day)
+                                                <label class="d-flex align-items-center gap-1">
+                                                    <input type="checkbox" name="Day[]" value="{{ $day }}" class="form-check-input">
+                                                    <span>{{ $day }}</span>
+                                                </label>
+                                            @endforeach
+                                        </div>
                                                                         <div class="col-md-6 mb-3">
                                                                             <label class="form-label">Room</label>
                                                                             <input type="text" class="form-control" name="Room" value="{{ $schedule->Room }}">

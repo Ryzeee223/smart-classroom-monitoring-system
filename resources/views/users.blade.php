@@ -111,7 +111,11 @@
                             @php $college = $college ?? collect(); @endphp
                             @foreach($colleges as $college)
                                 @php
-                                    $collegeId = $college->id;
+                                    $collegeId = (int) ($college->id ?? 0);
+                                    // Hide the first-created college (id=1) from all user assignment choices.
+                                    if ($collegeId === 1) {
+                                        continue;
+                                    }
                                     $collegeName = $college->college_name ?? $collegeId;
                                     $collegeCode = $college->abbreviation ?? '';
                                     $label = $collegeCode ? $collegeCode . ' - ' . $collegeName : $collegeName;

@@ -293,10 +293,15 @@
                                                                     </div>
 
                                                                     <div class="row">
-                                                                        <div class="col-md-6 mb-3">
-                                                                            <label class="form-label">Day</label>
-                                                                            <input type="text" class="form-control" name="Day" value="<?php echo e(is_array($schedule->Day) ? implode(', ', $schedule->Day) : $schedule->Day); ?>">
-                                                                        </div>
+                                                                        <label class="form-label">Day</label>
+                                        <div class="d-flex flex-wrap gap-3 mt-1">
+                                            <?php $__currentLoopData = ['Monday','Tuesday','Wednesday','Thursday','Friday']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $day): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <label class="d-flex align-items-center gap-1">
+                                                    <input type="checkbox" name="Day[]" value="<?php echo e($day); ?>" class="form-check-input">
+                                                    <span><?php echo e($day); ?></span>
+                                                </label>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        </div>
                                                                         <div class="col-md-6 mb-3">
                                                                             <label class="form-label">Room</label>
                                                                             <input type="text" class="form-control" name="Room" value="<?php echo e($schedule->Room); ?>">
