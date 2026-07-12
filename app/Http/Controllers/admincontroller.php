@@ -14,9 +14,25 @@ class AdminController extends Controller
     {
         // Admin-level users can manage all account roles.
         // Role mapping: 1=Admin, 2=Dean, 3=Assistant Dean, 4=Faculty, 5=Program Head
-        $account_users = User::whereIn('role', [1,2,3,4,5])->get();
-        $faculty_users = User::where('role', [2,3,4,5])->get();
-        
+
+        $sessionRole = (int) (session('user_role') ?? 0);
+        $collegeId = session('college_id');
+        if (!$collegeId && session('user_id')) {
+            $collegeId = User::query()->where('id', session('user_id'))->value('college_id');
+        }
+
+        $account_usersQuery = User::whereIn('role', [1, 2, 3, 4, 5]);
+        $faculty_usersQuery = User::whereIn('role', [2, 3, 4, 5]);
+
+        // Non-admins should only see users from their own college
+        if ($sessionRole !== 1 && $collegeId) {
+            $account_usersQuery->where('college_id', $collegeId);
+            $faculty_usersQuery->where('college_id', $collegeId);
+        }
+
+        $account_users = $account_usersQuery->get();
+        $faculty_users = $faculty_usersQuery->get();
+
         $Programs = Programs::query()->from('Programs')->get();
 
         $colleges = \App\Models\college::query()->select(['id','college_name','abbreviation','description'])->get();

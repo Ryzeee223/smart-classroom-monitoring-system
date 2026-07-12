@@ -37,7 +37,7 @@
             <h4>Create building</h4>
             <p>This is where you create a building for colleges</p>
             <div class="d-grid gap-2 align-items-center">
-                 <input type="text" placeholder="Building name" class="form-control name="building_name" id="building_name">
+                 <input type="text" placeholder="Building name" class="form-control" name="bldg_name" id="bldg_name">
             
             </div>
             <br>

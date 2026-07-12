@@ -24,8 +24,6 @@ class Schedule extends Model
         'Room',
         'Semester',
         'School_year',
-        'Programs',
-        'course',
         'year_level',
         'section'
     ];

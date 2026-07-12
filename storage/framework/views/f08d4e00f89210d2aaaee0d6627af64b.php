@@ -16,9 +16,22 @@
     }
     body {
         overflow-x: hidden;
-        overflow-y: hidden;
     }
 </style>
+
+
+<?php
+    $startTimes = [
+        "7:00:00", "7:30:00", "8:00:00", "8:30:00", "9:00:00", "9:30:00", "10:00:00", "10:30:00",
+        "11:00:00", "11:30:00", "12:00:00", "12:30:00", "1:00:00", "1:30:00", "2:00:00", "2:30:00",
+        "3:00:00", "3:30:00", "4:00:00", "4:30:00", "5:00:00"
+    ];
+
+    $endTimes = [
+        "8:00:00","8:30:00", "9:00:00", "9:30:00", "10:00:00", "10:30:00", "11:00:00", "11:30:00", "12:00:00", "12:30:00", "1:00:00", "1:30:00", "2:00:00", "2:30:00", "3:00:00", "3:30:00",
+        "4:00:00", "4:30:00", "5:00:00", "5:30:00", "6:00:00"
+    ];
+?>
 
 <div class="app-shell">
     <?php echo $__env->make('sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
@@ -26,6 +39,7 @@
     <main class="app-shell__content">
         <div class="container mt-5">
             <div class="row">
+                
                 <div class="col-md-8">
                     <div class="card">
                         <div class="card-header">
@@ -35,7 +49,7 @@
                             <form method="POST" action="<?php echo e(route('schedules.store')); ?>">
                                 <?php echo csrf_field(); ?>
 
-                                <div class="row">
+                                <div class="row text-start">
                                     
                                     <div class="col-md-6 mb-3">
                                         <?php
@@ -58,8 +72,7 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        
+                                    <div class="col-md-6 mb-3">
                                         <label class="form-label">Faculty</label>
                                         <select class="form-select" name="user_id" required>
                                             <option value="">Select Faculty</option>
@@ -72,8 +85,7 @@
                                         </select>
                                     </div>
 
-                                    
-                                    <div class="col-md-3">
+                                    <div class="col-md-3 mb-3">
                                         <label class="form-label">Year Level</label>
                                         <select class="form-select" name="year_level" required>
                                             <option value="">Year</option>
@@ -84,8 +96,7 @@
                                         </select>
                                     </div>
 
-                                    <!-- Section selection -->
-                                    <div class="col-md-3">
+                                    <div class="col-md-3 mb-3">
                                         <label class="form-label">Section</label>
                                         <select class="form-select" name="section" required>
                                             <option value="">Section</option>
@@ -96,9 +107,8 @@
                                     </div>
                                 </div>
 
-                                <div class="row mt-3">
-                                    
-                                    <div class="col-md-6">
+                                <div class="row mt-2">
+                                    <div class="col-md-6 mb-3">
                                         <label class="form-label">Course</label>
                                         <select class="form-select" name="Course" required>
                                             <option value="">Select Course</option>
@@ -110,35 +120,8 @@
                                         </select>
                                     </div>
 
-                                    
-                                    <div class="col-md-3">
+                                    <div class="col-md-3 mb-3">
                                         <label class="form-label">Start Time</label>
-                                        <?php
-                                            $timeSlots = [
-                                                '7:30-8:30','7:30-9:30','7:30-10-:30','7:30-11:30','7:30-12:30',
-                                                '8:00-9:30','8:00-10:30','8:00-11:30','8:00-12:30',
-                                                '8:30-9:30','8:30-10:30','8:30-11:30','8:30-12:30',
-                                                '9:00-10-:30','9:00-11:30','9:00-12:30',
-                                                '9:30-10-:30','9:30-11:30','9:30-12:30',
-                                                '10:30-11:30','10:30-12:30','10:30-1:00','10:30-1:30',
-                                                '1:00-2:00','1:00-2:30','1:00-3:00','1:00-3:30','1:00-4:00','1:00-4:30','1:00-5:00',
-                                                '1:30-2:30','1:30-3:00',
-                                                '2:00-3:00','2:00-3:30','2:00-4:00','2:00-4:30','2:00-5:00','2:00-5:30','2:00-6:00',
-                                                '3:00-4:00','3:00-4:30','3:00-5:00','3:00-5:30','3:00-6:00',
-                                                '3:30-4:30','3:30-5:00','3:30-5:30','3:30-6:00',
-                                                '4:30-5:30','4:30-6:00',
-                                                '5:00-6:00'
-                                            ];
-
-                                            $startTimes = collect($timeSlots)->map(function($slot){
-                                                return explode('-', $slot)[0] ?? '';
-                                            })->filter()->unique()->values();
-
-                                            $endTimes = collect($timeSlots)->map(function($slot){
-                                                $parts = explode('-', $slot);
-                                                return $parts[1] ?? '';
-                                            })->filter()->unique()->values();
-                                        ?>
                                         <select class="form-select" name="Start_time" required>
                                             <option value="">Select Start Time</option>
                                             <?php $__currentLoopData = $startTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $start): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -147,18 +130,19 @@
                                         </select>
                                     </div>
 
-                                    <div class="col-md-3">
+                                    <div class="col-md-3 mb-3">
                                         <label class="form-label">End Time</label>
                                         <select class="form-select" name="End_time" required>
                                             <option value="">Select End Time</option>
-                                            <?php $__currentLoopData = $endTimes->sort()->values(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $end): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php $__currentLoopData = $endTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $end): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <option value="<?php echo e($end); ?>"><?php echo e($end); ?></option>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </select>
                                     </div>
+                                </div>
 
-                                    
-                                    <div class="col-md-3">
+                                <div class="row mt-2">
+                                    <div class="col-md-6 mb-3">
                                         <label class="form-label">Room</label>
                                         <select class="form-select" name="Room" required>
                                             <option value="">Room</option>
@@ -168,9 +152,19 @@
                                             <option value="CC206">CC206</option>
                                         </select>
                                     </div>
-                                </div>
 
-                                
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Day</label>
+                                        <div class="d-flex flex-wrap gap-3 mt-1">
+                                            <?php $__currentLoopData = ['Monday','Tuesday','Wednesday','Thursday','Friday']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $day): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <label class="d-flex align-items-center gap-1">
+                                                    <input type="checkbox" name="Day[]" value="<?php echo e($day); ?>" class="form-check-input">
+                                                    <span><?php echo e($day); ?></span>
+                                                </label>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <div class="mt-4">
                                     <button type="submit" class="btn btn-primary w-100" onclick="return confirm('Save this schedule?')">
@@ -182,12 +176,13 @@
                     </div>
                 </div>
 
+                
                 <div class="col-md-4">
                     <div class="card">
                         <div class="card-header">
                             <h5>Recent Schedules</h5>
                         </div>
-                        <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                        <div class="card-body" style="max-height: 500px; overflow-y: auto;">
 
                             <?php
                                 $groupedSchedules = $schedules->groupBy(function ($s) {
@@ -202,7 +197,7 @@
                                     $collapseId = 'recentSchedules_' . ($first->id ?? $first->user_id ?? 'x');
                                 ?>
 
-                                <div class="border-bottom pb-3 mb-2">
+                                <div class="border-bottom pb-3 mb-2 text-start">
                                     <div class="d-flex justify-content-between align-items-start">
                                         <button class="btn btn-link px-0 text-start" type="button"
                                                 data-bs-toggle="collapse"
@@ -215,36 +210,36 @@
 
                                     <div class="collapse mt-2" id="<?php echo e($collapseId); ?>">
                                         <div class="d-flex flex-column gap-2">
-                                            <?php $__currentLoopData = $userSchedules; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $schedule): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                <div class="p-2 border rounded">
+                                <?php $__currentLoopData = $userSchedules; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $schedule): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <div class="p-2 border rounded bg-light">
                                                     <div class="d-flex justify-content-between align-items-start">
                                                         <div>
-                                                            <strong><?php echo e($schedule->course); ?></strong><br>
+                                                            <strong><?php echo e($schedule->Subject); ?></strong><br>
                                                             <small class="text-muted">
                                                                 <?php echo e($schedule->Day); ?> |
-                                                                <?php echo e($schedule->Start_time); ?>-<?php echo e($schedule->End_time); ?> |
+                                                                <?php echo e($schedule->start_time); ?> - <?php echo e($schedule->end_time); ?> |
                                                                 <?php echo e($schedule->Room); ?>
 
                                                             </small><br>
                                                             <small class="text-muted">
-                                                                <?php echo e($schedule->Programs ?? 'N/A'); ?> <?php echo e($schedule->year_level ?? ''); ?> <?php echo e($schedule->section ?? ''); ?>
+                                                                <?php echo e($schedule->year_level ?? ''); ?><?php echo e($schedule->section ?? ''); ?>
 
                                                                 | <?php echo e($schedule->Semester ?? 'N/A'); ?> <?php echo e($schedule->School_year ?? 'N/A'); ?>
 
                                                             </small>
                                                         </div>
-                                                        <div class="text-end">
-                                                            <button class="btn btn-sm btn-outline-primary me-1"
+                                                        <div class="text-end pt-1">
+                                                            <button class="btn btn-sm btn-outline-primary mb-1 d-block w-100"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#editModal<?php echo e($schedule->id); ?>">
                                                                 Edit
                                                             </button>
 
-                                                            <form method="POST" action="<?php echo e(route('schedules.destroy', $schedule->id)); ?>" class="d-inline"
+                                                            <form method="POST" action="<?php echo e(route('schedules.destroy', $schedule->id)); ?>"
                                                                   onsubmit="return confirm('Delete this schedule?')">
                                                                 <?php echo csrf_field(); ?>
                                                                 <?php echo method_field('DELETE'); ?>
-                                                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger w-100">Delete</button>
                                                             </form>
                                                         </div>
                                                     </div>
@@ -263,45 +258,20 @@
                                                                 <?php echo csrf_field(); ?>
                                                                 <?php echo method_field('PUT'); ?>
 
-                                                                <div class="modal-body">
+                                                                <div class="modal-body text-start">
                                                                     <div class="row">
-                                                                        <div class="col-md-6">
+                                                                        <div class="col-md-12 mb-3">
                                                                             <label class="form-label">Course</label>
                                                                             <input type="text" class="form-control" name="Course" value="<?php echo e($schedule->Course); ?>">
                                                                         </div>
+                                                                    </div>
 
-                                                                        <div class="col-md-6">
+                                                                    <div class="row">
+                                                                        <div class="col-md-6 mb-3">
                                                                             <label class="form-label">Start Time</label>
-                                                                            <?php
-                                                                                $timeSlots = [
-                                                                                    '7:30-8:30','7:30-9:30','7:30-10-:30','7:30-11:30','7:30-12:30',
-                                                                                    '8:00-9:30','8:00-10:30','8:00-11:30','8:00-12:30',
-                                                                                    '8:30-9:30','8:30-10:30','8:30-11:30','8:30-12:30',
-                                                                                    '9:00-10-:30','9:00-11:30','9:00-12:30',
-                                                                                    '9:30-10-:30','9:30-11:30','9:30-12:30',
-                                                                                    '10:30-11:30','10:30-12:30','10:30-1:00','10:30-1:30',
-                                                                                    '1:00-2:00','1:00-2:30','1:00-3:00','1:00-3:30','1:00-4:00','1:00-4:30','1:00-5:00',
-                                                                                    '1:30-2:30','1:30-3:00',
-                                                                                    '2:00-3:00','2:00-3:30','2:00-4:00','2:00-4:30','2:00-5:00','2:00-5:30','2:00-6:00',
-                                                                                    '3:00-4:00','3:00-4:30','3:00-5:00','3:00-5:30','3:00-6:00',
-                                                                                    '3:30-4:30','3:30-5:00','3:30-5:30','3:30-6:00',
-                                                                                    '4:30-5:30','4:30-6:00',
-                                                                                    '5:00-6:00'
-                                                                                ];
-
-                                                                                $startTimes = collect($timeSlots)->map(function($slot){
-                                                                                    return explode('-', $slot)[0] ?? '';
-                                                                                })->filter()->unique()->values();
-
-                                                                                $endTimes = collect($timeSlots)->map(function($slot){
-                                                                                    $parts = explode('-', $slot);
-                                                                                    return $parts[1] ?? '';
-                                                                                })->filter()->unique()->values();
-                                                                            ?>
                                                                             <select class="form-select" name="Start_time" required>
-                                                                                <option value="">Select Start Time</option>
                                                                                 <?php $__currentLoopData = $startTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $start): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                                    <option value="<?php echo e($start); ?>" <?php echo e($schedule->start_time == $start ? 'selected' : ''); ?>>
+                                                                                    <option value="<?php echo e($start); ?>" <?php echo e($schedule->Start_time == $start ? 'selected' : ''); ?>>
                                                                                         <?php echo e($start); ?>
 
                                                                                     </option>
@@ -309,12 +279,11 @@
                                                                             </select>
                                                                         </div>
 
-                                                                        <div class="col-md-6 mt-2">
+                                                                        <div class="col-md-6 mb-3">
                                                                             <label class="form-label">End Time</label>
                                                                             <select class="form-select" name="End_time" required>
-                                                                                <option value="">Select End Time</option>
                                                                                 <?php $__currentLoopData = $endTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $end): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                                    <option value="<?php echo e($end); ?>" <?php echo e($schedule->end_time == $end ? 'selected' : ''); ?>>
+                                                                                    <option value="<?php echo e($end); ?>" <?php echo e($schedule->End_time == $end ? 'selected' : ''); ?>>
                                                                                         <?php echo e($end); ?>
 
                                                                                     </option>
@@ -323,12 +292,12 @@
                                                                         </div>
                                                                     </div>
 
-                                                                    <div class="row mt-2">
-                                                                        <div class="col-md-6">
+                                                                    <div class="row">
+                                                                        <div class="col-md-6 mb-3">
                                                                             <label class="form-label">Day</label>
-                                                                            <input type="text" class="form-control" name="Day" value="<?php echo e($schedule->Day); ?>">
+                                                                            <input type="text" class="form-control" name="Day" value="<?php echo e(is_array($schedule->Day) ? implode(', ', $schedule->Day) : $schedule->Day); ?>">
                                                                         </div>
-                                                                        <div class="col-md-6">
+                                                                        <div class="col-md-6 mb-3">
                                                                             <label class="form-label">Room</label>
                                                                             <input type="text" class="form-control" name="Room" value="<?php echo e($schedule->Room); ?>">
                                                                         </div>
@@ -361,6 +330,4 @@
     </main>
 </div>
 </body>
-</html>
-
-<?php /**PATH /Users/macbook/Documents/capstone project/backups/emonitor 3rd phase copy/resources/views/schedules.blade.php ENDPATH**/ ?>
+</html><?php /**PATH /Users/macbook/Documents/capstone project/backups/emonitor 3rd phase copy/resources/views/schedules.blade.php ENDPATH**/ ?>

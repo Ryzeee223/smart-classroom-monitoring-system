@@ -63,7 +63,7 @@ Schema::create('semyr', function(Blueprint $table){
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('year_level');
             $table->string('section');
-            $table->enum('Day', ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']);
+            $table->string('day');
             $table->time('start_time');
             $table->time('end_time');
             $table->string('Subject');

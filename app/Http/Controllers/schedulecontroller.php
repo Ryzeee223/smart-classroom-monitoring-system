@@ -17,20 +17,33 @@ class schedulecontroller extends Controller
             return redirect('/');
         }
 
-        $faculty_list = \App\Models\User::whereIn('role', [2, 3, 4, 5])
-            ->where('acc_status', 1)
+        // Filter faculty by the logged-in user's college
+        $collegeId = session('college_id');
+        if (!$collegeId && session('user_id')) {
+            $collegeId = \App\Models\User::query()
+                ->where('id', session('user_id'))
+                ->value('college_id');
+        }
+
+        $faculty_listQuery = \App\Models\User::whereIn('role', [2, 3, 4, 5])
+            ->where('acc_status', 1);
+
+        if ($collegeId) {
+            $faculty_listQuery->where('college_id', $collegeId);
+        }
+
+        $faculty_list = $faculty_listQuery
             ->orderBy('first_name')
             ->orderBy('last_name')
             ->get();
-    
-    
-   
-       $schoolYears = \App\Models\semyr::query()
+
+        $schoolYears = \App\Models\semyr::query()
             ->orderBy('id')
             ->get()
             ->pluck('school_year')
             ->unique()
             ->values(); 
+
 
         if (session('user_role') == 5) {
             $user_id = session('user_id');
@@ -52,36 +65,46 @@ class schedulecontroller extends Controller
         }
 
         $validatedData = $request->validate([
-            'Day' => 'required',
-            'start_time' => 'required',
-            'end_time' => 'required',
-            'Subject' => 'required',
-            'Room' => 'required',
-            'Semester' => 'required',
-            'School_year' => 'required',
-            'Programs' => 'required',
-            'course' => 'required',
-            'year_level' => 'nullable',
-            'section' => 'nullable',
-            'user_id' => 'required|exists:users,id',
+            // Blade sends Day[] checkboxes -> request key will be Day
+            'Day' => ['required', 'array', 'min:1'],
+            'Day.*' => ['string'],
+
+            // Blade uses Start_time/End_time
+            'Start_time' => ['required'],
+            'End_time' => ['required'],
+
+            // Blade does NOT send Subject or course_id. It sends Course.
+            'Course' => ['required'],
+
+            'Room' => ['required'],
+            'Semester' => ['required'],
+            'School_year' => ['required'],
+
+            // Blade uses year_level and section
+            'year_level' => ['nullable'],
+            'section' => ['nullable'],
+
+            'user_id' => ['required', 'exists:users,id'],
         ]);
+
+        // Convert checkbox array to a storable string (schedule.Day is varchar(20))
+       
 
         $id = Str::uuid()->toString();
         Schedule::create([
             'id' => $id,
             'user_id' => $validatedData['user_id'],
+            'year_level' => $validatedData['year_level'],
+            'section' => $validatedData['section'],
             'Day' => $validatedData['Day'],
-            'Start_time' => $validatedData['Start_time'],
-            'End_time' => $validatedData['End_time'],
-            // Keep legacy combined Time column too (if DB still has it)
-            'Time' => $validatedData['Start_time'] . '-' . $validatedData['End_time'],
-            'Subject' => $validatedData['Subject'],
+            'start_time' => $validatedData['Start_time'],
+            'end_time' => $validatedData['End_time'],
+            'Subject' => $validatedData['Course'],
             'Room' => $validatedData['Room'],
             'Semester' => $validatedData['Semester'],
             'School_year' => $validatedData['School_year'],
-            'Programs' => $validatedData['Programs'],
-            'year_level' => $validatedData['year_level'],
-            'section' => $validatedData['section'],
+
+
         ]);
 
         return redirect()->back()->with('success', 'Schedule added successfully!');
@@ -111,22 +134,31 @@ class schedulecontroller extends Controller
         $schedule = Schedule::findOrFail($id);
 
         $validatedData = $request->validate([
-            'Day' => 'required',
-            'Start_time' => 'required',
-            'End_time' => 'required',
-            'Subject' => 'required',
-            'Room' => 'required',
-            'Semester' => 'required',
-            'School_year' => 'required',
-            'Programs' => 'required',
-            'year_level' => 'required',
-            'section' => 'required',
+            'Day' => ['required'],
+            'Start_time' => ['required'],
+            'End_time' => ['required'],
+            'Course' => ['required'],
+            'Room' => ['required'],
+            'Semester' => ['required'],
+            'School_year' => ['required'],
+            'year_level' => ['required'],
+            'section' => ['required'],
         ]);
 
-        // Keep legacy combined Time column too (if DB still has it)
-        $validatedData['Time'] = $validatedData['Start_time'] . '-' . $validatedData['End_time'];
+        $dayValue = is_array($validatedData['Day']) ? implode(', ', $validatedData['Day']) : (string) $validatedData['Day'];
 
-        $schedule->update($validatedData);
+        // schedule table columns are lowercase start_time/end_time
+        $schedule->update([
+            'Day' => $dayValue,
+            'start_time' => $validatedData['Start_time'],
+            'end_time' => $validatedData['End_time'],
+            'Subject' => $validatedData['Course'],
+            'Room' => $validatedData['Room'],
+            'Semester' => $validatedData['Semester'],
+            'School_year' => $validatedData['School_year'],
+            'year_level' => $validatedData['year_level'],
+            'section' => $validatedData['section'],
+        ]);
 
         return redirect()->back()->with('success', 'Schedule updated successfully!');
     }
