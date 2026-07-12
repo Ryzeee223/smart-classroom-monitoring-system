@@ -88,8 +88,8 @@ $user = $userId ? User::with('college')->find($userId) : null;
         }
 
         $validated = $request->validate([
-            'letter' => 'required|string|max:255',
-            'reason' => 'required|string|max:255',
+            'letter' => 'required|string|max:50',
+            'reason' => 'required|string|max:20',
         ]);
 
         // Request table name is `Request` (capital R)

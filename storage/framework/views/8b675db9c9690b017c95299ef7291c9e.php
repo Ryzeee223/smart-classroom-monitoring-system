@@ -37,6 +37,13 @@
             <h4>Create building</h4>
             <p>This is where you create a building for colleges</p>
             <div class="d-grid gap-2 align-items-center">
+                
+                <div>
+                    <label>Building type</label>
+                    <select value="">
+                        <option value="">Select Building type</option>
+                    </select>
+                </div>
                  <input type="text" placeholder="Building name" class="form-control" name="bldg_name" id="bldg_name">
                  <input type="text" placeholder="Building abbreviation" class="form-control" name="bldg_abbr" id="bldg_abbr">
             
@@ -51,11 +58,20 @@
     </div>
 
      
-            <form method="POST" action="<?php echo e(route ("storeRoom.store")); ?>">
+            <form method="POST" action="<?php echo e(route('storeRoom.store')); ?>">
                     <div class="shadow p-3 mb-3 bg-white rounded border-1">
                         <h4>Create Rooms</h4> <br>
                     <p>This is where you create a Room</p>
                     <div class="d-grid gap-2 align-items-center">
+                        <select name="college_id" class="form-select form-select-sm">
+                            <option value="">Select College</option>
+                            <?php $__empty_1 = true; $__currentLoopData = $colleges ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $c): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                <option value="<?php echo e($c->id); ?>"><?php echo e($c->college_name ?? $c->abbreviation); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                <option value="" disabled>No colleges available</option>
+                            <?php endif; ?>
+                        </select>
+
                          <input type="text" placeholder="Enter Classroom code (eg. cc101)" class="form-control form control-sm" required>
                         <select class="form-select form-select-sm" value="" required>
                             <option value="">Select Type</option>

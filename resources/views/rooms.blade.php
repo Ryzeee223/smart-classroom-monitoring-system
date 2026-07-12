@@ -38,6 +38,12 @@
             <p>This is where you create a building for colleges</p>
             <div class="d-grid gap-2 align-items-center">
                 {{-- dropdown list for college that one of the option should be shared --}}
+                <div>
+                    <label>Building type</label>
+                    <select value="">
+                        <option value="">Select Building type</option>
+                    </select>
+                </div>
                  <input type="text" placeholder="Building name" class="form-control" name="bldg_name" id="bldg_name">
                  <input type="text" placeholder="Building abbreviation" class="form-control" name="bldg_abbr" id="bldg_abbr">
             
@@ -57,10 +63,15 @@
                         <h4>Create Rooms</h4> <br>
                     <p>This is where you create a Room</p>
                     <div class="d-grid gap-2 align-items-center">
-                        <select value="">
+                        <select name="college_id" class="form-select form-select-sm">
                             <option value="">Select College</option>
-
+                            @forelse($colleges ?? [] as $c)
+                                <option value="{{ $c->id }}">{{ $c->college_name ?? $c->abbreviation }}</option>
+                            @empty
+                                <option value="" disabled>No colleges available</option>
+                            @endforelse
                         </select>
+
                          <input type="text" placeholder="Enter Classroom code (eg. cc101)" class="form-control form control-sm" required>
                         <select class="form-select form-select-sm" value="" required>
                             <option value="">Select Type</option>

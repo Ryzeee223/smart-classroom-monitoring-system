@@ -267,6 +267,15 @@
                                                                     </div>
 
                                                                     <div class="row">
+                                                                        <div class="col-md-12 mb-3">
+                                                                            <label class="form-label">Program</label>
+                                                                            <select class="form-select">
+                                                                                <option value="">Select Program</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row">
                                                                         <div class="col-md-6 mb-3">
                                                                             <label class="form-label">Start Time</label>
                                                                             <select class="form-select" name="Start_time" required>
