@@ -23,7 +23,7 @@
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold' : '' }}" href="/dashboard">Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('users.index') ? 'active fw-bold' : '' }}" href="/users">Users</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('college') ? 'active fw-bold' : '' }}" href= "/college">Colleges</a></li>
-                <li class="nav-item"><a class="nav-link {{ request()->routeIs('rooms.*') ? 'active fw-bold' : '' }}" href="{{ route('rooms.index') }}">Rooms and Buildings</a></li>
+                <li class="nav-item"><a class="nav-link {{ request()->routeIs('rooms.index') ? 'active fw-bold' : '' }}" href="{{ route('rooms.index') }}">Rooms and Buildings</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('settings') ? 'active fw-bold' : '' }}" href="/settings">Settings</a></li>
 
                 <li class="nav-item"><span class="nav-link text-muted">Reports</span></li>

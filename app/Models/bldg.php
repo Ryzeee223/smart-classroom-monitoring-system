@@ -11,12 +11,11 @@ class bldg extends Model
     protected $fillable =[
         'bldg_abbr',
         'bldg_name',
+        'college_id',
         
     ];
     protected $table = 'building';
 
-    public function building()
-    {
-        return $this->hasMany(bldg::class);
-    }
+   
+
 }

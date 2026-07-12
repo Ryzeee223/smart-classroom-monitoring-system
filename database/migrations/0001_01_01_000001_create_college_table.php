@@ -16,7 +16,7 @@ $table->id();
 $table->string('college_name')->unique();
 $table->string('abbreviation')->unique();
 $table->string('description')->nullable();
-$table->timestamp();
+$table->timestamps();
 });
     }
 

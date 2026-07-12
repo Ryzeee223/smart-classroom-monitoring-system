@@ -222,5 +222,5 @@ Route::delete('/college/{college}', [App\Http\Controllers\collegecontroller::cla
 Route::post('/rooms/', [App\Http\Controllers\room_bldg_controller::class, 'storeRoom'])->name('storeRoom.store');
 Route::get('/rooms/', [App\Http\Controllers\room_bldg_controller::class, 'show'])->name('rooms.index');
 
-Route::post('/buildings/store', [App\Http\Controllers\room_bldg_controller::class, 'storeBldg'])->name('storeBldg.store');
-Route::get('/buildings/{id}/building', [App\Http\Controllers\room_bldg_controller::class, 'show']);
+Route::post('/rooms/store', [App\Http\Controllers\room_bldg_controller::class, 'storeBldg'])->name('storeBldg.store');
+Route::get('/rooms/{id}', [App\Http\Controllers\room_bldg_controller::class, 'show']);

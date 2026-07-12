@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rooms - eMonitor</title>
-    <link href="{{ asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}" rel="stylesheet">
-    <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
+    <link href="<?php echo e(asset('bootstrap-5.3.8-dist/css/bootstrap.min.css')); ?>" rel="stylesheet">
+    <script src="<?php echo e(asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js')); ?>"></script>
 </head>
 <body>
 
@@ -18,33 +18,33 @@
     }
 </style>
 
-@include('sidebar')
+<?php echo $__env->make('sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <div class="mt-5" style="margin-left: 300px;">
     <main class="container py-2">
         <h1 class="mb-4">Rooms</h1>
 
         <div class="row g-4 mb-4">
-            {{-- Left column --}}
+            
             <div class="col-lg-8">
 
-                {{-- Create building --}}
+                
                 <div class="card p-3 shadow-sm bg-white border-1 mb-4 ">
                     <h2 class="h5 mb-3">Create building</h2>
 
-                    <form method="POST" action="{{ route('storeBldg.store') }}">
-                        @csrf
+                    <form method="POST" action="<?php echo e(route('storeBldg.store')); ?>">
+                        <?php echo csrf_field(); ?>
 
                         <div class="row g-3">
                             <div class="d-grid gap-1 align-items-center">
                                 <label class="form-label form-label-sm">Select College</label>
                                 <select name="bldg_id" class="form-select form-select-sm" id="bldg_id">
                                     <option value="">Select College</option>
-                                    @forelse($colleges ?? [] as $c)
-                                        <option value="{{ $c->id }}">{{ $c->college_name ?? $c->abbreviation }}</option>
-                                    @empty
+                                    <?php $__empty_1 = true; $__currentLoopData = $colleges ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $c): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                        <option value="<?php echo e($c->id); ?>"><?php echo e($c->college_name ?? $c->abbreviation); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                         <option value="" disabled>No colleges available</option>
-                                    @endforelse
+                                    <?php endif; ?>
                                 </select>
 
                                 <label class="form-label form-label-sm" name="bldg_name">Building name</label>
@@ -61,20 +61,20 @@
                     </form>
                 </div>
 
-                {{-- Create Rooms --}}
+                
                 <div class="card p-3 shadow-sm bg-white border-1 mb-4">
                     <h2 class="h5 mb-3">Create Rooms</h2>
 
-                    <form method="POST" action="{{ route('storeRoom.store') }}">
+                    <form method="POST" action="<?php echo e(route('storeRoom.store')); ?>">
                         <div class="d-grid gap-2 align-items-center">
-                            @csrf
+                            <?php echo csrf_field(); ?>
                             <select name="college_id" class="form-select form-select-sm">
                                 <option value="">Select College</option>
-                                @forelse($colleges ?? [] as $c)
-                                    <option value="{{ $c->id }}">{{ $c->college_name ?? $c->abbreviation }}</option>
-                                @empty
+                                <?php $__empty_1 = true; $__currentLoopData = $colleges ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $c): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                    <option value="<?php echo e($c->id); ?>"><?php echo e($c->college_name ?? $c->abbreviation); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                     <option value="" disabled>No colleges available</option>
-                                @endforelse
+                                <?php endif; ?>
                             </select>
 
                             <input type="text" placeholder="Enter Classroom code (eg. cc101)" class="form-control form-control-sm" name="room_name" required>
@@ -92,50 +92,50 @@
                     </form>
                 </div>
 
-                {{-- Assign rooms to buildings --}}
+                
                 <div class="card p-3 shadow-sm bg-white border-1">
                     <h2 class="h5 mb-2">Assign Rooms to Building</h2>
                     <p class="mb-0">This is where you assign rooms on buildings</p>
                 </div>
             </div>
 
-            {{-- Right column (Existing buildings slot) --}}
+            
             <div class="col-lg-4">
                 <div class="card p-3 shadow-sm bg-white border-1 h-100">
                     <h5 class="mb-3 d-flex justify-content-between align-items-center"> 
                         <span>Existing buildings</span>
                     </h5>
 
-                    {{-- College filter --}}
+                    
                     <div class="mb-3">
                         <label class="form-label form-label-sm mb-1">Filter by College</label>
                         <select class="form-select form-select-sm" id="college-filter" onchange="filterBuildingsByCollege()">
                             <option value="">All colleges</option>
-                            @forelse($colleges ?? [] as $c)
-                                <option value="{{ $c->id }}">{{ $c->college_name ?? $c->abbreviation }}</option>
-                            @empty
+                            <?php $__empty_1 = true; $__currentLoopData = $colleges ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $c): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                <option value="<?php echo e($c->id); ?>"><?php echo e($c->college_name ?? $c->abbreviation); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                 <option value="" disabled>No colleges available</option>
-                            @endforelse
+                            <?php endif; ?>
                         </select>
                     </div>
 
                     <div class="table-responsive mb-0">
-                        {{-- slot container --}}
+                        
                             <div class="p-2" style="background:#f8f9fa; border-radius:6px;">
                             <div class="card-body p-0">
                                 <p class="mb-2 text-muted" style="font-size: 0.9rem;">Existing buildings</p>
                             </div>
 
                             <div id="existing-buildings-container">
-                                @forelse($bldgModel ?? [] as $b)
+                                <?php $__empty_1 = true; $__currentLoopData = $bldgModel ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $b): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                     <div class="d-flex justify-content-between align-items-center border rounded-2 px-2 py-2 mb-2 bg-white"
-                                         data-college-id="{{ $b->college_id ?? '' }}">
-                                        <div class="fw-semibold">{{ $b->bldg_name }}</div>
-                                        <div class="text-muted">({{ $b->bldg_abbr }})</div>
+                                         data-college-id="<?php echo e($b->college_id ?? ''); ?>">
+                                        <div class="fw-semibold"><?php echo e($b->bldg_name); ?></div>
+                                        <div class="text-muted">(<?php echo e($b->bldg_abbr); ?>)</div>
                                     </div>
-                                @empty
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                     <p class="mb-0 text-muted" style="font-size: 0.9rem;">No buildings available.</p>
-                                @endforelse
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -166,3 +166,4 @@
 </body>
 </html>
 
+<?php /**PATH E:\Users\Eron\capstone project\main project\smart-classroom-monitoring-system\resources\views/rooms.blade.php ENDPATH**/ ?>
