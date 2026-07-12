@@ -34,8 +34,16 @@
     @csrf
         {{-- Create building --}}
         <div class="shadow p-3 mb-3 rounded border-1">
-            <h4>Create building</h4>
-            <p>This is where you create a building for colleges</p>
+<div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h4>Create building</h4>
+                <p>This is where you create a building for colleges</p>
+            </div>
+            <div class="ms-5">
+                <h4 class="mb-0">Existing buildings</h4>
+                <p class="mb-0 text-muted">Display the existing buildings here</p>
+            </div>
+        </div>
             <div class="d-grid gap-2 align-items-center">
                 {{-- dropdown list for college that one of the option should be shared --}}
                 <div>

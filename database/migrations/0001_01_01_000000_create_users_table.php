@@ -11,19 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('college', function(blueprint $table){
-$table->id();
-$table->string('college_name')->unique();
-$table->string('abbreviation')->unique();
-$table->string('description')->nullable();
-});
+       
 
-Schema::create('semyr', function(Blueprint $table){
-    $table->id();
-    $table->string('semester');
-    $table->string('school_year');
-    $table->timestamps();
-});
+
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('first_name');
@@ -34,7 +24,7 @@ Schema::create('semyr', function(Blueprint $table){
             $table->string('profile_picture')->nullable();
             $table->string('password');
             $table->integer('role');
-            $table->foreignId('college_id')->constrained('college')->onDelete('cascade')->nullable();
+            $table->foreignId('college_id')->constrained('college')->onDelete('cascade');
             $table->string('RFID_code')->nullable()->unique();
             $table->tinyInteger('acc_status')->default(1);
             $table->tinyInteger('status')->default(0);
@@ -58,54 +48,7 @@ Schema::create('semyr', function(Blueprint $table){
             $table->timestamps();
         });
 
-        Schema::create('schedule', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('programs_id')->constrained('programs')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('year_level');
-            $table->string('section');
-            $table->string('day');
-            $table->time('start_time');
-            $table->time('end_time');
-            $table->string('Subject');
-            $table->string('Room');
-            $table->string('Semester');
-            $table->string('School_year');
-            $table->timestamps();
-        });
 
-                Schema::create('building', function(Blueprint $table) {
-            $table->id();
-            $table->foreignId('college_id')->constrained('college')->onDelete('cascade');
-            $table->string('bldg_name');
-            $table->string('bldg_abbr');
-            $table->timestamps();
-
-});
-
-
-Schema::create('course', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('college_id')->constrained('college')->onDelete('cascade');
-            $table->string('course_code')->unique();
-            $table->string('course_name')->unique();
-            $table->text('description')->nullable();
-            $table->timestamps();
-        });
-
-Schema::create('room', function(Blueprint $table){
-    $table->id();
-    $table->string('room_name')->unique();
-    $table->string('room_type');
-    $table->foreignId('room_id')->constrained('building')->onDelete('cascade');
-});
-
-Schema::create('Scanner', function(Blueprint $table){
-    $table->id();
-    $table->string('RFID_code')->unique();
-    $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-    $table->timestamp('scanned_at')->nullable();
-});
     }
 
 
@@ -114,14 +57,8 @@ Schema::create('Scanner', function(Blueprint $table){
      */
     public function down(): void
     {
-        Schema::dropIfExists('semyr');
-        Schema::dropIfExists('schedule');
+        Schema::dropIfExists('users');
         Schema::dropIfExists('sessions');
         Schema::dropIfExists('password_reset_tokens');
-        Schema::dropIfExists('users');
-        schema::dropIfExists('building');
-        Schema::dropIfExists('room');
-        Schema::dropIfExists('Scanner');
-        Schema::dropIfExists('course');
     }
 };
