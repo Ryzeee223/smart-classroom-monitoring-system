@@ -19,13 +19,15 @@ class room_bldg_controller extends Controller
         $request->validate([
             'room_name' => 'required|string|max:30',
             'room_type' => 'required|string|max:30',
-            'bldg_id' => 'nullable|exists:bldg,id',
+            'college_id'=> 'nullable|exists:college,id',
+            'bldg_id'   => 'nullable|exist:building,id',
         ]);
 
         room::create([
             'room_name' => $request->input('room_name'),
             'room_type' => $request->input('room_type'),
-            'bldg_id'   => $request->input('bldg_id'),
+            'college_id'=> $request->input('college_id') ?? null,
+            'bldg_id'   => $request->input('bldg_id') ?? null,
         ]);
 
         return redirect()->back()->with('success', 'Room created successfully.');
@@ -37,23 +39,19 @@ class room_bldg_controller extends Controller
             return redirect('/');
         }
 
-        // In rooms.blade.php, the college dropdown for creating a building uses name="bldg_id"
-        // but it represents the selected college_id.
+       
         $request->validate([
-            'bldg_name' => 'required|string|max:50',
-            'bldg_abbr' => 'required|string|max:10',
-            'bldg_id' => 'nullable|exists:college,id',
+            'bldg_name' => 'required|string|max:100',
+            'bldg_abbr' => 'required|string|max:20|unique:building,bldg_abbr',
+            'college_id' => 'nullable|exists:college,id',
         ]);
-
-        $selectedCollegeId = $request->input('bldg_id');
 
         bldg::create([
             'bldg_name' => $request->input('bldg_name'),
             'bldg_abbr' => $request->input('bldg_abbr'),
-            'college_id' => $selectedCollegeId !== null && $selectedCollegeId !== '' ? $selectedCollegeId : null,
+            'college_id'=> $request->input('college_id') ?? null,
         ]);
-
-        return redirect()->back()->with('success', 'Building created successfully.');
+        return redirect()->route('rooms.index')->with('success', 'Building created successfully.');
     }
 
     public function showrm(Request $request)

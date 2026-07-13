@@ -31,14 +31,13 @@
                 
                 <div class="card p-3 shadow-sm bg-white border-1 mb-4 ">
                     <h2 class="h5 mb-3">Create building</h2>
-
                     <form method="POST" action="<?php echo e(route('storeBldg.store')); ?>">
                         <?php echo csrf_field(); ?>
 
                         <div class="row g-3">
                             <div class="d-grid gap-1 align-items-center">
                                 <label class="form-label form-label-sm">Select College</label>
-                                <select name="bldg_id" class="form-select form-select-sm" id="bldg_id">
+                                <select name="college_id" class="form-select form-select-sm" id="college_id">
                                     <option value="">Select College</option>
                                     <?php $__empty_1 = true; $__currentLoopData = $colleges ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $c): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                         <option value="<?php echo e($c->id); ?>"><?php echo e($c->college_name ?? $c->abbreviation); ?></option>
@@ -106,7 +105,15 @@
                         <span>Existing buildings</span>
                     </h5>
 
-                    
+                        <?php if(session('error')): ?>
+                            <div class="alert alert-danger alert-sm mb-3"><?php echo e(session('error')); ?></div>
+                        <?php endif; ?>
+
+                        <?php if(session('success')): ?>
+                            <div class="alert alert-success alert-sm mb-3"><?php echo e(session('success')); ?></div>
+                        <?php endif; ?>
+
+                        
                     <div class="mb-3">
                         <label class="form-label form-label-sm mb-1">Filter by College</label>
                         <select class="form-select form-select-sm" id="college-filter" onchange="filterBuildingsByCollege()">

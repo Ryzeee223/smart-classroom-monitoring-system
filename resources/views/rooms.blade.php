@@ -31,14 +31,13 @@
                 {{-- Create building --}}
                 <div class="card p-3 shadow-sm bg-white border-1 mb-4 ">
                     <h2 class="h5 mb-3">Create building</h2>
-
                     <form method="POST" action="{{ route('storeBldg.store') }}">
                         @csrf
 
                         <div class="row g-3">
                             <div class="d-grid gap-1 align-items-center">
                                 <label class="form-label form-label-sm">Select College</label>
-                                <select name="bldg_id" class="form-select form-select-sm" id="bldg_id">
+                                <select name="college_id" class="form-select form-select-sm" id="college_id">
                                     <option value="">Select College</option>
                                     @forelse($colleges ?? [] as $c)
                                         <option value="{{ $c->id }}">{{ $c->college_name ?? $c->abbreviation }}</option>
@@ -106,7 +105,15 @@
                         <span>Existing buildings</span>
                     </h5>
 
-                    {{-- College filter --}}
+                        @if(session('error'))
+                            <div class="alert alert-danger alert-sm mb-3">{{ session('error') }}</div>
+                        @endif
+
+                        @if(session('success'))
+                            <div class="alert alert-success alert-sm mb-3">{{ session('success') }}</div>
+                        @endif
+
+                        {{-- College filter --}}
                     <div class="mb-3">
                         <label class="form-label form-label-sm mb-1">Filter by College</label>
                         <select class="form-select form-select-sm" id="college-filter" onchange="filterBuildingsByCollege()">

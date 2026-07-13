@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('building', function(Blueprint $table) {
             $table->id();
             $table->foreignId('college_id')->nullable()->constrained('college')->onDelete('cascade');
-            $table->string('bldg_name');
-            $table->string('bldg_abbr');
+            $table->string('bldg_name')->unique();
+            $table->string('bldg_abbr')->unique();
             $table->timestamps();
         });
        

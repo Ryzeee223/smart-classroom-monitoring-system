@@ -15,7 +15,9 @@ return new class extends Migration
     $table->id();
     $table->string('room_name')->unique();
     $table->string('room_type');
-    $table->foreignId('bldg_id')->constrained('building')->onDelete('cascade');
+    $table->foreignId('college_id')->nullable()->constrained('college')->onDelete('cascade');
+    $table->foreignId('bldg_id')->nullable()->constrained('building')->onDelete('cascade');
+    $table->timestamps();
 });
     }
 

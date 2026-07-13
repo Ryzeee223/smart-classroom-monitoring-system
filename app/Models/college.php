@@ -14,7 +14,7 @@ class college extends Model
         'college_name',
         'abbreviation',
         'description',
-        'user_id',
+        
     ];
 
     protected $table = 'college';
