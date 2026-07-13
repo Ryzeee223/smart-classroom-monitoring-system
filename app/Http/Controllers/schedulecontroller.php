@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use App\Models\Schedule;
 use App\Models\course;
-use App\Models\programs;
+use App\Models\Programs;
 use App\Models\User;
+use App\Models\room;
+use App\Models\semyr;
+
 
 class schedulecontroller extends Controller
 {
@@ -20,12 +22,12 @@ class schedulecontroller extends Controller
         // Filter faculty by the logged-in user's college
         $collegeId = session('college_id');
         if (!$collegeId && session('user_id')) {
-            $collegeId = \App\Models\User::query()
+            $collegeId = User::query()
                 ->where('id', session('user_id'))
                 ->value('college_id');
         }
 
-        $faculty_listQuery = \App\Models\User::whereIn('role', [2, 3, 4, 5])
+        $faculty_listQuery = User::whereIn('role', [2, 3, 4, 5])
             ->where('acc_status', 1);
 
         if ($collegeId) {
@@ -37,77 +39,93 @@ class schedulecontroller extends Controller
             ->orderBy('last_name')
             ->get();
 
-        $schoolYears = \App\Models\semyr::query()
+        $schoolYears = semyr::query()
             ->orderBy('id')
             ->get()
             ->pluck('school_year')
             ->unique()
-            ->values(); 
+            ->values();
 
-
-        if (session('user_role') == 5) {
+        if ((int) session('user_role') === 5) {
             $user_id = session('user_id');
             $schedules = Schedule::where('user_id', $user_id)->get();
         } else {
             $schedules = Schedule::all();
-            $course = course::all();
         }
 
-        return view('schedules', compact('schedules', 'faculty_list', 'course', 'schoolYears'));
-    
-    
+
+        $programs = Programs::all();
+        $courses = course::all();
+
+        // View expects $course for the course dropdown
+        $course = $courses;
+
+        $rooms = room::all();
+
+        return view('schedules', compact('schedules', 'faculty_list', 'course', 'schoolYears', 'programs', 'rooms'));
     }
 
     public function store(Request $request)
-{
+    {
         if (!session('logged_in')) {
             return redirect('/');
         }
 
         $validatedData = $request->validate([
-            // Blade sends Day[] checkboxes -> request key will be Day
             'Day' => ['required', 'array', 'min:1'],
             'Day.*' => ['string'],
 
-            // Blade uses Start_time/End_time
+            
+            'program_id' => ['required', 'exists:Programs,id'],
+            'Course' => ['required', 'exists:courses,id'],
+            'Room' => ['required', 'exists:room,id'],
+            'user_id' => ['required', 'exists:users,id'],
+            'Semester' => ['required', 'exists:semyr,id'],
+            'School_year' => ['required', 'exists:semyr,id'],
+
             'Start_time' => ['required'],
             'End_time' => ['required'],
 
-            // Blade does NOT send Subject or course_id. It sends Course.
-            'Course' => ['required'],
-
-            'Room' => ['required'],
-            'Semester' => ['required'],
-            'School_year' => ['required'],
-
-            // Blade uses year_level and section
-            'year_level' => ['nullable'],
-            'section' => ['nullable'],
-
-            'user_id' => ['required', 'exists:users,id'],
+            'year_level' => ['required', 'string'],
+            'section' => ['required', 'string'],
         ]);
 
-        // Convert checkbox array to a storable string (schedule.Day is varchar)
-        $dayValue = is_array($validatedData['Day'])
-            ? implode(', ', $validatedData['Day'])
-            : (string) $validatedData['Day'];
+        $dayValue = implode(', ', $validatedData['Day']);
 
-        // Do not set `id` manually; DB column is auto-increment (BIGINT) in the migration.
+        $courseId = course::query()
+            ->where('course_name', $validatedData['Course'])
+            ->value('id');
+        if (!$courseId) {
+            return redirect()->back()->with('error', 'Selected course not found.');
+        }
+
+        $roomId = room::query()
+            ->where('room_name', $validatedData['Room'])
+            ->value('id');
+        if (!$roomId) {
+            return redirect()->back()->with('error', 'Selected room not found.');
+        }
+
         Schedule::create([
             'user_id' => $validatedData['user_id'],
+            'program_id' => $validatedData['program_id'],
+            'course_id' => $courseId,
+            'room_id' => $roomId,
+
             'year_level' => $validatedData['year_level'],
             'section' => $validatedData['section'],
-            'Day' => $dayValue,
+
+            'day' => $dayValue,
             'start_time' => $validatedData['Start_time'],
             'end_time' => $validatedData['End_time'],
-            'Subject' => $validatedData['Course'],
-            'Room' => $validatedData['Room'],
+
             'Semester' => $validatedData['Semester'],
             'School_year' => $validatedData['School_year'],
         ]);
 
         return redirect()->back()->with('success', 'Schedule added successfully!');
     }
+
 
     public function destroy($id)
     {
@@ -133,31 +151,55 @@ class schedulecontroller extends Controller
         $schedule = Schedule::findOrFail($id);
 
         $validatedData = $request->validate([
-            'Day' => ['required'],
+            'Day' => ['required', 'array', 'min:1'],
+
+            'user_id'    => ['required', 'exists:users,id'],
+            'program_id' => ['required', 'exists:programs,id'],
+            'Course_id'  => ['required', 'exists:courses,id'],
+            'Room_id'    => ['required', 'exists:room,id'],
+            
             'Start_time' => ['required'],
-            'End_time' => ['required'],
-            'Course' => ['required'],
-            'Room' => ['required'],
-            'Semester' => ['required'],
-            'School_year' => ['required'],
-            'year_level' => ['required'],
-            'section' => ['required'],
+            'End_time'   => ['required'],
+
+            'Semester'   => ['required', 'exists:semyr,id'],
+            'School_year'=> ['required', 'exists:semyr,id'],
+
+            'year_level' => ['required', 'string'],
+            'section'    => ['required', 'string'],
         ]);
 
-        
+        $dayValue = implode(', ', $validatedData['Day']);
 
-        // schedule table columns are lowercase start_time/end_time
+        $courseId = course::query()
+            ->where('course_name', $validatedData['Course'])
+            ->value('id');
+        if (!$courseId) {
+            return redirect()->back()->with('error', 'Selected course not found.');
+        }
+
+        $roomId = room::query()
+            ->where('room_name', $validatedData['Room'])
+            ->value('id');
+        if (!$roomId) {
+            return redirect()->back()->with('error', 'Selected room not found.');
+        }
+
         $schedule->update([
-            'Day' => $validatedData['Day'],
-            'start_time' => $validatedData['Start_time'],
-            'end_time' => $validatedData['End_time'],
-            'Subject' => $validatedData['Course'],
-            'Room' => $validatedData['Room'],
-            'Semester' => $validatedData['Semester'],
-            'School_year' => $validatedData['School_year'],
+            'program_id' => $validatedData['program_id'],
+            'course_id' => $courseId,
+            'room_id' => $roomId,
+
             'year_level' => $validatedData['year_level'],
             'section' => $validatedData['section'],
+
+            'day' => $dayValue,
+            'start_time' => $validatedData['Start_time'],
+            'end_time' => $validatedData['End_time'],
+
+            'Semester' => $validatedData['Semester'],
+            'School_year' => $validatedData['School_year'],
         ]);
+
 
         return redirect()->back()->with('success', 'Schedule updated successfully!');
     }

@@ -34,8 +34,12 @@ class coursecontroller extends Controller
 
         $request->validate([
             'college_id' => 'required|integer|exists:college,id',
-            'course_code' => 'required|unique:course,course_code',
+            'course_code' => 'required|unique:courses,course_code',
+            
+
+
             'course_name' => 'required|string|max:255',
+
             'description' => 'nullable|string',
         ]);
 
@@ -76,9 +80,10 @@ class coursecontroller extends Controller
 
         $request->validate([
             'college_id' => 'required|integer|exists:college,id',
-            'course_code' => 'required|string|max:255|unique:course,course_code,' . $id,
-            'course_name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'course_code' => 'required|string|max:10|unique:courses,course_code,' . $id,
+
+            'course_name' => 'required|string|max:65',
+            'description' => 'nullable|string|max:255',
         ]);
 
         $course = course::findOrFail($id);

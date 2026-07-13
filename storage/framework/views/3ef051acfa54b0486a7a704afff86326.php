@@ -32,4 +32,4 @@
         </div>
     </body>
 </html>
-<?php /**PATH E:\Users\Eron\capstone project\main project\smart-classroom-monitoring-system\vendor\laravel\framework\src\Illuminate\Foundation\Exceptions/views/minimal.blade.php ENDPATH**/ ?>
+<?php /**PATH /Users/macbook/Documents/capstone project/backups/emonitor 3rd phase copy/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/views/minimal.blade.php ENDPATH**/ ?>

@@ -26,6 +26,8 @@ class ProgramController extends Controller
         }
 
         return view('programs', compact('Programs'));
+
+
     }
 
     public function store(Request $request)
@@ -63,11 +65,13 @@ class ProgramController extends Controller
             'college_id' => $collegeId,
             'Program_abbr' => $request->program_abbr,
             'Program_name' => $request->program_name,
-            'description' => $request->description ?? '',
+            'description' => $request->description ?? '',            
         ]);
 
         return back()->with('success', 'Program saved successfully!');
     }
+
+
 
     public function edit($id)
     {
@@ -78,6 +82,8 @@ class ProgramController extends Controller
         $Program = Programs::findOrFail($id);
         return view('program.edit', compact('Program'));
     }
+
+    
 
 
     public function update(Request $request, $id)
@@ -112,7 +118,7 @@ class ProgramController extends Controller
         $Program = Programs::findOrFail($id);
         $Program->delete();
 
-        return redirect()->route('programs')->with('success', 'Program deleted successfully!');
+        return redirect()->route('program')->with('success', 'Program deleted successfully!');
     }
 }
 

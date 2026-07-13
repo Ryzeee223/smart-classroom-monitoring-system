@@ -54,12 +54,12 @@
                                     <div class="row">
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label">Program</label>
-                                        <select class="form-select" name="Room" required>
+                                        <select class="form-select" name="program_id" required>
                                             <option value="">Select Program</option>
-                                            <option value="CC101">CC101</option>
-                                            <option value="CC104">CC104</option>
-                                            <option value="CC205">CC205</option>
-                                            <option value="CC206">CC206</option>
+                                                <?php $__currentLoopData = $programs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $program): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <option value="<?php echo e($program->id); ?>"><?php echo e($program->Program_abbr); ?></option>
+                                               <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
                                         </select>
                                     </div>
                                 </div>
@@ -134,7 +134,7 @@
                                         <select class="form-select" name="Course" required>
                                             <option value="">Select Course</option>
                                             <?php $__currentLoopData = $course; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $courses): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                <option value="<?php echo e($courses->course_name); ?>">
+                                                <option value="<?php echo e($courses->id); ?>">
                                                     <?php echo e($courses->course_name); ?> (<?php echo e($courses->course_code); ?>)
                                                 </option>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -170,10 +170,9 @@
                                         <label class="form-label">Room</label>
                                         <select class="form-select" name="Room" required>
                                             <option value="">Room</option>
-                                            <option value="CC101">CC101</option>
-                                            <option value="CC104">CC104</option>
-                                            <option value="CC205">CC205</option>
-                                            <option value="CC206">CC206</option>
+                                            <?php $__currentLoopData = $rooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <option value="<?php echo e($room->id); ?>"><?php echo e($room->room_name); ?></option>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </select>
                                     </div>
 
@@ -181,7 +180,7 @@
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Day</label>
                                         <div class="d-flex flex-wrap gap-3 mt-1">
-                                            <?php $__currentLoopData = ['Monday','Tuesday','Wednesday','Thursday','Friday']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $day): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php $__currentLoopData = ['Mon','Tue','Wed','Thu','Fri']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $day): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <label class="d-flex align-items-center gap-1">
                                                     <input type="checkbox" name="Day[]" value="<?php echo e($day); ?>" class="form-check-input">
                                                     <span><?php echo e($day); ?></span>
@@ -295,11 +294,18 @@
                                                                     <div class="row">
                                                                         <div class="col-md-12 mb-3">
                                                                             <label class="form-label">Program</label>
-                                                                            <select class="form-select">
+                                                                            <select class="form-select" name="program_id" required>
                                                                                 <option value="">Select Program</option>
+                                                                                <?php $__currentLoopData = $programs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $program): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                                    <option value="<?php echo e($program->id); ?>" <?php echo e((isset($schedule->program_id) && (int)$schedule->program_id === (int)$program->id) ? 'selected' : ''); ?>>
+                                                                                        <?php echo e($program->Program_abbr); ?>
+
+                                                                                    </option>
+                                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                             </select>
                                                                         </div>
                                                                     </div>
+
 
                                                                     <div class="row">
                                                                         <div class="col-md-6 mb-3">
@@ -370,4 +376,4 @@
     </main>
 </div>
 </body>
-</html><?php /**PATH E:\Users\Eron\capstone project\main project\smart-classroom-monitoring-system\resources\views/schedules.blade.php ENDPATH**/ ?>
+</html><?php /**PATH /Users/macbook/Documents/capstone project/backups/emonitor 3rd phase copy/resources/views/schedules.blade.php ENDPATH**/ ?>

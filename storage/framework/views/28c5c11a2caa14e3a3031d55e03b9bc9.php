@@ -126,4 +126,4 @@
     }
 </style>
 
-<?php /**PATH E:\Users\Eron\capstone project\main project\smart-classroom-monitoring-system\resources\views/sidebar.blade.php ENDPATH**/ ?>
+<?php /**PATH /Users/macbook/Documents/capstone project/backups/emonitor 3rd phase copy/resources/views/sidebar.blade.php ENDPATH**/ ?>

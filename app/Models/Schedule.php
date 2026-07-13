@@ -14,18 +14,19 @@ class Schedule extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'id',
         'user_id',
-        'Day',
-        'Time',
+        'program_id',
+        'room_id',
+        'course_id',
+
+        'year_level',
+        'section',
+        'day',
         'start_time',
         'end_time',
-        'Subject',
-        'Room',
+        
         'Semester',
         'School_year',
-        'year_level',
-        'section'
     ];
 
 public function user()

@@ -56,10 +56,10 @@
                                         <label class="form-label">Program</label>
                                         <select class="form-select" name="program_id" required>
                                             <option value="">Select Program</option>
-                                            <option value="CC101">CC101</option>
-                                            <option value="CC104">CC104</option>
-                                            <option value="CC205">CC205</option>
-                                            <option value="CC206">CC206</option>
+                                                @foreach ($programs as $program)
+                                                <option value="{{ $program->id  }}">{{ $program->Program_abbr }}</option>
+                                               @endforeach
+
                                         </select>
                                     </div>
                                 </div>
@@ -133,7 +133,7 @@
                                         <select class="form-select" name="Course" required>
                                             <option value="">Select Course</option>
                                             @foreach($course as $courses)
-                                                <option value="{{ $courses->course_name }}">
+                                                <option value="{{ $courses->id }}">
                                                     {{ $courses->course_name }} ({{ $courses->course_code }})
                                                 </option>
                                             @endforeach
@@ -169,10 +169,9 @@
                                         <label class="form-label">Room</label>
                                         <select class="form-select" name="Room" required>
                                             <option value="">Room</option>
-                                            <option value="CC101">CC101</option>
-                                            <option value="CC104">CC104</option>
-                                            <option value="CC205">CC205</option>
-                                            <option value="CC206">CC206</option>
+                                            @foreach($rooms as $room)
+                                                <option value="{{ $room->id }}">{{ $room->room_name }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
 
@@ -180,7 +179,7 @@
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Day</label>
                                         <div class="d-flex flex-wrap gap-3 mt-1">
-                                            @foreach(['Monday','Tuesday','Wednesday','Thursday','Friday'] as $day)
+                                            @foreach(['Mon','Tue','Wed','Thu','Fri'] as $day)
                                                 <label class="d-flex align-items-center gap-1">
                                                     <input type="checkbox" name="Day[]" value="{{ $day }}" class="form-check-input">
                                                     <span>{{ $day }}</span>
@@ -291,11 +290,17 @@
                                                                     <div class="row">
                                                                         <div class="col-md-12 mb-3">
                                                                             <label class="form-label">Program</label>
-                                                                            <select class="form-select">
+                                                                            <select class="form-select" name="program_id" required>
                                                                                 <option value="">Select Program</option>
+                                                                                @foreach($programs as $program)
+                                                                                    <option value="{{ $program->id }}" {{ (isset($schedule->program_id) && (int)$schedule->program_id === (int)$program->id) ? 'selected' : '' }}>
+                                                                                        {{ $program->Program_abbr }}
+                                                                                    </option>
+                                                                                @endforeach
                                                                             </select>
                                                                         </div>
                                                                     </div>
+
 
                                                                     <div class="row">
                                                                         <div class="col-md-6 mb-3">

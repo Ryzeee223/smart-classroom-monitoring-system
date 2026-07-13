@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('program_id')->constrained('programs')->onDelete('cascade');
-            $table->foreignId('course_id')->constrained('course')->onDelete('cascade');
             $table->foreignId('room_id')->constrained('room')->onDelete('cascade');
+            $table->foreignId('course_id')->constrained('courses')->onDelete('cascade');
+            
             $table->string('year_level');
             $table->string('section');
             $table->string('day');
@@ -25,6 +26,7 @@ return new class extends Migration
             $table->string('Semester');
             $table->string('School_year');
             $table->timestamps();
+            
         });
     }
 

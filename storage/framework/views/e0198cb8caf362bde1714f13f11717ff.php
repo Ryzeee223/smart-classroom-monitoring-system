@@ -122,4 +122,4 @@
 </body>
 </html>
 
-<?php /**PATH E:\Users\Eron\capstone project\main project\smart-classroom-monitoring-system\resources\views/course.blade.php ENDPATH**/ ?>
+<?php /**PATH /Users/macbook/Documents/capstone project/backups/emonitor 3rd phase copy/resources/views/course.blade.php ENDPATH**/ ?>
