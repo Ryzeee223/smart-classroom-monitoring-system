@@ -23,4 +23,5 @@ class Programs extends Model
     {
         return $this->hasMany(Programs::class);
     }
+    
 }

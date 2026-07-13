@@ -293,7 +293,7 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex flex-column align-items-center gap-2">
-                                        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-outline-primary fw-semibold" title="Edit">
+                                        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-outline-primary" title="Edit">
                                             Edit
                                         </a>
 

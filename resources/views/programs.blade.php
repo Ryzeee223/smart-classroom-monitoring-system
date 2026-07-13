@@ -102,7 +102,7 @@
                                     <form method="POST" action="{{ route('program.destroy', $program->id) }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this program?')">Delete</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold" onclick="return confirm('Delete this program?')">Delete</button>
                                     </form>
                                 </div>
                             </li>

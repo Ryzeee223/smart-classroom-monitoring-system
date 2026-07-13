@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Schedule - eMonitor</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="{{ asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}" rel="stylesheet">
     <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
 </head>
+
 <body>
 <style>
     .app-shell { display: flex; min-height: 100vh; }
@@ -88,8 +90,9 @@
                                     </div>
                                 </div>
 
-                                {{-- faculty --}}
+                                
                                 <div class="row">
+                                    {{-- selec faculty --}}
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Faculty</label>
                                         <select class="form-select" name="user_id" required>
@@ -132,7 +135,7 @@
                                         <label class="form-label">Course</label>
                                         <select class="form-select" name="Course" required>
                                             <option value="">Select Course</option>
-                                            @foreach($course as $courses)
+                                            @foreach($courses as $courses)
                                                 <option value="{{ $courses->id }}">
                                                     {{ $courses->course_name }} ({{ $courses->course_code }})
                                                 </option>
@@ -189,11 +192,84 @@
                                     </div>
 
 
+
                                 <div class="mt-4">
                                     <button type="submit" class="btn btn-primary w-100" onclick="return confirm('Save this schedule?')">
                                         Add Schedule
                                     </button>
                                 </div>
+
+                                {{-- Conflict alert --}}
+                                <div id="scheduleConflictAlert" class="alert alert-danger mt-3 d-none" role="alert">
+                                    Schedule conflict detected. Please choose another time or room.
+                                </div>
+
+                                {{-- Conflict checker script --}}
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        const form = document.querySelector('form[action="{{ route('schedules.store') }}"]');
+                                        if (!form) return;
+
+                                        const alertEl = document.getElementById('scheduleConflictAlert');
+                                        const apiUrl = '{{ route('schedules.bookingsystem') }}';
+
+                                        function getSelectedDays() {
+                                            return Array.from(form.querySelectorAll('input[name="Day[]"]:checked')).map(el => el.value);
+                                        }
+
+                                        async function checkConflictForDay(day, roomId, startTime, endTime) {
+                                            const payload = {
+                                                day: day,
+                                                room_id: roomId,
+                                                start_time: startTime,
+                                                end_time: endTime
+                                            };
+
+                                            const res = await fetch(apiUrl, {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                                },
+                                                body: JSON.stringify(payload)
+                                            });
+
+                                            if (!res.ok) {
+                                                // Fail open: allow submission if the checker fails
+                                                return false;
+                                            }
+
+                                            const data = await res.json();
+                                            return !!data.conflict;
+                                        }
+
+                                        form.addEventListener('submit', async function (e) {
+                                            alertEl.classList.add('d-none');
+
+                                            const selectedDays = getSelectedDays();
+                                            const roomId = form.querySelector('select[name="Room"]').value;
+                                            const startTime = form.querySelector('select[name="Start_time"]').value;
+                                            const endTime = form.querySelector('select[name="End_time"]').value;
+
+                                            // If form is incomplete, let backend validation handle it
+                                            if (!selectedDays.length || !roomId || !startTime || !endTime) return;
+
+                                            e.preventDefault();
+
+                                            for (const day of selectedDays) {
+                                                const hasConflict = await checkConflictForDay(day, roomId, startTime, endTime);
+                                                if (hasConflict) {
+                                                    alertEl.classList.remove('d-none');
+                                                    return;
+                                                }
+                                            }
+
+                                            // No conflicts: submit
+                                            form.submit();
+                                        });
+                                    });
+                                </script>
+
                             </form>
                         </div>
                     </div>
@@ -238,25 +314,30 @@
                                                 <div class="p-2 border rounded bg-light">
                                                     <div class="d-flex justify-content-between align-items-start">
                                                         <div>
-                                                            <strong>{{ $schedule->Subject }}</strong><br>
+                                                            {{-- Schedule fields (match schedule table columns) --}}
+                                                            <strong>{{ $schedule->program?->Program_abbr ?? $schedule->Programs?->Program_abbr ?? 'N/A' }} {{ $schedule->year_level ?? '' }} {{$schedule->section }}</strong><br>
+                                                            <strong>{{ $schedule->course->course_code ?? 'N/A' }}</strong><br>
                                                             <small class="text-muted">
-                                                                {{ $schedule->Day }} |
+                                                                {{ $schedule->day ?? ($schedule->Day ?? 'N/A') }} |
                                                                 {{ $schedule->start_time }} - {{ $schedule->end_time }} |
-                                                                {{ $schedule->Room }}
+                                                                {{ $schedule->room_id ?? ($schedule->Room ?? 'N/A') }}
                                                             </small><br>
+
                                                             <small class="text-muted">
-                                                                {{ $schedule->year_level ?? '' }}{{ $schedule->section ?? '' }}
+
+                                                                
                                                                 | {{ $schedule->Semester ?? 'N/A' }} {{ $schedule->School_year ?? 'N/A' }}
                                                             </small>
                                                         </div>
                                                         <div class="text-end pt-1">
                                                             <button class="btn btn-sm btn-outline-primary mb-1 d-block w-100"
+                                                                    type="button"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#editModal{{ $schedule->id }}">
                                                                 Edit
                                                             </button>
 
-                                                            <form method="POST" action="{{ route('schedules.destroy', $schedule->id) }}"
+                                                            <form method="POST" action="{{ route('schedules.destroy', $schedule->id) }}" class="d-block w-100"
                                                                   onsubmit="return confirm('Delete this schedule?')">
                                                                 @csrf
                                                                 @method('DELETE')
@@ -278,12 +359,13 @@
                                                             <form method="POST" action="{{ route('schedules.update', $schedule->id) }}">
                                                                 @csrf
                                                                 @method('PUT')
-
+                                                                
                                                                 <div class="modal-body text-start">
                                                                     <div class="row">
                                                                         <div class="col-md-12 mb-3">
                                                                             <label class="form-label">Course</label>
-                                                                            <input type="text" class="form-control" name="Course" value="{{ $schedule->Course }}">
+                                                                            <input type="text" class="form-control" name="Course" value="{{ $schedule->course_id }}">
+
                                                                         </div>
                                                                     </div>
 
@@ -338,7 +420,8 @@
                                         </div>
                                                                         <div class="col-md-6 mb-3">
                                                                             <label class="form-label">Room</label>
-                                                                            <input type="text" class="form-control" name="Room" value="{{ $schedule->Room }}">
+                                                                            <input type="text" class="form-control" name="Room" value="{{ $schedule->room_id }}">
+
                                                                         </div>
                                                                     </div>
                                                                 </div>

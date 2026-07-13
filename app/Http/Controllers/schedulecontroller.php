@@ -56,13 +56,10 @@ class schedulecontroller extends Controller
 
         $programs = Programs::all();
         $courses = course::all();
-
-        // View expects $course for the course dropdown
-        $course = $courses;
-
         $rooms = room::all();
 
-        return view('schedules', compact('schedules', 'faculty_list', 'course', 'schoolYears', 'programs', 'rooms'));
+        
+        return view('schedules', compact('schedules', 'faculty_list', 'courses', 'schoolYears', 'programs', 'rooms'));
     }
 
     public function store(Request $request)
@@ -75,13 +72,13 @@ class schedulecontroller extends Controller
             'Day' => ['required', 'array', 'min:1'],
             'Day.*' => ['string'],
 
-            
             'program_id' => ['required', 'exists:Programs,id'],
             'Course' => ['required', 'exists:courses,id'],
             'Room' => ['required', 'exists:room,id'],
             'user_id' => ['required', 'exists:users,id'],
-            'Semester' => ['required', 'exists:semyr,id'],
-            'School_year' => ['required', 'exists:semyr,id'],
+
+            'Semester' => ['required', 'string'],
+            'School_year' => ['required', 'string'],
 
             'Start_time' => ['required'],
             'End_time' => ['required'],
@@ -90,42 +87,34 @@ class schedulecontroller extends Controller
             'section' => ['required', 'string'],
         ]);
 
+
         $dayValue = implode(', ', $validatedData['Day']);
 
-        $courseId = course::query()
-            ->where('course_name', $validatedData['Course'])
-            ->value('id');
-        if (!$courseId) {
-            return redirect()->back()->with('error', 'Selected course not found.');
-        }
+        // Blade submits Course and Room as IDs.
+        $courseId = $validatedData['Course'];
+        $roomId = $validatedData['Room'];
 
-        $roomId = room::query()
-            ->where('room_name', $validatedData['Room'])
-            ->value('id');
-        if (!$roomId) {
-            return redirect()->back()->with('error', 'Selected room not found.');
-        }
+        
+            Schedule::create([
+                'user_id' => $validatedData['user_id'],
+                'program_id' => $validatedData['program_id'],
+                'course_id' => $courseId,
+                'room_id' => $roomId,
 
-        Schedule::create([
-            'user_id' => $validatedData['user_id'],
-            'program_id' => $validatedData['program_id'],
-            'course_id' => $courseId,
-            'room_id' => $roomId,
+                'year_level' => $validatedData['year_level'],
+                'section' => $validatedData['section'],
 
-            'year_level' => $validatedData['year_level'],
-            'section' => $validatedData['section'],
+                'day' => $dayValue,
+                'start_time' => $validatedData['Start_time'],
+                'end_time' => $validatedData['End_time'],
 
-            'day' => $dayValue,
-            'start_time' => $validatedData['Start_time'],
-            'end_time' => $validatedData['End_time'],
+                'Semester' => $validatedData['Semester'],
+                'School_year' => $validatedData['School_year'],
+            ]);
+        
 
-            'Semester' => $validatedData['Semester'],
-            'School_year' => $validatedData['School_year'],
-        ]);
-
-        return redirect()->back()->with('success', 'Schedule added successfully!');
+            return redirect()->back()->with('success', 'Schedule added successfully!');
     }
-
 
     public function destroy($id)
     {
@@ -153,36 +142,26 @@ class schedulecontroller extends Controller
         $validatedData = $request->validate([
             'Day' => ['required', 'array', 'min:1'],
 
-            'user_id'    => ['required', 'exists:users,id'],
-            'program_id' => ['required', 'exists:programs,id'],
-            'Course_id'  => ['required', 'exists:courses,id'],
-            'Room_id'    => ['required', 'exists:room,id'],
-            
+            'program_id' => ['required', 'exists:Programs,id'],
+            'Course'     => ['required', 'exists:courses,id'],
+            'Room'       => ['required', 'exists:room,id'],
+
             'Start_time' => ['required'],
             'End_time'   => ['required'],
 
-            'Semester'   => ['required', 'exists:semyr,id'],
-            'School_year'=> ['required', 'exists:semyr,id'],
+            'Semester'    => ['required', 'string'],
+            'School_year' => ['required', 'string'],
 
             'year_level' => ['required', 'string'],
             'section'    => ['required', 'string'],
         ]);
 
+
         $dayValue = implode(', ', $validatedData['Day']);
 
-        $courseId = course::query()
-            ->where('course_name', $validatedData['Course'])
-            ->value('id');
-        if (!$courseId) {
-            return redirect()->back()->with('error', 'Selected course not found.');
-        }
-
-        $roomId = room::query()
-            ->where('room_name', $validatedData['Room'])
-            ->value('id');
-        if (!$roomId) {
-            return redirect()->back()->with('error', 'Selected room not found.');
-        }
+        // Blade submits Course and Room as IDs.
+        $courseId = $validatedData['Course'];
+        $roomId = $validatedData['Room'];
 
         $schedule->update([
             'program_id' => $validatedData['program_id'],
@@ -204,7 +183,39 @@ class schedulecontroller extends Controller
         return redirect()->back()->with('success', 'Schedule updated successfully!');
     }
 
+  
     // this is where the algorithm for checking schedule conflicts will be implemented
+    // Receives: day, room_id, start_time, end_time
+    // Returns JSON with conflict=true/false
+    public function bookingsystem(Request $request)
+    {
+        if (!session('logged_in')) {
+            return response()->json(['error' => 'Unauthenticated.'], 401);
+        }
+
+        $validated = $request->validate([
+            'day' => ['required', 'string'],
+            'room_id' => ['required', 'integer', 'exists:room,id'],
+            'start_time' => ['required', 'date_format:H:i:s'],
+            'end_time' => ['required', 'date_format:H:i:s', 'after:start_time'],
+        ]);
+
+        // conflict rule: same room + same day + overlapping time interval
+        // overlap condition: existing.start < new.end AND existing.end > new.start
+        $hasConflict = Schedule::query()
+            ->where('room_id', $validated['room_id'])
+            ->where('day', $validated['day'])
+            ->where(function ($q) use ($validated) {
+                $q->where('start_time', '<', $validated['end_time'])
+                  ->where('end_time', '>', $validated['start_time']);
+            })
+            ->exists();
+
+        return response()->json([
+            'conflict' => $hasConflict,
+        ]);
+    }
 }
+
 
 

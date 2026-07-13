@@ -4,16 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\course;
 use Illuminate\Http\Request;
-use App\Models\Subject;
 use App\Models\Programs;
+use App\Models\room
 
-class subjectcontroller extends Controller
+class myschedulecontroller extends Controller
 {
     public function index()
     {
-$courses = course::with('course')->get();
+        $courses = course::with('course')->get();
         $Programs = Programs::all();
-        return view('subjects', compact('courses', 'Programs'));
+        $courses = course::all();
+        $rooms = room::all();
+        
+        return view('myschedule', compact('courses', 'Programs', 'rooms') );
     }
 
     public function store(Request $request)
@@ -28,7 +31,7 @@ $courses = course::with('course')->get();
 
         course::create($request->all());
 
-        return redirect()->route('subjects')->with('success', 'Course created successfully.');
+        return redirect()->route('myschedule')->with('success', 'Course created successfully.');
     }
 
     public function edit($id)
@@ -62,7 +65,7 @@ $courses = course::with('course')->get();
             'course_id' => $request->course_id,
         ]);
 
-        return redirect()->route('subjects')->with('success', 'Course updated successfully!');
+        return redirect()->route('myschedule')->with('success', 'Course updated successfully!');
     }
 
     public function destroy($id)

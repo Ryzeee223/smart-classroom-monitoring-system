@@ -1,4 +1,4 @@
-s<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,11 +8,8 @@ s<!DOCTYPE html>
     <title>eMonitor - My Schedule</title>
 </head>
 <body>
-
     <style>
-        /* Keep layout consistent with other pages (fixed sidebar + content offset) */
         .app-shell{display:flex; min-height:100vh;}
-        .app-sidebar{position:fixed; top:0; left:0; width:260px; height:100vh;}
         .app-shell__content{flex:1; min-width:0; margin-left:260px;}
         @media (max-width: 767.98px){
             .app-shell__content{margin-left:0;}
@@ -27,54 +24,87 @@ s<!DOCTYPE html>
             @include('sidebar')
         </div>
 
-        <div class="app-shell__content">
+        
+                <div class="app-shell__content">
+            <div class="container mt-5">
 
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Welcome, {{ $current_user->first_name }} {{ $current_user->last_name }}!</h5>
-                        <p class="mb-0">Here's your schedule for the semester.</p>
-                    </div>
-            <div class="card-body">
-                        <h4>My Schedule</h4>
-                        <div class="table-responsive" style="min-height: 360px;">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Course</th>
-                                        <th>Subject</th>
-                                        <th>Day</th>
-                                        <th>Time</th>
-                                        <th>Room</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse($schedules as $schedule)
-                                    <tr>
-                                        <td>{{ $schedule->course ?? 'N/A' }}</td>
-                                        <td>{{ $schedule->Day ?? 'N/A' }}</td>
-                                        <td>{{ $schedule->Time ?? 'N/A' }}</td>
-                                        <td>{{ $schedule->Room ?? 'N/A' }}</td>
-                                    </tr>
-                                    @empty
-                                    <tr>
-                                        <td colspan="4" class="text-center">No schedules found.</td>
-                                    </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
+
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-10 col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Welcome, {{ $current_user->first_name }} {{ $current_user->last_name }}!</h5>
+                                <p class="mb-0">Here's your schedule for the semester.</p>
+                            </div>
+
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                                    <h4 class="mb-0">My Schedule</h4>
+                                    <span class="text-muted">{{ $schedules->count() }} schedule(s)</span>
+                                </div>
+
+                                @php
+                                    // Group by semester+school year to make the page easier to read.
+                                    $grouped = $schedules->groupBy(function($s){
+                                        return trim(($s->Semester ?? 'N/A').' '.($s->School_year ?? 'N/A'));
+                                    });
+
+                                   
+                                @endphp
+
+                                @forelse($grouped as $groupKey => $groupItems)
+                                    <div class="mb-4">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <h6 class="text-uppercase fw-bold">{{ $groupKey }}</h6>
+                                            <span class="text-muted">{{ $groupItems->count() }} item(s)</span>
+                                        </div>
+
+                                        <div class="table-responsive" style="min-height: 180px;">
+                                            <table class="table table-striped align-middle">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Program</th>
+                                                        <th>Course</th>
+                                                        <th>Day</th>
+                                                        <th>Time</th>
+                                                        <th>Room</th>
+                                                       
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($groupItems as $schedule)
+                                                        <tr>
+                                                            <td>{{ $schedule->program?->Program_abbr ?? $schedule->Programs?->Program_abbr ?? $schedule->Programs?->Program_name ?? 'N/A' }} {{$schedule->year_level}} {{$schedule->section}}</td>
+                                                            <td>
+                                                                {{ $schedule->course?->course_code }}
+                                                            </td>
+                                                            <td>{{ $schedule->day ?? ($schedule->Day ?? 'N/A') }}</td>
+                                                            <td>
+                                                                {{ $schedule->start_time ?? ($schedule->Start_time ?? 'N/A') }}
+                                                                -
+                                                                {{ $schedule->end_time ?? ($schedule->End_time ?? 'N/A') }}
+                                                            </td>
+                                                            <td>{{ $schedule->room?->room_name }}</td>
+                                                         
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="text-center py-5">
+                                        <h5 class="mb-2">No schedules found.</h5>
+                                        <p class="text-muted mb-0">Once your faculty schedules are assigned, they will appear here.</p>
+                                    </div>
+                                @endforelse
+                            </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    </div>
 </body>
 </html>
+

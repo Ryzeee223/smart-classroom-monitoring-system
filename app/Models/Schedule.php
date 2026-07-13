@@ -29,8 +29,27 @@ class Schedule extends Model
         'School_year',
     ];
 
-public function user()
+public function User()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+public function Programs()
+{
+    return $this->belongsTo(Programs::class, 'program_id', 'id');
+}
+
+// Optional: lower-case relationship name (handy in other views)
+public function program()
+{
+    return $this->belongsTo(Programs::class, 'program_id', 'id');
+}
+
+public function course()
+{
+    return $this->belongsTo(course::class, 'course_id');
+}
+public function room()
+{
+    return $this->belongsTo(room::class,'room_id');
+}
 }

@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Schedule - eMonitor</title>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <link href="<?php echo e(asset('bootstrap-5.3.8-dist/css/bootstrap.min.css')); ?>" rel="stylesheet">
     <script src="<?php echo e(asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js')); ?>"></script>
 </head>
+
 <body>
 <style>
     .app-shell { display: flex; min-height: 100vh; }
@@ -90,6 +92,7 @@
 
                                 
                                 <div class="row">
+                                    
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Faculty</label>
                                         <select class="form-select" name="user_id" required>
@@ -133,7 +136,7 @@
                                         <label class="form-label">Course</label>
                                         <select class="form-select" name="Course" required>
                                             <option value="">Select Course</option>
-                                            <?php $__currentLoopData = $course; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $courses): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php $__currentLoopData = $courses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $courses): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <option value="<?php echo e($courses->id); ?>">
                                                     <?php echo e($courses->course_name); ?> (<?php echo e($courses->course_code); ?>)
                                                 </option>
@@ -190,11 +193,84 @@
                                     </div>
 
 
+
                                 <div class="mt-4">
                                     <button type="submit" class="btn btn-primary w-100" onclick="return confirm('Save this schedule?')">
                                         Add Schedule
                                     </button>
                                 </div>
+
+                                
+                                <div id="scheduleConflictAlert" class="alert alert-danger mt-3 d-none" role="alert">
+                                    Schedule conflict detected. Please choose another time or room.
+                                </div>
+
+                                
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        const form = document.querySelector('form[action="<?php echo e(route('schedules.store')); ?>"]');
+                                        if (!form) return;
+
+                                        const alertEl = document.getElementById('scheduleConflictAlert');
+                                        const apiUrl = '<?php echo e(route('schedules.bookingsystem')); ?>';
+
+                                        function getSelectedDays() {
+                                            return Array.from(form.querySelectorAll('input[name="Day[]"]:checked')).map(el => el.value);
+                                        }
+
+                                        async function checkConflictForDay(day, roomId, startTime, endTime) {
+                                            const payload = {
+                                                day: day,
+                                                room_id: roomId,
+                                                start_time: startTime,
+                                                end_time: endTime
+                                            };
+
+                                            const res = await fetch(apiUrl, {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                                },
+                                                body: JSON.stringify(payload)
+                                            });
+
+                                            if (!res.ok) {
+                                                // Fail open: allow submission if the checker fails
+                                                return false;
+                                            }
+
+                                            const data = await res.json();
+                                            return !!data.conflict;
+                                        }
+
+                                        form.addEventListener('submit', async function (e) {
+                                            alertEl.classList.add('d-none');
+
+                                            const selectedDays = getSelectedDays();
+                                            const roomId = form.querySelector('select[name="Room"]').value;
+                                            const startTime = form.querySelector('select[name="Start_time"]').value;
+                                            const endTime = form.querySelector('select[name="End_time"]').value;
+
+                                            // If form is incomplete, let backend validation handle it
+                                            if (!selectedDays.length || !roomId || !startTime || !endTime) return;
+
+                                            e.preventDefault();
+
+                                            for (const day of selectedDays) {
+                                                const hasConflict = await checkConflictForDay(day, roomId, startTime, endTime);
+                                                if (hasConflict) {
+                                                    alertEl.classList.remove('d-none');
+                                                    return;
+                                                }
+                                            }
+
+                                            // No conflicts: submit
+                                            form.submit();
+                                        });
+                                    });
+                                </script>
+
                             </form>
                         </div>
                     </div>
@@ -239,28 +315,32 @@
                                                 <div class="p-2 border rounded bg-light">
                                                     <div class="d-flex justify-content-between align-items-start">
                                                         <div>
-                                                            <strong><?php echo e($schedule->Subject); ?></strong><br>
+                                                            
+                                                            <strong><?php echo e($schedule->program?->Program_abbr ?? $schedule->Programs?->Program_abbr ?? 'N/A'); ?> <?php echo e($schedule->year_level ?? ''); ?> <?php echo e($schedule->section); ?></strong><br>
+                                                            <strong><?php echo e($schedule->course->course_code ?? 'N/A'); ?></strong><br>
                                                             <small class="text-muted">
-                                                                <?php echo e($schedule->Day); ?> |
+                                                                <?php echo e($schedule->day ?? ($schedule->Day ?? 'N/A')); ?> |
                                                                 <?php echo e($schedule->start_time); ?> - <?php echo e($schedule->end_time); ?> |
-                                                                <?php echo e($schedule->Room); ?>
+                                                                <?php echo e($schedule->room_id ?? ($schedule->Room ?? 'N/A')); ?>
 
                                                             </small><br>
-                                                            <small class="text-muted">
-                                                                <?php echo e($schedule->year_level ?? ''); ?><?php echo e($schedule->section ?? ''); ?>
 
+                                                            <small class="text-muted">
+
+                                                                
                                                                 | <?php echo e($schedule->Semester ?? 'N/A'); ?> <?php echo e($schedule->School_year ?? 'N/A'); ?>
 
                                                             </small>
                                                         </div>
                                                         <div class="text-end pt-1">
                                                             <button class="btn btn-sm btn-outline-primary mb-1 d-block w-100"
+                                                                    type="button"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#editModal<?php echo e($schedule->id); ?>">
                                                                 Edit
                                                             </button>
 
-                                                            <form method="POST" action="<?php echo e(route('schedules.destroy', $schedule->id)); ?>"
+                                                            <form method="POST" action="<?php echo e(route('schedules.destroy', $schedule->id)); ?>" class="d-block w-100"
                                                                   onsubmit="return confirm('Delete this schedule?')">
                                                                 <?php echo csrf_field(); ?>
                                                                 <?php echo method_field('DELETE'); ?>
@@ -282,12 +362,13 @@
                                                             <form method="POST" action="<?php echo e(route('schedules.update', $schedule->id)); ?>">
                                                                 <?php echo csrf_field(); ?>
                                                                 <?php echo method_field('PUT'); ?>
-
+                                                                
                                                                 <div class="modal-body text-start">
                                                                     <div class="row">
                                                                         <div class="col-md-12 mb-3">
                                                                             <label class="form-label">Course</label>
-                                                                            <input type="text" class="form-control" name="Course" value="<?php echo e($schedule->Course); ?>">
+                                                                            <input type="text" class="form-control" name="Course" value="<?php echo e($schedule->course_id); ?>">
+
                                                                         </div>
                                                                     </div>
 
@@ -345,7 +426,8 @@
                                         </div>
                                                                         <div class="col-md-6 mb-3">
                                                                             <label class="form-label">Room</label>
-                                                                            <input type="text" class="form-control" name="Room" value="<?php echo e($schedule->Room); ?>">
+                                                                            <input type="text" class="form-control" name="Room" value="<?php echo e($schedule->room_id); ?>">
+
                                                                         </div>
                                                                     </div>
                                                                 </div>

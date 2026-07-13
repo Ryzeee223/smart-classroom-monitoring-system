@@ -237,6 +237,7 @@
                                                         </div>
                                                         <div class="text-end">
                                                             <button class="btn btn-sm btn-outline-primary me-1"
+                                                                    type="button"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#editModal{{ $schedule->id }}">
                                                                 Edit

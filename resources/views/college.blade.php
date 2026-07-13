@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}" rel="stylesheet">
     <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
-    <title>eMonitor - Programs</title>
+    <title>eMonitor - Colleges</title>
 </head>
 <body>
     @include('sidebar')
@@ -84,7 +84,7 @@
                                     <form method="POST" action="{{ route('college.destroy', $college->id) }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this college?')">Delete</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold" onclick="return confirm('Delete this college?')">Delete</button>
                                     </form>
                                 </div>
                             </li>

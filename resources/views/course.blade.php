@@ -96,11 +96,11 @@
                                                 <td>{{ $course->course_name }}</td>
                                                 <td>{{ Str::limit($course->description, 30) }}</td>
                                                 <td class="text-nowrap">
-                                                    <a href="{{ route('course.edit', $course->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                                    <a href="{{ route('course.edit', $course->id) }}" class="btn btn-sm btn-outline-primary fw-semibold">Edit</a>
                                                     <form method="POST" action="{{ route('course.destroy', $course->id) }}" class="d-inline" onsubmit="return confirm('Are you sure?')">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                                                     </form>
                                                 </td>
                                             </tr>

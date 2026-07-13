@@ -109,44 +109,44 @@ Route::get('/schedtime', function () {
     return view('schedtime');
 })->name('schedtime');
 
-Route::post('/myschedule/store', function (Illuminate\Http\Request $request) {
-    if (!session('logged_in') || !in_array((int) session('user_role'), [2, 3, 4, 5], true)) {
-        return redirect('/dashboard');
-    }
+// Route::post('/myschedule/store', function (Illuminate\Http\Request $request) {
+//     if (!session('logged_in') || !in_array((int) session('user_role'), [2, 3, 4, 5], true)) {
+//         return redirect('/dashboard');
+//     }
 
-    $id = Str::uuid()->toString();
+//     $id = Str::uuid()->toString();
 
-    $validatedData = $request->validate([
-        'user_id' => 'required|exists:users,id',
-        'course_id' => 'nullable|exists:course,id',
-        'year_level' => 'nullable|string',
-        'section' => 'nullable|string',
-        'Day' => 'required',
-        'Time' => 'required',
-        'course' => 'required',
-        'Room' => 'required',
-        'Semester' => 'required',
-        'School_year' => 'required',
-    ]);
+//     $validatedData = $request->validate([
+//         'user_id' => 'required|exists:users,id',
+//         'course_id' => 'nullable|exists:course,id',
+//         'year_level' => 'nullable|string',
+//         'section' => 'nullable|string',
+//         'Day' => 'required',
+//         'Time' => 'required',
+//         'course' => 'required',
+//         'Room' => 'required',
+//         'Semester' => 'required',
+//         'School_year' => 'required',
+//     ]);
 
-    $data = [
-        'id' => $id,
-        'user_id' => session('user_id'),
-        'Programs' => $request->year_level ?? '',
-        'Year_level' => $request->year_level ?? '',
-        'Section' => $request->section ?? '',
-        'Day' => $validatedData['Day'],
-        'Time' => $validatedData['Time'],
-        'course' => $validatedData['course'],
-        'Room' => $validatedData['Room'],
-        'Semester' => $validatedData['Semester'],
-        'School_year' => $validatedData['School_year'],
-    ];
+//     $data = [
+//         'id' => $id,
+//         'user_id'  => session('user_id'),
+//         'Programs' => session('program_id') ?? '',
+//         'Year_level' => $request->year_level ?? '',
+//         'Section' => $request->section ?? '',
+//         'Day' => $validatedData['Day'],
+//         'Time' => $validatedData['Time'],
+//         'course' => $validatedData['course'],
+//         'Room' => $validatedData['Room'],
+//         'Semester' => $validatedData['Semester'],
+//         'School_year' => $validatedData['School_year'],
+//     ];
 
-    \App\Models\Schedule::insert($data);
+//     \App\Models\Schedule::insert($data);
 
-    return redirect('/myschedule')->with('success', 'Schedule added successfully!');
-})->name('myschedule.store');
+//     return redirect('/myschedule')->with('success', 'Schedule added successfully!');
+// })->name('myschedule.store');
 
 Route::get('school-year-settings', function () {
     return view('partials.school-year-settings');
@@ -186,7 +186,11 @@ Route::post('/schedules/store', [App\Http\Controllers\schedulecontroller::class,
 Route::put('/schedules/{id}', [App\Http\Controllers\schedulecontroller::class, 'update'])->name('schedules.update');
 Route::delete('/schedules/{id}', [App\Http\Controllers\schedulecontroller::class, 'destroy'])->name('schedules.destroy');
 
+// Conflict checker (booking system)
+Route::post('/schedules/bookingsystem', [App\Http\Controllers\schedulecontroller::class, 'bookingsystem'])->name('schedules.bookingsystem');
+
 Route::get('/programs', [\App\Http\Controllers\ProgramController::class, 'index'])->name('program');
+
 Route::post('/programs', [\App\Http\Controllers\ProgramController::class, 'store'])->name('programs.store');
 Route::get('/programs/{programs}/edit', [\App\Http\Controllers\ProgramController::class, 'edit'])->name('program.edit');
 Route::put('/programs/{programs}', [\App\Http\Controllers\ProgramController::class, 'update'])->name('program.update');
