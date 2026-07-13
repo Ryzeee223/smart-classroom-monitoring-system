@@ -98,11 +98,11 @@
                 </div>
             </div>
 
-            {{-- Right column (Existing buildings slot) --}}
+            {{-- Right column --}}
             <div class="col-lg-4">
                 <div class="card p-3 shadow-sm bg-white border-1 h-100">
                     <h5 class="mb-3 d-flex justify-content-between align-items-center"> 
-                        <span>Existing buildings</span>
+                        <span>Existing buildings and rooms  </span>
                     </h5>
 
                         @if(session('error'))
@@ -114,8 +114,8 @@
                         @endif
 
                         {{-- College filter --}}
-                    <div class="mb-3">
-                        <label class="form-label form-label-sm mb-1">Filter by College</label>
+                            <div class="mb-3">
+                        <label class="form-label form-label-sm mb-1">Filter by present College ID</label>
                         <select class="form-select form-select-sm" id="college-filter" onchange="filterBuildingsByCollege()">
                             <option value="">All colleges</option>
                             @forelse($colleges ?? [] as $c)
@@ -144,6 +144,35 @@
                                     <p class="mb-0 text-muted" style="font-size: 0.9rem;">No buildings available.</p>
                                 @endforelse
                             </div>
+
+                            <div class="mt-4">
+                                <div class="card-body p-0 mb-2">
+                                    <p class="mb-2 text-muted" style="font-size: 0.9rem;">Existing rooms</p>
+                                </div>
+
+                                <div id="existing-rooms-container">
+                                    @forelse($rooms ?? [] as $r)
+                                        @php
+                                            // Filtering should use the PRESENT college_id from related/created records
+                                            $roomCollegeId = $r->college_id ?? ($r->building->college_id ?? '');
+                                            $roomBuildingAbbr = optional($r->building)->bldg_abbr;
+                                        @endphp
+
+                                        <div class="d-flex justify-content-between align-items-center border rounded-2 px-2 py-2 mb-2 bg-white"
+                                             data-college-id="{{ $roomCollegeId }}">
+                                            <div>
+                                                <div class="fw-semibold">{{ $r->room_name }}</div>
+                                                <div class="text-muted" style="font-size:0.85rem;">{{ $r->room_type ?? '' }} {{ $roomBuildingAbbr ? '• ' . $roomBuildingAbbr : '' }}</div>
+                                            </div>
+                                            <div class="text-muted" style="font-size:0.85rem;">
+                                                {{ $roomBuildingAbbr ? '(' . $roomBuildingAbbr . ')' : '' }}
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <p class="mb-0 text-muted" style="font-size: 0.9rem;">No rooms available.</p>
+                                    @endforelse
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -151,18 +180,30 @@
         </div>
     </main>
 </div>
+
 <script>
     function filterBuildingsByCollege() {
         const select = document.getElementById('college-filter');
-        const collegeId = select ? select.value : '';
-        const container = document.getElementById('existing-buildings-container');
-        if (!container) return;
+        const collegeId = select ? (select.value ?? '') : '';
+        // collegeId is compared directly against each item's data-college-id
 
-        const items = container.querySelectorAll('[data-college-id]');
-        items.forEach(el => {
-            const id = el.getAttribute('data-college-id') || '';
-            el.style.display = (!collegeId || collegeId === id) ? '' : 'none';
-        });
+
+        // Filter both buildings and rooms using the same filter
+        const buildingContainer = document.getElementById('existing-buildings-container');
+        const roomsContainer = document.getElementById('existing-rooms-container');
+
+        const filterContainer = (container) => {
+            if (!container) return;
+            const items = container.querySelectorAll('[data-college-id]');
+            items.forEach(el => {
+                const id = el.getAttribute('data-college-id') || '';
+                // Only show items whose data-college-id matches the selected present college id
+                el.style.display = (!collegeId || collegeId === id) ? '' : 'none';
+            });
+        };
+
+        filterContainer(buildingContainer);
+        filterContainer(roomsContainer);
     }
 
     // initial call (show all)

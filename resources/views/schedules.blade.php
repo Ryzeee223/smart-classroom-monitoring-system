@@ -19,7 +19,7 @@
     }
 </style>
 
-{{-- Predefining the arrays once at the very top to avoid repetitive messy code blocks --}}
+
 @php
     $startTimes = [
         "7:00:00", "7:30:00", "8:00:00", "8:30:00", "9:00:00", "9:30:00", "10:00:00", "10:30:00",
@@ -36,11 +36,11 @@
 <div class="app-shell">
     @include('sidebar')
 
-    <main class="app-shell__content">
+    <main class="app-shell__content d-flex justify-content-center">
         <div class="container mt-5">
-            <div class="row">
+            <div class="row align-items-start">
                 {{-- ADD SCHEDULE FORM --}}
-                <div class="col-md-8">
+                <div class="col-md-9">
                     <div class="card">
                         <div class="card-header">
                             <h5>Add Schedule for Faculty</h5>
@@ -49,8 +49,24 @@
                             <form method="POST" action="{{ route('schedules.store') }}">
                                 @csrf
 
+
+                                {{-- Programs --}}
+                                    <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">Program</label>
+                                        <select class="form-select" name="program_id" required>
+                                            <option value="">Select Program</option>
+                                            <option value="CC101">CC101</option>
+                                            <option value="CC104">CC104</option>
+                                            <option value="CC205">CC205</option>
+                                            <option value="CC206">CC206</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+
                                 <div class="row text-start">
-                                    {{-- Semester / School Year (top) --}}
+                                    {{-- Semester / School Year--}}
                                     <div class="col-md-6 mb-3">
                                         @php
                                             $latestSemyr = \App\Models\semyr::query()->latest('id')->first();
@@ -62,6 +78,7 @@
                                         <input type="hidden" name="Semester" value="{{ $latestSemyr->semester ?? '' }}">
                                     </div>
 
+                                    {{-- school year --}}
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">School Year</label>
                                         <select class="form-select" name="School_year" required disabled>
@@ -71,6 +88,7 @@
                                     </div>
                                 </div>
 
+                                {{-- faculty --}}
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Faculty</label>
@@ -84,6 +102,7 @@
                                         </select>
                                     </div>
 
+                                    {{-- year level --}}
                                     <div class="col-md-3 mb-3">
                                         <label class="form-label">Year Level</label>
                                         <select class="form-select" name="year_level" required>
@@ -95,6 +114,7 @@
                                         </select>
                                     </div>
 
+                                        {{-- sectioning --}}
                                     <div class="col-md-3 mb-3">
                                         <label class="form-label">Section</label>
                                         <select class="form-select" name="section" required>
@@ -106,6 +126,7 @@
                                     </div>
                                 </div>
 
+                                {{-- course --}}
                                 <div class="row mt-2">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Course</label>
@@ -119,6 +140,7 @@
                                         </select>
                                     </div>
 
+                                        {{-- start time --}}
                                     <div class="col-md-3 mb-3">
                                         <label class="form-label">Start Time</label>
                                         <select class="form-select" name="Start_time" required>
@@ -129,6 +151,7 @@
                                         </select>
                                     </div>
 
+                                    {{-- end time --}}
                                     <div class="col-md-3 mb-3">
                                         <label class="form-label">End Time</label>
                                         <select class="form-select" name="End_time" required>
@@ -140,6 +163,7 @@
                                     </div>
                                 </div>
 
+                                {{-- rooms --}}
                                 <div class="row mt-2">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Room</label>
@@ -152,6 +176,7 @@
                                         </select>
                                     </div>
 
+                                    {{-- Day --}}
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Day</label>
                                         <div class="d-flex flex-wrap gap-3 mt-1">
@@ -163,7 +188,7 @@
                                             @endforeach
                                         </div>
                                     </div>
-                                </div>
+
 
                                 <div class="mt-4">
                                     <button type="submit" class="btn btn-primary w-100" onclick="return confirm('Save this schedule?')">
@@ -176,10 +201,11 @@
                 </div>
 
                 {{-- RECENT SCHEDULES LIST --}}
-                <div class="col-md-4">
+                <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <h5>Recent Schedules</h5>
+                            <h5>Assigned Faculty Schedules</h5>
+                            <span>Faculty schedules shown here and can be edited or delete</span>
                         </div>
                         <div class="card-body" style="max-height: 500px; overflow-y: auto;">
 

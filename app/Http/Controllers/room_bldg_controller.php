@@ -65,7 +65,12 @@ class room_bldg_controller extends Controller
         $bldgModel = bldg::all();
         $colleges = college::all();
 
-        return view('rooms', compact('bldgModel', 'colleges'));
+        // Existing rooms to display in the UI
+        $rooms = room::query()
+            ->with('building')
+            ->get();
+
+        return view('rooms', compact('bldgModel', 'colleges', 'rooms'));
     }
 }
 

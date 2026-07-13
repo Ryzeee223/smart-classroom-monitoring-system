@@ -190,33 +190,6 @@ body {
                 @endif
 
                     @if (in_array($viewerRole, [1, 2, 3], true))
-                        
-                <!-- Recent Faculty Assignments -->
-                {{-- <div class="card shadow-lg">
-                    <div class="card-header bg-info bg-opacity-10">
-                        <h5 class="mb-0 fw-bold text-dark small">Recent Faculty Added</h5>
-                    </div>
-
-                    
-                    <div class="card-body" style="max-height: 300px; overflow-y: auto;">
-                        <div class="list-group list-group-flush">
-                            @forelse($recent_faculty ?? [] as $faculty)
-                                <a class="list-group-item list-group-item-action border-0 px-3 py-2" href="#">
-                                    <div class="d-flex align-items-center">
-                                        <div>
-                                            <h6 class="mb-1 small fw-bold">{{ $faculty->first_name }} {{ $faculty->last_name }}</h6>
-                                            <p class="text-xs mb-0 text-muted">{{ $faculty->email }}</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            @empty
-                                <div class="list-group-item text-center py-4 text-muted">
-                                    No recent faculty added
-                                </div>
-                            @endforelse
-                        </div>
-                    </div>
-                </div> --}}
             </div>
 </div>
 @endif

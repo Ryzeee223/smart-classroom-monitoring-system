@@ -17,9 +17,15 @@ class room extends Model
 
     protected $table = 'room';
 
-    public function room()
+    public function building()
     {
         return $this->belongsTo(bldg::class, 'bldg_id');
+    }
+
+    // Optional: keep backward compatibility if anything else used the old relation name
+    public function roomRelation()
+    {
+        return $this->building();
     }
 }
 

@@ -1,4 +1,3 @@
-<!-- Notifications Modal -->
 <div class="modal fade " id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel" aria-hidden="true" style="">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">

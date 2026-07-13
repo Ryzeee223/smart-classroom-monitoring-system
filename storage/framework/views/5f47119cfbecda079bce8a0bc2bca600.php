@@ -36,11 +36,11 @@
 <div class="app-shell">
     <?php echo $__env->make('sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-    <main class="app-shell__content">
+    <main class="app-shell__content d-flex justify-content-center">
         <div class="container mt-5">
-            <div class="row">
+            <div class="row align-items-start">
                 
-                <div class="col-md-8">
+                <div class="col-md-9">
                     <div class="card">
                         <div class="card-header">
                             <h5>Add Schedule for Faculty</h5>
@@ -48,6 +48,22 @@
                         <div class="card-body">
                             <form method="POST" action="<?php echo e(route('schedules.store')); ?>">
                                 <?php echo csrf_field(); ?>
+
+
+                                
+                                    <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">Program</label>
+                                        <select class="form-select" name="Room" required>
+                                            <option value="">Select Program</option>
+                                            <option value="CC101">CC101</option>
+                                            <option value="CC104">CC104</option>
+                                            <option value="CC205">CC205</option>
+                                            <option value="CC206">CC206</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
 
                                 <div class="row text-start">
                                     
@@ -62,6 +78,7 @@
                                         <input type="hidden" name="Semester" value="<?php echo e($latestSemyr->semester ?? ''); ?>">
                                     </div>
 
+                                    
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">School Year</label>
                                         <select class="form-select" name="School_year" required disabled>
@@ -71,6 +88,7 @@
                                     </div>
                                 </div>
 
+                                
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Faculty</label>
@@ -85,6 +103,7 @@
                                         </select>
                                     </div>
 
+                                    
                                     <div class="col-md-3 mb-3">
                                         <label class="form-label">Year Level</label>
                                         <select class="form-select" name="year_level" required>
@@ -96,6 +115,7 @@
                                         </select>
                                     </div>
 
+                                        
                                     <div class="col-md-3 mb-3">
                                         <label class="form-label">Section</label>
                                         <select class="form-select" name="section" required>
@@ -107,6 +127,7 @@
                                     </div>
                                 </div>
 
+                                
                                 <div class="row mt-2">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Course</label>
@@ -120,6 +141,7 @@
                                         </select>
                                     </div>
 
+                                        
                                     <div class="col-md-3 mb-3">
                                         <label class="form-label">Start Time</label>
                                         <select class="form-select" name="Start_time" required>
@@ -130,6 +152,7 @@
                                         </select>
                                     </div>
 
+                                    
                                     <div class="col-md-3 mb-3">
                                         <label class="form-label">End Time</label>
                                         <select class="form-select" name="End_time" required>
@@ -141,6 +164,7 @@
                                     </div>
                                 </div>
 
+                                
                                 <div class="row mt-2">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Room</label>
@@ -153,6 +177,7 @@
                                         </select>
                                     </div>
 
+                                    
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Day</label>
                                         <div class="d-flex flex-wrap gap-3 mt-1">
@@ -164,7 +189,7 @@
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </div>
                                     </div>
-                                </div>
+
 
                                 <div class="mt-4">
                                     <button type="submit" class="btn btn-primary w-100" onclick="return confirm('Save this schedule?')">
@@ -177,10 +202,11 @@
                 </div>
 
                 
-                <div class="col-md-4">
+                <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <h5>Recent Schedules</h5>
+                            <h5>Assigned Faculty Schedules</h5>
+                            <span>Faculty schedules shown here and can be edited or delete</span>
                         </div>
                         <div class="card-body" style="max-height: 500px; overflow-y: auto;">
 
