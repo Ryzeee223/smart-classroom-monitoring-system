@@ -126,3 +126,34 @@
     }
 </style>
 
+<script>
+    let lastDetectedUid = null;
+
+    // Check the server for a new scan every 2 seconds
+    setInterval(() => {
+        fetch('/api/check-latest-scan')
+            .then(response => response.json())
+            .then(data => {
+                // If a card is active, and it's NOT the one we just handled
+                if (data.uid && data.uid !== lastDetectedUid) {
+                    lastDetectedUid = data.uid;
+                    
+                    // Trigger your action here!
+                    handleRfidScanGlobally(data.uid);
+                } else if (!data.uid) {
+                    // Clear the last detected card once it expires from cache
+                    lastDetectedUid = null;
+                }
+            })
+            .catch(error => console.error('Error checking RFID:', error));
+    }, 2000); // 2000ms = 2 seconds
+
+    // This function runs whenever a card is tapped!
+    function handleRfidScanGlobally(uid) {
+        // Example action: Show a nice browser alert
+        alert("RFID Card Scanned Globally! UID: " + uid);
+        
+        // Example: You can redirect the page, play a sound, or update a form field!
+        // window.location.href = "/students/" + uid;
+    }
+</script>

@@ -52,52 +52,38 @@
                             </select>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">RFID Code <small class="text-muted">(Tap card)</small></label>
-                            <input type="hidden" name="rfid_code" id="rfid_input">
-                            <span id="rfid_label" class="form-control bg-light" style="font-family:monospace">N/A</span>
 
-                            <script>
-                                let lastUid = '';
-                                setInterval(async () => {
-                                  try {
-                                    const res = await fetch('http://localhost:3000/status');
-                                    const data = await res.json();
-                                    if (data.uid && data.uid !== lastUid) {
-                                      document.getElementById('rfid_label').textContent = data.uid;
-                                      document.getElementById('rfid_input').value = data.uid;
-                                      lastUid = data.uid;
-                                    }
-                                  } catch (e) {}
-                                }, 100);
-                            </script>
+<div class="mb-3">
+    <label class="form-label">RFID Code <small class="text-muted">(Tap card)</small></label>
+    <input type="hidden" name="rfid_code" id="rfid_input">
+    <span id="rfid_label" class="form-control bg-light" style="font-family:monospace">N/A</span>
+</div>
 
-                            <script>
-                                let ws;
-                                function connectRfidWs() {
-                                    ws = new WebSocket('ws://localhost:3001');
+{{-- logic of the assigning ID --}}
+<script>
+    const rfidInput = document.getElementById('rfid_input');
+    const rfidLabel = document.getElementById('rfid_label');
 
-                                    ws.onopen = () => console.log('RFID WS connected');
-                                    ws.onmessage = (event) => {
-                                        const data = JSON.parse(event.data);
-                                        if (data.type === 'rfid') {
-                                            document.getElementById('rfid_label').textContent = data.uid;
-                                            document.getElementById('rfid_input').value = data.uid;
-                                            console.log('RFID:', data.uid);
-                                        }
-                                    };
-                                    ws.onclose = () => setTimeout(connectRfidWs, 1000);
-                                    ws.onerror = (err) => console.error('RFID WS error:', err);
-                                }
+    // Poll your Laravel API endpoint every 2 seconds
+    const pollInterval = setInterval(async () => {
+        try {
+            const response = await fetch('/api/check-latest-scan'); // The route we created earlier that reads Cache::get('latest_nfc_scan')
+            const data = await response.json();
 
-                                function clearRfid() {
-                                    document.getElementById('rfid_label').textContent = 'N/A';
-                                    document.getElementById('rfid_input').value = '';
-                                }
+            if (data.uid && data.uid !== 'N/A') {
+                // 1. Update the hidden input value
+                rfidInput.value = data.uid;
 
-                                connectRfidWs();
-                            </script>
-                        </div>
+                // 2. Update the visual span text
+                rfidLabel.textContent = data.uid;
+
+               
+            }
+        } catch (error) {
+            console.error("Error fetching RFID scan:", error);
+        }
+    }, 2000);
+</script>
 
                         <button type="submit" class="btn btn-primary">Assign RFID</button>
                     </form>
@@ -106,7 +92,7 @@
 
                 <br>
 
-                {{-- Reset current logged-in password (available to all roles) --}}
+                
                 <div class="card">
                     <div class="card-body">
                         <h5 class="mt-3">Reset my password</h5>

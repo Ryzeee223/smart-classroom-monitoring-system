@@ -4,9 +4,8 @@ use Faker\Guesser\Name;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use App\Http\Controllers\collegecontroller;
-use App\Http\Controllers\coursecontroller;
-use App\Http\Controllers\ProgramController;
+
+
 
 
 Route::get('/', function () {
@@ -15,14 +14,6 @@ Route::get('/', function () {
 
 Route::post('/', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login');
 Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
-
-// Route::get('/rooms', function () {
-//     return view('rooms');
-// })->name('rooms.index');
-
-
-
-
 
 // {{-- 1=admin 2=dean 3=asst. dean 4=faculty 5=programhead --}}
 Route::get('/dashboard', function () {
@@ -105,48 +96,10 @@ Route::get('/myschedule', function () {
     return view('myschedule', compact('current_user', 'schedules', 'Programs'));
 })->name('myschedule');
 
-Route::get('/schedtime', function () {
-    return view('schedtime');
-})->name('schedtime');
+// Route::get('/schedtime', function () {
+//     return view('schedtime');
+// })->name('schedtime');
 
-// Route::post('/myschedule/store', function (Illuminate\Http\Request $request) {
-//     if (!session('logged_in') || !in_array((int) session('user_role'), [2, 3, 4, 5], true)) {
-//         return redirect('/dashboard');
-//     }
-
-//     $id = Str::uuid()->toString();
-
-//     $validatedData = $request->validate([
-//         'user_id' => 'required|exists:users,id',
-//         'course_id' => 'nullable|exists:course,id',
-//         'year_level' => 'nullable|string',
-//         'section' => 'nullable|string',
-//         'Day' => 'required',
-//         'Time' => 'required',
-//         'course' => 'required',
-//         'Room' => 'required',
-//         'Semester' => 'required',
-//         'School_year' => 'required',
-//     ]);
-
-//     $data = [
-//         'id' => $id,
-//         'user_id'  => session('user_id'),
-//         'Programs' => session('program_id') ?? '',
-//         'Year_level' => $request->year_level ?? '',
-//         'Section' => $request->section ?? '',
-//         'Day' => $validatedData['Day'],
-//         'Time' => $validatedData['Time'],
-//         'course' => $validatedData['course'],
-//         'Room' => $validatedData['Room'],
-//         'Semester' => $validatedData['Semester'],
-//         'School_year' => $validatedData['School_year'],
-//     ];
-
-//     \App\Models\Schedule::insert($data);
-
-//     return redirect('/myschedule')->with('success', 'Schedule added successfully!');
-// })->name('myschedule.store');
 
 Route::get('school-year-settings', function () {
     return view('partials.school-year-settings');
@@ -175,12 +128,10 @@ Route::get('/course', function () {
 
 Route::get('/settings/school-year', [App\Http\Controllers\semyrController::class, 'schoolYearSettings'])->name('settings.school_year');
 Route::post('/settings/change-school-year', [App\Http\Controllers\semyrController::class, 'store'])->name('settings.store_school_year');   
- 
+
 Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile');
 Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
 Route::post('/profile/request', [App\Http\Controllers\ProfileController::class, 'storeRequest'])->name('profile.request.store');
-
-
 
 Route::post('/schedules/store', [App\Http\Controllers\schedulecontroller::class, 'store'])->name('schedules.store');
 Route::put('/schedules/{id}', [App\Http\Controllers\schedulecontroller::class, 'update'])->name('schedules.update');
