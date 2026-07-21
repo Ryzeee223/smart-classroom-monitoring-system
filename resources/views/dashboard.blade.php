@@ -19,7 +19,7 @@ body {
         <!-- nav bar -->
     @include('sidebar')
 
-    <main role="main" style="margin-left:260px;">
+<main role="main" class="page-content">
 
             <div class="container p-4" style="padding-top:16px;">
                 
@@ -46,7 +46,8 @@ body {
                 <div class="card h-100 shadow border-1">
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
                         <h6 class="text-muted mb-2">Rooms</h6>
-                        <div class="display-4 fw-bold text-primary mb-0">4</div>
+                        <div class="display-4 fw-bold text-primary mb-0">{{ $showrm ?? $roomnm ?? 0 }}</div>
+
                     </div>
                 </div>
             </div>
@@ -95,32 +96,134 @@ body {
                         <h5 class="mb-0 fw-bold text-dark">Live Classroom Status</h5>
                     </div>
 
-                    {{-- add a tab on top for building --}}
+                    {{-- add a navbar of buildings (click to filter classrooms) --}}
                     <div class="card-body p-0">
                         <p class="p-4 pb-3 text-muted small">Rooms update automatically as Faculty tap registered RFID Cards.</p>
-                       <div class="card-body" style=""> <h3>Building A</h3>
-                       </div>
-                        <div class="row row-cols-1 row-cols-md-2 g-3 px-4 pb-4">
-                            
-                            <div class="col ">
-                                <div class="card shadow-sm h-100 border-1">
-                                    <div class="card-body p-3">
-                                        <div class="d-flex justify-content-between align-items-start mb-1">
-                                            <div>
-                                                <h6 class="mb-1 fw-bold small">Computer Lab</h6>
-                                                <p class="mb-0 text-muted fs-6">CC101</p>
-                                            </div>
-                                            <span class="badge bg-success rounded-pill px-2 py-1 fs-6">Vacant</span>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer p-2 pt-1 bg-transparent border-0">
-                                        <p class="mb-0 text-muted fs-6"><small class="fw-bold text-uppercase">Faculty:</small> None</p>
-                                    </div>
-                                </div>
-                            </div>
+
+                        {{-- Building selector --}}
+                        <div class="px-3 pb-2">
+                            <div class="nav nav-pills flex-column flex-sm-row gap-2" role="tablist" aria-label="Buildings">
+                                @php
+                                    $bldng = $buildings ?? null;
+                                @endphp
+
+                                @if($bldng && $buildings->count())
+                                    @foreach($buildings as $bIndex => $b)
+                                        @php
+                                            $abbr = $b->bldg_abbr ?? $b->abbr ?? $b->name ?? ('B' . ($bIndex + 1));
+                                        @endphp
+
+                                        <button
+                                            class="nav-link building-tab {{ $bIndex === 0 ? 'active' : '' }}"
+                                            type="button"
+                                            data-building="{{ $abbr }}"
+                                        >
+                                            {{ $abbr }}
+                                        </button>
+                                    @endforeach
+                                @else
+                                    <button class="nav-link active building-tab" type="button" data-building="A">N/A</button>
+                                @endif
+
                             </div>
                         </div>
+
+                        {{-- Building header --}}
+                        <div class="card-body" style="">
+                            <h3 class="building-title"></h3>
+                        </div>
+
+                        {{-- Classroom grid (populated by JS when clicking a building) --}}
+                        <div class="row row-cols-1 row-cols-md-2 g-3 px-4 pb-4" id="classroomGrid"></div>
+
+                        {{-- Room data for the selected building tab --}}
+                        @php
+                            // We expect controller to have $rooms (with building relationship loaded).
+                            // If not present, fall back to empty.
+                            $roomsForGrid = $rooms ?? collect();
+                        @endphp
+
+                        {{-- <script>
+                            window.__roomsGrid = @json($roomsForGrid->map(function ($r) {
+                                return [
+                                    'id' => $r->id ?? null,
+                                    'name' => $r->room_name ?? '',
+                                    'type' => $r->room_type ?? '',
+                                    'bldg_abbr' => optional($r->building)->bldg_abbr ?? ($r->building_abbr ?? ''),
+                                    'bldg_name' => optional($r->building)->bldg_name ?? ($r->building_name ?? ''),
+                                ];
+                            })->values());
+                        </script> --}}
+
+
                     </div>
+                </div>
+            </div>
+
+            <script>
+                (function () {
+                    const grid = document.getElementById('classroomGrid');
+                    const buildingTitle = document.querySelector('.building-title');
+                    const rooms = window.__roomsGrid || [];
+
+                    function renderForBuilding(abbr) {
+                        if (!grid) return;
+
+                        const filtered = rooms.filter(r => (r.bldg_abbr || '') === (abbr || ''));
+
+                        if (!filtered.length) {
+                            grid.innerHTML = `
+                                <div class="col-12">
+                                    <div class="alert alert-light border" role="alert">
+                                        No rooms found for building <strong>${abbr || ''}</strong>.
+                                    </div>
+                                </div>
+                            `;
+                            if (buildingTitle) buildingTitle.textContent = abbr ? `Building ${abbr}` : '';
+                            return;
+                        }
+
+                        grid.innerHTML = filtered.map(r => {
+                            const subtitle = [r.type].filter(Boolean).join(' ');
+                            return `
+                                <div class="col">
+                                    <div class="card shadow-sm h-100 border-1">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                                <div>
+                                                    <h6 class="mb-1 fw-bold small">${r.name || ''}</h6>
+                                                    <p class="mb-0 text-muted fs-6">${r.bldg_abbr ? r.bldg_abbr : ''}</p>
+                                                </div>
+                                                <span class="badge bg-success rounded-pill px-2 py-1 fs-6">Vacant</span>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer p-2 pt-1 bg-transparent border-0">
+                                            <p class="mb-0 text-muted fs-6"><small class="fw-bold text-uppercase">Faculty:</small> None</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+
+                        if (buildingTitle) buildingTitle.textContent = abbr ? `Building ${abbr}` : '';
+                    }
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const activeBtn = document.querySelector('.building-tab.active');
+                        const initialAbbr = activeBtn ? activeBtn.getAttribute('data-building') : '';
+
+                        if (initialAbbr !== undefined) renderForBuilding(initialAbbr);
+
+                        document.querySelectorAll('.building-tab').forEach(btn => {
+                            btn.addEventListener('click', function () {
+                                const abbr = this.getAttribute('data-building') || '';
+                                renderForBuilding(abbr);
+                            });
+                        });
+                    });
+                })();
+            </script>
+
 
                 </div>
             </div>
@@ -135,72 +238,22 @@ body {
 
 
 @if(in_array($viewerRole, [2, 3], true))
-                   <!--  <div id="leave-requests-section" class="card shadow-lg mb-3">
-
-                        <div class="card-header">
-
-                            {{-- change to notif icon combine it with recently added users --}}
-                            <h5 class="mb-0 fw-bold small">Access Status / Leave Requests</h5>
-                        </div>
-                        <div class="card-body py-3">
-                            <p class="card-text text-muted mb-3 fs-6">Click a faculty name to view their leave request details.</p>
-
-                            <div class="list-group">
-                                @forelse(($leave_requests_by_faculty ?? collect()) as $facultyUserId => $reqs)
-                                    @php
-                                        $first = $reqs->first();
-                                        $facultyName = trim(($first->first_name ?? '').' '.($first->last_name ?? ''));
-                                        $collapseId = 'faculty-requests-' . $facultyUserId;
-                                    @endphp
-
-                                    <button
-                                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-3 py-2"
-                                        type="button"
-                                        data-bs-toggle="collapse"
-                                        data-bs-target="#{{ $collapseId }}"
-                                        aria-expanded="false"
-                                        aria-controls="{{ $collapseId }}"
-                                    >
-                                        <span class="fw-bold small">{{ $facultyName ?: 'Unknown Faculty' }}</span>
-                                        <span class="badge bg-primary rounded-pill">{{ $reqs->count() }}</span>
-                                    </button>
-
-                                    <div id="{{ $collapseId }}" class="collapse">
-                                        <div class="p-3" style="border-top:1px solid rgba(0,0,0,.08)">
-                                            @foreach($reqs as $r)
-                                                <div class="mb-3">
-                                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                                        <div class="fw-bold small">{{ $r->letter }}</div>
-                                                        <div class="text-muted" style="font-size:12px;">{{ !empty($r->created_at) ? \Carbon\Carbon::parse($r->created_at)->format('Y-m-d') : '-' }}</div>
-
-                                                    </div>
-                                                    <div class="text-muted small">Reason: {{ $r->reason }}</div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                @empty
-                                    <div class="text-center text-muted py-4">
-                                        No leave requests yet.
-                                    </div>
-                                @endforelse
-                            </div>
-                        </div>
-                    </div> -->
+                  
                 @endif
 
                     @if (in_array($viewerRole, [1, 2, 3], true))
             </div>
 </div>
 @endif
-
-                    
-
                 </div>
 
                 <div>
                     @include('partials.notifications-modal')
                 </div>
+
+                {{-- Building tab + filter script (basic for current static cards) --}}
+
+
             <!-- Recent Logs (inside Right Column) -->
                     <div class="col-lg-12 mt-3 width-100">
                         <div class="card shadow">
@@ -212,12 +265,12 @@ body {
                                     <table class="table table-hover mb-0">
                                         <thead class="table-light">
                                             <tr>
-                                                <th>Card Number</th>
+                                                <th>Class</th>
                                                 <th>Faculty Name</th>
                                                 <th>Room</th>
                                                 <th>Time In</th>
-                                                <th>Time Out</th>
                                                 <th>Course</th>
+                                                <th>Status</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -231,9 +284,10 @@ body {
                         </div>
                     </div>
         </div>
-    </div>
+</div>
 </body>
 </html>
+
 
 
 

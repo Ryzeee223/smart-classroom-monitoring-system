@@ -23,6 +23,19 @@
     <main class=" container mt-4 mb-5 p-4 gap-4">
         <div class="row">
             <div class="col-12 col-lg-6 mb-4">
+                @if ($errors->any())
+                                <div class="alert alert-danger mt-3">
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
+                            @if (session('success'))
+                                <div class="alert alert-success mt-3">{{ session('success') }}</div>
+                            @endif
                 <div class="card shadow">
                     <div class="card-header">
                         
@@ -47,19 +60,7 @@
 
                             <button type="submit" class="btn btn-primary">Save College</button>
 
-                            @if ($errors->any())
-                                <div class="alert alert-danger mt-3">
-                                    <ul class="mb-0">
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            @endif
-
-                            @if (session('success'))
-                                <div class="alert alert-success mt-3">{{ session('success') }}</div>
-                            @endif
+                            
                         </form>
                     </div>
                 </div>
@@ -73,7 +74,7 @@
                     <div class="card-body">
                         <p>List of program currently in the system.</p>
                         <ul class="list-group list-group-flush">
-@forelse($college ?? [] as $college)
+                                    @forelse($college ?? [] as $college)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
                                     <strong>{{ $college->college_name }}</strong> - <strong>{{ $college->abbreviation }}</strong>

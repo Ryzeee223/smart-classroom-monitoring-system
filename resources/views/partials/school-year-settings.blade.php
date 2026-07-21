@@ -1,14 +1,11 @@
 {{-- School Year settings container (UI-only) --}}
 <div class="card mt-4">
     <div class="card-header">
-        <h4 class="mb-0">School Year Settings</h4>
+        <h4 class="mb-0">Set School Year</h4>
     </div>
 
     <div class="card-body">
-        {{--
-          UI-only placeholder.
-          When backend persistence is added, this form can be wired to a route.
-        --}}
+        
         <form method="POST" action="{{ route('settings.store_school_year') }}" onsubmit="return true;">
             @csrf
 

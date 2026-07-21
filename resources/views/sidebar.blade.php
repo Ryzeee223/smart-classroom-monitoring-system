@@ -14,7 +14,7 @@
         @endif
     </div>
 
-    <div class="app-sidebar__body card-body" style="max-height: calc(100vh - 160px);">
+    <div class="app-sidebar__body card-body">
         <ul class="nav flex-column">
             {{-- 1=admin 2=dean 3=asst. dean 4=faculty 5=programhead --}}
 
@@ -90,11 +90,13 @@
     @endif
 </nav>
 
+
 <style>
     .app-sidebar{
         width:260px;
-        height:100vh;
+        height:100%;
         position:fixed;
+
         top:0;
         left:0;
         background:#f8f9fa;
@@ -103,6 +105,13 @@
         display:flex;
         flex-direction:column;
     }
+
+    /* default desktop content offset (safe on mobile via media query below) */
+    .page-content{
+        margin-left:260px;
+        width:calc(100% - 260px);
+    }
+
     .app-sidebar__brand{margin-bottom:12px;}
     .app-sidebar__brand-link{
         font-weight:800;
@@ -122,8 +131,14 @@
 
     
     @media (max-width: 767.98px){
-        .app-sidebar{display:none;}
+        /* keep sidebar content visible when included on mobile pages */
+        .app-sidebar{display:block; position:relative; width:100%; height:auto; border-right:none; padding:12px;}
+        .app-sidebar__body{max-height:none; overflow:visible;}
+        /* prevent pages from being pushed off-screen on mobile */
+        .page-content{margin-left:0 !important; width:100% !important;}
     }
+
+
 </style>
 
 <script>
@@ -148,12 +163,5 @@
             .catch(error => console.error('Error checking RFID:', error));
     }, 2000); // 2000ms = 2 seconds
 
-    // This function runs whenever a card is tapped!
-    function handleRfidScanGlobally(uid) {
-        // Example action: Show a nice browser alert
-        alert("RFID Card Scanned Globally! UID: " + uid);
-        
-        // Example: You can redirect the page, play a sound, or update a form field!
-        // window.location.href = "/students/" + uid;
-    }
+
 </script>

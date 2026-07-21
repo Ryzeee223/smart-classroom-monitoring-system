@@ -1,5 +1,4 @@
 <?php
-
 use Faker\Guesser\Name;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -96,9 +95,7 @@ Route::get('/myschedule', function () {
     return view('myschedule', compact('current_user', 'schedules', 'Programs'));
 })->name('myschedule');
 
-// Route::get('/schedtime', function () {
-//     return view('schedtime');
-// })->name('schedtime');
+
 
 
 Route::get('school-year-settings', function () {
@@ -178,3 +175,7 @@ Route::get('/rooms/', [App\Http\Controllers\room_bldg_controller::class, 'show']
 
 Route::post('/rooms/store', [App\Http\Controllers\room_bldg_controller::class, 'storeBldg'])->name('storeBldg.store');
 Route::get('/rooms/{id}', [App\Http\Controllers\room_bldg_controller::class, 'show']);
+Route::delete('/rooms/{id}', [App\Http\Controllers\room_bldg_controller::class, 'destroy'])->name('building.destroy');;
+Route::delete('/rooms/', [App\Http\Controllers\room_bldg_controller::class, 'explode'])->name('room.explode');
+
+

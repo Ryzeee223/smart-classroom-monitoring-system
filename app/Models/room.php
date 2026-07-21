@@ -12,7 +12,7 @@ class room extends Model
     protected $fillable = [
         'room_name',
         'room_type',
-        'college_id',
+        'bldg_id',
     ];
 
     protected $table = 'room';
@@ -27,6 +27,7 @@ class room extends Model
     {
         return $this->building();
     }
+
 }
 
 

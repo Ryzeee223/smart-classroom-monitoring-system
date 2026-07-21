@@ -24,9 +24,9 @@
     
 @endphp
 
-<div class="mt-5" style="margin-left: 300px;">
+<div class="page-content">
     <main class="container py-2">
-        <h1 class="mb-4">Rooms</h1>
+        <h1 class="mb-4">Rooms and Buildings</h1>
 
         <div class="row g-4 mb-4">
             {{-- Left column --}}
@@ -71,22 +71,23 @@
                     <form method="POST" action="{{ route('storeRoom.store') }}">
                         <div class="d-grid gap-2 align-items-center">
                             @csrf
-                            <select name="college_id" class="form-select form-select-sm">
-                                <option value="">Select College</option>
-                                @forelse($colleges ?? [] as $c)
-                                    <option value="{{ $c->id }}">{{ $c->college_name ?? $c->abbreviation }}</option>
+                            <select name="bldg_id" class="form-select form-select-sm" id="bldg_id">
+                                <option value="">Select Building</option>
+                                @forelse($bldgModel ?? [] as $bldg)
+                                    <option value="{{ $bldg->id }}">{{ $bldg->bldg_name }} ({{ $bldg->bldg_abbr }})</option>
                                 @empty
-                                    <option value="" disabled>No colleges available</option>
+                                    <option value="" disabled>No buildings available</option>
                                 @endforelse
                             </select>
 
-                            <input type="text" placeholder="Enter Classroom code (eg. cc101)" class="form-control form-control-sm" name="room_name" required>
 
                             <select class="form-select form-select-sm" name="room_type" required>
                                 <option value="">Select Type</option>
                                 <option value="Lec">Lecture</option>
                                 <option value="Lab">Laboratory</option>
                             </select>
+
+                            <input type="text" placeholder="Enter Classroom code (eg. cc101)" class="form-control form-control-sm" name="room_name" required>
                         </div>
 
                         <div class="d-flex justify-content-center mt-3">
@@ -95,11 +96,7 @@
                     </form>
                 </div>
 
-                {{-- Assign rooms to buildings --}}
-                <div class="card p-3 shadow-sm bg-white border-1">
-                    <h2 class="h5 mb-2">Assign Rooms to Building</h2>
-                    <p class="mb-0">This is where you assign rooms on buildings</p>
-                </div>
+               
             </div>
 
             {{-- Right column --}}
@@ -119,20 +116,20 @@
 
                         {{-- College filter --}}
                             <div class="mb-3">
-                        <label class="form-label form-label-sm mb-1">Filter by present College ID</label>
-                        <select class="form-select form-select-sm" id="college-filter" onchange="filterBuildingsByCollege()">
+                            <label class="form-label form-label-sm mb-1">Filter by present College ID</label>
+                            <select class="form-select form-select-sm" id="college-filter" onchange="filterBuildingsByCollege()">
                             <option value="">All colleges</option>
                             @forelse($colleges ?? [] as $c)
                                 <option value="{{ $c->id }}">{{ $c->college_name ?? $c->abbreviation }}</option>
                             @empty
                                 <option value="" disabled>No colleges available</option>
                             @endforelse
-                        </select>
-                    </div>
+                             </select>
+                            </div>
 
                     <div class="table-responsive mb-0">
                         {{-- slot container --}}
-                            <div class="p-2" style="background:#f8f9fa; border-radius:6px;">
+                        <div class="p-2" style="background:#f8f9fa; border-radius:6px;">
                             <div class="card-body p-0">
                                 <p class="mb-2 text-muted" style="font-size: 0.9rem;">Existing buildings</p>
                             </div>
@@ -141,13 +138,22 @@
                                 @forelse($bldgModel ?? [] as $b)
                                     <div class="d-flex justify-content-between align-items-center border rounded-2 px-2 py-2 mb-2 bg-white"
                                          data-college-id="{{ $b->college_id ?? '' }}">
-                                        <div class="fw-semibold">{{ $b->bldg_name }}</div>
-                                        <div class="text-muted">({{ $b->bldg_abbr }})</div>
+                                        <div>
+                                            <div class="fw-semibold">{{ $b->bldg_name }}</div>
+                                            <div class="text-muted">({{ $b->bldg_abbr }})</div>
+                                        </div>
+
+                                        <form action="{{ route('building.destroy', $b->id) }}" method="POST" onsubmit="return confirm('Delete this building?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                                        </form>
                                     </div>
                                 @empty
                                     <p class="mb-0 text-muted" style="font-size: 0.9rem;">No buildings available.</p>
                                 @endforelse
                             </div>
+
 
                             <div class="mt-4">
                                 <div class="card-body p-0 mb-2">
@@ -158,20 +164,35 @@
                                     @forelse($rooms ?? [] as $r)
                                         @php
                                             // Filtering should use the PRESENT college_id from related/created records
-                                            $roomCollegeId = $r->college_id ?? ($r->building->college_id ?? '');
+                                            $roomCollegeId = $r->college_id ?? (optional($r->building)->college_id ?? '');
                                             $roomBuildingAbbr = optional($r->building)->bldg_abbr;
+
                                         @endphp
 
                                         <div class="d-flex justify-content-between align-items-center border rounded-2 px-2 py-2 mb-2 bg-white"
                                              data-college-id="{{ $roomCollegeId }}">
                                             <div>
                                                 <div class="fw-semibold">{{ $r->room_name }}</div>
-                                                <div class="text-muted" style="font-size:0.85rem;">{{ $r->room_type ?? '' }} {{ $roomBuildingAbbr ? '• ' . $roomBuildingAbbr : '' }}</div>
+                                                <div class="text-muted" style="font-size:0.85rem;">
+                                                    {{ $r->room_type ?? '' }}
+                                                    {{ $roomBuildingAbbr ? '• ' . $roomBuildingAbbr : '' }}
+                                                </div>
+                                                
                                             </div>
                                             <div class="text-muted" style="font-size:0.85rem;">
-                                                {{ $roomBuildingAbbr ? '(' . $roomBuildingAbbr . ')' : '' }}
+                                                {{ optional($r->building)->bldg_name ? optional($r->building)->bldg_name : ($roomBuildingAbbr ? '(' . $roomBuildingAbbr . ')' : '') }}
                                             </div>
-                                        </div>
+
+
+                                            <form action="{{ route('building.destroy', $r->id) }}" method="POST" onsubmit="return confirm('Delete this room?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                                            </form>
+
+
+
+                                     </div>
                                     @empty
                                         <p class="mb-0 text-muted" style="font-size: 0.9rem;">No rooms available.</p>
                                     @endforelse

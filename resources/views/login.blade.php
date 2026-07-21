@@ -7,11 +7,17 @@
     
     <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
     <title>Login - eMonitor</title>
+    <style>
+        body{
+            overflow-y:hidden;
+            overflow-x:hidden;
+        }
+    </style>
 </head>
-<body class="d-flex justify-content-center align-items-center min-vh-100 bg-light py-3">
+<body class="d-flex justify-content-center  align-items-center min-vh-100 bg-light py-3">
     <form method="POST" action="{{ route('login') }}">
         @csrf
-        <div class="card shadow w-100" style="max-width: 400px;">
+        <div class="card rounded-4 shadow w-100" style="max-width: 400px;">
             <div class="card-body p-4 p-md-5">
                 <h1 class="card-title text-center mb-4 fs-2">Login</h1>
                 @if ($errors->any())

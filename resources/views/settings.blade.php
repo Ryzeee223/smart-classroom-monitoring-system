@@ -12,14 +12,22 @@
 <style>
    body{
     overflow-x: hidden;
-    
+   }
+   /* desktop offset provided by sidebar.blade.php styles */
+   .page-content{
+        margin-left: 260px;
+        width: calc(100% - 260px);
+   }
+   @media (max-width: 767.98px){
+        .page-content{margin-left:0 !important; width:100% !important;}
    }
 </style>
 
 @include('sidebar')
 
-<div class="">
-    <main class=" container mt-4 mb-5" style="margin-left: 35%; width: 50%;">
+<div class="page-content">
+    <main class="container mt-4 mb-5">
+
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
@@ -78,8 +86,7 @@
                 rfidLabel.textContent = data.uid;
 
                
-            }
-        } catch (error) {
+            }        } catch (error) {
             console.error("Error fetching RFID scan:", error);
         }
     }, 2000);
@@ -94,8 +101,8 @@
 
                 
                 <div class="card">
-                    <div class="card-body">
-                        <h5 class="mt-3">Reset my password</h5>
+                    <div class="card-body mb-0">
+                        <h5 class="form-label">Reset my password</h5>
                         <form action="{{ route('settings.reset_password') }}" method="POST" class="mt-3">
                             @csrf
 
