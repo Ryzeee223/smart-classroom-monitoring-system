@@ -47,7 +47,7 @@
                                         ? $roleMap[$user->role]
                                         : ($user->role ?? null);
 
-                            
+                                    
 
                                    
                                     
@@ -72,6 +72,7 @@
                                         <div><Strong>College:</Strong>{{$currentCollegeName ?? 'No College Assigned' }}</div>
                                         <div><strong>Employee ID:</strong> {{ $user->employee_ID ?? '-' }}</div>
                                         <div><strong>Role:</strong> {{ $roleName ?? 'Unknown' }}</div>
+                                        <div><strong>Status:</strong> {{ $AccStatus ?? 'Unknown' }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -128,7 +129,7 @@
 
                                             <form action="{{ route('profile.request.store') }}" method="POST" class="row g-3">
                                                 @csrf
-
+                                  
                                                 <div class="col-12">
                                                     <label for="letter" class="form-label">Your request</label>
                                                     <input
@@ -148,6 +149,7 @@
                                                         <option value="Sick leave">Sick leave</option>
                                                         <option value="official business leave">Official Business leave</option>
                                                         <option value="Summer class">Request a summer class</option>
+                                                        <option value="others"> others</option>
                                                     </select>
                                                 </div>
 
@@ -168,6 +170,7 @@
                                                                 <th>Letter</th>
                                                                 <th>Reason</th>
                                                                 <th>Date</th>
+                                                                <th>Status</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -179,15 +182,19 @@
                                                                         // DB::table() returns timestamps as strings by default
                                                                         $createdAt = $r->created_at;
                                                                         $createdAtFormatted = null;
-                                                                        if (!empty($createdAt)) {
+                                                                        if (!empty($createdAt)) 
+                                                                        {
                                                                             try {
                                                                                 $createdAtFormatted = \Carbon\Carbon::parse($createdAt)->format('Y-m-d');
                                                                             } catch (\Throwable $e) {
                                                                                 $createdAtFormatted = $createdAt;
                                                                             }
                                                                         }
+
+
                                                                     @endphp
                                                                     <td>{{ $createdAtFormatted ?? '-' }}</td>
+                                                                    <td> {{$r->status}}</td>
                                                                 </tr>
                                                             @endforeach
                                                         </tbody>

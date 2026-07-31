@@ -132,6 +132,7 @@
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(in_array($sessionRole, [2, 3], true)): ?>
                         <input type="hidden" name="college_id" value="<?php echo e($currentCollegeId); ?>">
                     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
                 </div>
                       <div class="row g-2 mt-2">
                     <div class="col-md">

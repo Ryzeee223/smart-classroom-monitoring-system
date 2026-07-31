@@ -26,8 +26,7 @@ return new class extends Migration
             $table->integer('role');
             $table->foreignId('college_id')->constrained('college')->onDelete('cascade');
             $table->string('RFID_code')->nullable()->unique();
-            $table->tinyInteger('acc_status')->default(1);
-            $table->tinyInteger('status')->default(0);
+            $table->string('acc_status')->default('present');
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();

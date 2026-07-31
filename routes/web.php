@@ -1,4 +1,6 @@
 <?php
+
+use App\Http\Controllers\RequestController;
 use Faker\Guesser\Name;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -34,15 +36,16 @@ Route::get('/dashboard', function () {
     $userRole = (int) (session('user_role') ?? 0);
 
     // Leave requests are only visible to Dean (2) and Assistant Dean (3)
-    $leave_requests_by_faculty = collect();
+    $req = collect();
     if (in_array($userRole, [2, 3], true)) {
         $requests = \Illuminate\Support\Facades\DB::table('requests')
-            ->join('users', 'users.id', '=', 'requests.user_request')
+            ->join('users', 'users.id', '=', 'requests.user_id')
             ->whereIn('users.role', [4, 5]) // faculty + program head accounts request letters
             ->select(
                 'users.first_name',
                 'users.last_name',
                 'users.id as user_id',
+                'requests.id',
                 'requests.letter',
                 'requests.reason',
                 'requests.created_at'
@@ -52,7 +55,7 @@ Route::get('/dashboard', function () {
 
 
         // Group by faculty user id
-        $leave_requests_by_faculty = $requests->groupBy('user_id');
+        $req = $requests->groupBy('user_id');
     }
 
     $role_name = match ($userRole) {
@@ -69,7 +72,8 @@ Route::get('/dashboard', function () {
         'role_name',
         'faculty_count',
         'pending_count',
-        'leave_requests_by_faculty'
+        'req',
+        
     ));
 })->name('dashboard');
 
@@ -78,6 +82,7 @@ Route::get('/college', function(){
 
 })->name('college');
 
+Route::get('/approve/{id?}', [App\Http\Controllers\RequestController::class, 'show'])->name('approval');
 
 Route::get('/schedules', [App\Http\Controllers\schedulecontroller::class, 'index'])->name('schedules');
 
@@ -90,11 +95,10 @@ Route::get('/myschedule', function () {
     $current_user = \App\Models\User::find($user_id);
     $schedules = \App\Models\Schedule::where('user_id', $user_id)->get();
     $Programs = \App\Models\Programs::all();
-    // $course = \App\Models\course::all();
+    
 
     return view('myschedule', compact('current_user', 'schedules', 'Programs'));
 })->name('myschedule');
-
 
 
 
@@ -123,12 +127,16 @@ Route::get('/course', function () {
     return view('course');
 })->name('course');
 
+
+
 Route::get('/settings/school-year', [App\Http\Controllers\semyrController::class, 'schoolYearSettings'])->name('settings.school_year');
 Route::post('/settings/change-school-year', [App\Http\Controllers\semyrController::class, 'store'])->name('settings.store_school_year');   
 
+
 Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile');
 Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
-Route::post('/profile/request', [App\Http\Controllers\ProfileController::class, 'storeRequest'])->name('profile.request.store');
+Route::post('/profile/request', [App\Http\Controllers\RequestController::class, 'storeRequest'])->name('profile.request.store');
+
 
 Route::post('/schedules/store', [App\Http\Controllers\schedulecontroller::class, 'store'])->name('schedules.store');
 Route::put('/schedules/{id}', [App\Http\Controllers\schedulecontroller::class, 'update'])->name('schedules.update');
@@ -178,4 +186,6 @@ Route::get('/rooms/{id}', [App\Http\Controllers\room_bldg_controller::class, 'sh
 Route::delete('/rooms/{id}', [App\Http\Controllers\room_bldg_controller::class, 'destroy'])->name('building.destroy');;
 Route::delete('/rooms/', [App\Http\Controllers\room_bldg_controller::class, 'explode'])->name('room.explode');
 
-
+Route::post('/requests/approve/{id}', [App\Http\Controllers\RequestController::class, 'approval'])->name('requests.approve');
+Route::post('/requests/decline/{id}', [App\Http\Controllers\RequestController::class, 'decline'])->name('requests.decline');
+Route::get('/notifications-modal', [RequestController::class, 'show'])->name('request.show');

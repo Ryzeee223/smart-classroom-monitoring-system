@@ -14,17 +14,13 @@ return new class extends Migration
         Schema::create('requests', function (Blueprint $table) {
             // Keep the existing auto-id
             $table->id();
-
-            // Columns used by ProfileController@storeRequest()
-            $table->unsignedBigInteger('request_id')->unique();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('letter', 255);
-            $table->string('reason', 255);
-            $table->unsignedBigInteger('user_request');
+            $table->string('reason', 50);
+            $table->enum('status', ['pending', 'approved', 'declined'])->default('pending');
+            
 
-            $table->timestamps();
-
-            // If you want referential integrity, uncomment:
-            // $table->foreign('user_request')->references('id')->on('users')->cascadeOnDelete();
+             $table->timestamps();
         });
     }
 

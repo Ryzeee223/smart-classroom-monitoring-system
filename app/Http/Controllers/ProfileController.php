@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use App\Models\college;
 class ProfileController extends Controller
 {
     public function show()
@@ -14,19 +13,20 @@ class ProfileController extends Controller
         }
  
         $userId = session('user_id');
-        $user = $userId ? User::find($userId) : null;
+        $user = $userId ? User::with('college')->find($userId) : null;
        
         // Load requests for this user (for the profile display)
         $requests = $userId ? \Illuminate\Support\Facades\DB::table('requests')
-            ->where('user_request', $userId)
+            ->where('user_id', $userId)
             ->orderByDesc('created_at')
             ->get() : collect();
 
-$college = $user && $user->college_id ? college::find($user->college_id) : null;
-
-$user = $userId ? User::with('college')->find($userId) : null;
-
-        return view('profile', compact('user', 'requests', 'college'));
+             $sessionStatus = session('user_id');
+        $status = User::findOrFail($sessionStatus);
+        $AccStatus = $status -> acc_status;
+        
+        
+        return view('profile', compact('user', 'requests', 'AccStatus'));
     }
 
     public function update(Request $request)
@@ -71,45 +71,11 @@ $user = $userId ? User::with('college')->find($userId) : null;
 
         return redirect()->route('profile')->with('success', 'Profile photo updated successfully!');
     }
-   
-    
-    public function storeRequest(Request $request)
+
+    public function showStatus()
     {
-        if (!session('logged_in')) {
-            return redirect('/');
-        }
 
-        $userId = session('user_id');
-        $userRole = (int) (session('user_role') ?? 0);
-
-        // Only roles 2,3,4,5 can submit requests
-        if (!in_array($userRole, [2, 3, 4, 5], true)) {
-            return redirect()->route('profile')->with('success', 'You are not allowed to submit a request.');
-        }
-
-        $validated = $request->validate([
-            'letter' => 'required|string|max:50',
-            'reason' => 'required|string|max:20',
-        ]);
-
-        // Request table name is `Request` (capital R)
-        // Store request_id (custom) into the auto table.
-        $requestId = random_int(1_000_000, 9_999_999);
-
-        \Illuminate\Support\Facades\DB::table('requests')->insert([
-            'request_id' => $requestId,
-            'letter' => $validated['letter'],
-            'reason' => $validated['reason'],
-            'user_request' => $userId,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        return redirect()->route('profile')->with('success', 'Request submitted successfully!');
     }
-
-    
-    
 }
 
 

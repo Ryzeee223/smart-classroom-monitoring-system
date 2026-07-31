@@ -6,27 +6,23 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-
                 <div class="mb-4">
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <h6 class="mb-0 fw-bold">Leave Requests</h6>
-                        <span class="badge bg-primary">{{ ($leave_requests_by_faculty ?? collect())->count() }}</span>
+                        <span class="badge bg-primary">{{ ($req ?? collect())->count() }}</span>
                     </div>
-
-                    @if(in_array((int)(session('user_role') ?? 0), [2,3], true))
+@if(in_array((int)(session('user_role') ?? 0), [2,3], true))
                         <div id="leave-requests-modal-content">
                             <p class="text-muted small mb-3">Click a faculty name to view leave request details.</p>
-
                             <div class="list-group">
-                                @forelse(($leave_requests_by_faculty ?? collect()) as $facultyUserId => $reqs)
+                                @forelse(($req ?? collect()) as $facultyUserId => $req)
                                     @php
-                                        $first = $reqs->first();
+                                        $first = $req->first();
                                         $facultyName = trim(($first->first_name ?? '').' '.($first->last_name ?? ''));
                                         $collapseId = 'modal-faculty-requests-' . $facultyUserId;
                                     @endphp
-
                                     <button
-                                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-3 py-2"
+                                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-3 py-2 "
                                         type="button"
                                         data-bs-toggle="collapse"
                                         data-bs-target="#{{ $collapseId }}"
@@ -34,20 +30,32 @@
                                         aria-controls="{{ $collapseId }}"
                                     >
                                         <span class="fw-bold small">{{ $facultyName ?: 'Unknown Faculty' }}</span>
-                                        <span class="badge bg-primary rounded-pill">{{ $reqs->count() }}</span>
+                                        <span class="badge bg-primary rounded-pill">{{ $req->count() }}</span>
                                     </button>
-
-                                    <div id="{{ $collapseId }}" class="collapse">
+                                    <div id="{{ $collapseId }}" class="collapse border border-dark-1">
                                         <div class="p-3" style="border-top:1px solid rgba(0,0,0,.08)">
-                                            @foreach($reqs as $r)
+                                            @foreach($req as $r)
                                                 <div class="mb-3">
-                                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                                        <div class="fw-bold small">{{ $r->letter }}</div>
+                                                    <div class="d-flex justify-content-between align-items-center mb-1 ">
+                                                        <div class="fw-bold small">{{ $r->reason }}</div>
                                                         <div class="text-muted" style="font-size:12px;">
                                                             {{ !empty($r->created_at) ? \Carbon\Carbon::parse($r->created_at)->format('Y-m-d') : '-' }}
                                                         </div>
                                                     </div>
-                                                    <div class="text-muted small">Reason: {{ $r->reason }}</div>
+                                                        <div class="text-muted small">Reason: {{ $r->letter }}
+
+                                                        <br>
+                                                        <div class="d-flex gap-2 mt-2">
+                                                            <form action="{{ route('requests.approve', $r->id) }}" method="POST">
+                                                                @csrf
+                                                                <button type="submit" class="btn btn-outline-success btn-sm">Accept</button>
+                                                            </form>
+                                                            <form action="{{ route('requests.decline', $r->id) }}" method="POST">
+                                                                @csrf
+                                                                <button type="submit" class="btn btn-outline-danger btn-sm">Decline</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             @endforeach
                                         </div>
@@ -58,12 +66,7 @@
                             </div>
                         </div>
                     @else
-                        <div class="mb-4">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        no request has not been approved yet.
-                    </div>
-                            
-                        </div>
+                        <div class="text-center text-muted py-4">Your requests will be reviewed by the Dean.</div>
                     @endif
                 </div>
 
@@ -94,4 +97,3 @@
         </div>
     </div>
 </div>
-

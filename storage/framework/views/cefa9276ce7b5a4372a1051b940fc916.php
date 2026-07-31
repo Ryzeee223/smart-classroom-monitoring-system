@@ -6,27 +6,23 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-
                 <div class="mb-4">
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <h6 class="mb-0 fw-bold">Leave Requests</h6>
-                        <span class="badge bg-primary"><?php echo e(($leave_requests_by_faculty ?? collect())->count()); ?></span>
+                        <span class="badge bg-primary"><?php echo e(($req ?? collect())->count()); ?></span>
                     </div>
-
-                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(in_array((int)(session('user_role') ?? 0), [2,3], true)): ?>
+<?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(in_array((int)(session('user_role') ?? 0), [2,3], true)): ?>
                         <div id="leave-requests-modal-content">
                             <p class="text-muted small mb-3">Click a faculty name to view leave request details.</p>
-
                             <div class="list-group">
-                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = ($leave_requests_by_faculty ?? collect()); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $facultyUserId => $reqs): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = ($req ?? collect()); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $facultyUserId => $req): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                                     <?php
-                                        $first = $reqs->first();
+                                        $first = $req->first();
                                         $facultyName = trim(($first->first_name ?? '').' '.($first->last_name ?? ''));
                                         $collapseId = 'modal-faculty-requests-' . $facultyUserId;
                                     ?>
-
                                     <button
-                                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-3 py-2"
+                                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-3 py-2 "
                                         type="button"
                                         data-bs-toggle="collapse"
                                         data-bs-target="#<?php echo e($collapseId); ?>"
@@ -34,21 +30,34 @@
                                         aria-controls="<?php echo e($collapseId); ?>"
                                     >
                                         <span class="fw-bold small"><?php echo e($facultyName ?: 'Unknown Faculty'); ?></span>
-                                        <span class="badge bg-primary rounded-pill"><?php echo e($reqs->count()); ?></span>
+                                        <span class="badge bg-primary rounded-pill"><?php echo e($req->count()); ?></span>
                                     </button>
-
-                                    <div id="<?php echo e($collapseId); ?>" class="collapse">
+                                    <div id="<?php echo e($collapseId); ?>" class="collapse border border-dark-1">
                                         <div class="p-3" style="border-top:1px solid rgba(0,0,0,.08)">
-                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $reqs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $req; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                                                 <div class="mb-3">
-                                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                                        <div class="fw-bold small"><?php echo e($r->letter); ?></div>
+                                                    <div class="d-flex justify-content-between align-items-center mb-1 ">
+                                                        <div class="fw-bold small"><?php echo e($r->reason); ?></div>
                                                         <div class="text-muted" style="font-size:12px;">
                                                             <?php echo e(!empty($r->created_at) ? \Carbon\Carbon::parse($r->created_at)->format('Y-m-d') : '-'); ?>
 
                                                         </div>
                                                     </div>
-                                                    <div class="text-muted small">Reason: <?php echo e($r->reason); ?></div>
+                                                        <div class="text-muted small">Reason: <?php echo e($r->letter); ?>
+
+
+                                                        <br>
+                                                        <div class="d-flex gap-2 mt-2">
+                                                            <form action="<?php echo e(route('requests.approve', $r->id)); ?>" method="POST">
+                                                                <?php echo csrf_field(); ?>
+                                                                <button type="submit" class="btn btn-outline-success btn-sm">Accept</button>
+                                                            </form>
+                                                            <form action="<?php echo e(route('requests.decline', $r->id)); ?>" method="POST">
+                                                                <?php echo csrf_field(); ?>
+                                                                <button type="submit" class="btn btn-outline-danger btn-sm">Decline</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                                         </div>
@@ -59,12 +68,7 @@
                             </div>
                         </div>
                     <?php else: ?>
-                        <div class="mb-4">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        no request has not been approved yet.
-                    </div>
-                            
-                        </div>
+                        <div class="text-center text-muted py-4">Your requests will be reviewed by the Dean.</div>
                     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
 
@@ -94,6 +98,4 @@
             </div>
         </div>
     </div>
-</div>
-
-<?php /**PATH /Volumes/shared/capstone project/backups/emonitor 3rd phase copy/resources/views/partials/notifications-modal.blade.php ENDPATH**/ ?>
+</div><?php /**PATH /Volumes/shared/capstone project/backups/emonitor 3rd phase copy/resources/views/partials/notifications-modal.blade.php ENDPATH**/ ?>

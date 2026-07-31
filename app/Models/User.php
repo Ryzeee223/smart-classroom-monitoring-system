@@ -24,7 +24,6 @@ class User extends Authenticatable
         'profile_picture',
         'RFID_code',
         'acc_status',
-        'status',
     ];
 
     protected $hidden = [
@@ -37,8 +36,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'acc_status' => 'boolean',
-            'status' => 'boolean',
+            
         ];
     }
     public function college()

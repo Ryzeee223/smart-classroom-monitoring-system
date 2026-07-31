@@ -69,8 +69,7 @@ class AdminController extends Controller
             'college_id' => $request->college_id,
             'profile_picture' => null,
             'RFID_code' => null,
-            'acc_status' => 1,
-            'status' => 0,
+            'acc_status' => 'present',
         ]);
 
         return back()->with('success', 'User saved successfully!');
