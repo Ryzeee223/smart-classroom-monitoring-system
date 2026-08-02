@@ -40,21 +40,24 @@ Route::get('/dashboard', function () {
     if (in_array($userRole, [2, 3], true)) {
         $requests = \Illuminate\Support\Facades\DB::table('requests')
             ->join('users', 'users.id', '=', 'requests.user_id')
-            ->whereIn('users.role', [4, 5]) // faculty + program head accounts request letters
+            ->whereIn('users.role', [2, 3, 4, 5]) // All roles that can submit requests (Dean, Asst Dean, Faculty, Program Head)
+            ->where('requests.status', 'pending') // Only show pending requests
             ->select(
                 'users.first_name',
                 'users.last_name',
                 'users.id as user_id',
+                'users.role',
                 'requests.id',
                 'requests.letter',
                 'requests.reason',
+                'requests.status',
                 'requests.created_at'
             )
             ->orderByDesc('requests.created_at')
             ->get();
 
 
-        // Group by faculty user id
+        // Group by user id (who submitted the request)
         $req = $requests->groupBy('user_id');
     }
 
@@ -67,13 +70,18 @@ Route::get('/dashboard', function () {
         default => 'Unknown',
     };
 
+    // Buildings and their rooms for the Live Classroom Status grid
+    $buildings = \App\Models\bldg::all();
+    $rooms = \App\Models\room::with('building')->get();
+
     return view('dashboard', compact(
         'recent_faculty',
         'role_name',
         'faculty_count',
         'pending_count',
         'req',
-        
+        'buildings',
+        'rooms',
     ));
 })->name('dashboard');
 
@@ -111,8 +119,7 @@ Route::post('school-year-settings', function (Illuminate\Http\Request $request) 
         'semester' => 'required|string',
     ]);
 
-    // Save the school year and semester to the database or perform any other necessary actions
-    // For example, you can create a new Semester record
+    
     \App\Models\semyr::create([
         'Semester' => $validatedData['semester'],
         'School_year' => $validatedData['school_year'],
@@ -121,8 +128,7 @@ Route::post('school-year-settings', function (Illuminate\Http\Request $request) 
     return redirect()->back()->with('success', 'School year and semester settings updated successfully!');
 })->name('school-year-settings.update');
 
-// NOTE: /programs and /course are handled by controllers below.
-// Keep only one route definition per path/name to avoid rendering the wrong page.
+
 Route::get('/course', function () {
     return view('course');
 })->name('course');
@@ -189,3 +195,10 @@ Route::delete('/rooms/', [App\Http\Controllers\room_bldg_controller::class, 'exp
 Route::post('/requests/approve/{id}', [App\Http\Controllers\RequestController::class, 'approval'])->name('requests.approve');
 Route::post('/requests/decline/{id}', [App\Http\Controllers\RequestController::class, 'decline'])->name('requests.decline');
 Route::get('/notifications-modal', [RequestController::class, 'show'])->name('request.show');
+
+Route::get('/partials.approve',function() {
+    return view('partials.approve');
+})->name('approve');
+
+Route::get('/partials.approve/{id}',[App\Http\Controllers\RequestController::class, 'showreason'])->name('showReason');
+Route::get('/partials.notifications-modal/{id}',[App\Http\Controllers\RequestController::class, 'showreason'])->name('showReqReason');

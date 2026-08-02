@@ -111,12 +111,14 @@ body {
                                     @foreach($buildings as $bIndex => $b)
                                         @php
                                             $abbr = $b->bldg_abbr ?? $b->abbr ?? $b->name ?? ('B' . ($bIndex + 1));
+                                            $name = $b->bldg_name ?? $abbr;
                                         @endphp
 
                                         <button
                                             class="nav-link building-tab {{ $bIndex === 0 ? 'active' : '' }}"
                                             type="button"
                                             data-building="{{ $abbr }}"
+                                            data-building-name="{{ $name }}"
                                         >
                                             {{ $abbr }}
                                         </button>
@@ -141,10 +143,9 @@ body {
                             // We expect controller to have $rooms (with building relationship loaded).
                             // If not present, fall back to empty.
                             $roomsForGrid = $rooms ?? collect();
-                        @endphp
 
-                        {{-- <script>
-                            window.__roomsGrid = @json($roomsForGrid->map(function ($r) {
+                            // Build the grid data in PHP so the @json directive only receives a simple variable.
+                            $roomsGridData = $roomsForGrid->map(function ($r) {
                                 return [
                                     'id' => $r->id ?? null,
                                     'name' => $r->room_name ?? '',
@@ -152,8 +153,12 @@ body {
                                     'bldg_abbr' => optional($r->building)->bldg_abbr ?? ($r->building_abbr ?? ''),
                                     'bldg_name' => optional($r->building)->bldg_name ?? ($r->building_name ?? ''),
                                 ];
-                            })->values());
-                        </script> --}}
+                            })->values();
+                        @endphp
+
+                        <script>
+                            window.__roomsGrid = @json($roomsGridData);
+                        </script>
 
 
                     </div>
@@ -166,20 +171,22 @@ body {
                     const buildingTitle = document.querySelector('.building-title');
                     const rooms = window.__roomsGrid || [];
 
-                    function renderForBuilding(abbr) {
+                    function renderForBuilding(abbr, name) {
                         if (!grid) return;
 
                         const filtered = rooms.filter(r => (r.bldg_abbr || '') === (abbr || ''));
+
+                        const title = name || (abbr ? `Building ${abbr}` : '');
 
                         if (!filtered.length) {
                             grid.innerHTML = `
                                 <div class="col-12">
                                     <div class="alert alert-light border" role="alert">
-                                        No rooms found for building <strong>${abbr || ''}</strong>.
+                                        No rooms found for building <strong>${title}</strong>.
                                     </div>
                                 </div>
                             `;
-                            if (buildingTitle) buildingTitle.textContent = abbr ? `Building ${abbr}` : '';
+                            if (buildingTitle) buildingTitle.textContent = title;
                             return;
                         }
 
@@ -205,19 +212,21 @@ body {
                             `;
                         }).join('');
 
-                        if (buildingTitle) buildingTitle.textContent = abbr ? `Building ${abbr}` : '';
+                        if (buildingTitle) buildingTitle.textContent = title;
                     }
 
                     document.addEventListener('DOMContentLoaded', function () {
                         const activeBtn = document.querySelector('.building-tab.active');
                         const initialAbbr = activeBtn ? activeBtn.getAttribute('data-building') : '';
+                        const initialName = activeBtn ? activeBtn.getAttribute('data-building-name') : '';
 
-                        if (initialAbbr !== undefined) renderForBuilding(initialAbbr);
+                        if (initialAbbr !== undefined) renderForBuilding(initialAbbr, initialName);
 
                         document.querySelectorAll('.building-tab').forEach(btn => {
                             btn.addEventListener('click', function () {
                                 const abbr = this.getAttribute('data-building') || '';
-                                renderForBuilding(abbr);
+                                const name = this.getAttribute('data-building-name') || '';
+                                renderForBuilding(abbr, name);
                             });
                         });
                     });

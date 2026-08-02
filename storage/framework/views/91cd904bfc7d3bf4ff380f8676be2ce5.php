@@ -46,6 +46,10 @@
                     <div class="card">
                         <div class="card-header">
                             <h5>Add Schedule for Faculty</h5>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($collegeName)): ?>
+                            <div class="d-flex justify-content-center"><span class="mt-1 align-text-center justify-content-center"><?php echo e($collegeName); ?></span></div>
+                                
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </div>
                         <div class="card-body">
                             <form method="POST" action="<?php echo e(route('schedules.store')); ?>">
@@ -93,12 +97,12 @@
                                 
                                 <div class="row">
                                     
-                                    <div class="col-md-6 mb-3">
+<div class="col-md-6 mb-3">
                                         <label class="form-label">Faculty</label>
                                         <select class="form-select" name="user_id" required>
                                             <option value="">Select Faculty</option>
                                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $faculty_list; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $faculty): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
-                                                <option value="<?php echo e($faculty->id); ?>">
+                                                <option value="<?php echo e($faculty->id); ?>" <?php echo e((isset($selectedFacultyId) && (int)$selectedFacultyId === (int)$faculty->id) ? 'selected' : ''); ?>>
                                                     <?php echo e($faculty->first_name); ?> <?php echo e($faculty->last_name); ?>
 
                                                 </option>
@@ -282,6 +286,9 @@
                         <div class="card-header">
                             <h5>Assigned Faculty Schedules</h5>
                             <span>Faculty schedules shown here and can be edited or delete</span>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($collegeName)): ?>
+                                <div class="text-muted small mt-1">Showing users from: <strong><?php echo e($collegeName); ?></strong></div>
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </div>
                         <div class="card-body" style="max-height: 500px; overflow-y: auto;">
 

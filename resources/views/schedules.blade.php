@@ -46,6 +46,10 @@
                     <div class="card">
                         <div class="card-header">
                             <h5>Add Schedule for Faculty</h5>
+                            @if(!empty($collegeName))
+                            <div class="d-flex justify-content-center"><span class="mt-1 align-text-center justify-content-center">{{ $collegeName }}</span></div>
+                                
+                            @endif
                         </div>
                         <div class="card-body">
                             <form method="POST" action="{{ route('schedules.store') }}">
@@ -93,12 +97,12 @@
                                 
                                 <div class="row">
                                     {{-- selec faculty --}}
-                                    <div class="col-md-6 mb-3">
+<div class="col-md-6 mb-3">
                                         <label class="form-label">Faculty</label>
                                         <select class="form-select" name="user_id" required>
                                             <option value="">Select Faculty</option>
                                             @foreach($faculty_list as $faculty)
-                                                <option value="{{ $faculty->id }}">
+                                                <option value="{{ $faculty->id }}" {{ (isset($selectedFacultyId) && (int)$selectedFacultyId === (int)$faculty->id) ? 'selected' : '' }}>
                                                     {{ $faculty->first_name }} {{ $faculty->last_name }}
                                                 </option>
                                             @endforeach
@@ -281,6 +285,9 @@
                         <div class="card-header">
                             <h5>Assigned Faculty Schedules</h5>
                             <span>Faculty schedules shown here and can be edited or delete</span>
+                            @if(!empty($collegeName))
+                                <div class="text-muted small mt-1">Showing users from: <strong>{{ $collegeName }}</strong></div>
+                            @endif
                         </div>
                         <div class="card-body" style="max-height: 500px; overflow-y: auto;">
 

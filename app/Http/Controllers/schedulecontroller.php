@@ -9,6 +9,7 @@ use App\Models\Programs;
 use App\Models\User;
 use App\Models\room;
 use App\Models\semyr;
+use App\Models\college;
 
 
 class schedulecontroller extends Controller
@@ -19,7 +20,9 @@ class schedulecontroller extends Controller
             return redirect('/');
         }
 
-        // Filter faculty by the logged-in user's college
+        $sessionRole = (int) (session('user_role') ?? 0);
+
+        // Resolve the logged-in user's college
         $collegeId = session('college_id');
         if (!$collegeId && session('user_id')) {
             $collegeId = User::query()
@@ -27,10 +30,13 @@ class schedulecontroller extends Controller
                 ->value('college_id');
         }
 
-        $faculty_listQuery = User::whereIn('role', [2, 3, 4, 5])
-            ->where('acc_status', 1);
+        // Faculty list: everyone who can be assigned a schedule
+        // (Dean=2, Asst. Dean=3, Faculty=4, Program Head=5).
+        // Non-admin users only see faculty from their own college,
+        // so the Dean / Assistant Dean's dropdown matches their college.
+        $faculty_listQuery = User::whereIn('role', [2, 3, 4, 5]);
 
-        if ($collegeId) {
+        if ($sessionRole !== 1 && $collegeId) {
             $faculty_listQuery->where('college_id', $collegeId);
         }
 
@@ -46,20 +52,29 @@ class schedulecontroller extends Controller
             ->unique()
             ->values();
 
-        if ((int) session('user_role') === 5) {
-            $user_id = session('user_id');
-            $schedules = Schedule::where('user_id', $user_id)->get();
+        // Schedules: Program Heads only see their own schedule;
+        // Dean / Assistant Dean see schedules of users in their college;
+        // Admin sees all.
+        if ($sessionRole === 5) {
+            $schedules = Schedule::where('user_id', session('user_id'))->get();
+        } elseif ($sessionRole !== 1 && $collegeId) {
+            $collegeUserIds = User::where('college_id', $collegeId)->pluck('id');
+            $schedules = Schedule::whereIn('user_id', $collegeUserIds)->get();
         } else {
             $schedules = Schedule::all();
         }
-
 
         $programs = Programs::all();
         $courses = course::all();
         $rooms = room::all();
 
-        
-        return view('schedules', compact('schedules', 'faculty_list', 'courses', 'schoolYears', 'programs', 'rooms'));
+        // Current college name for display (used by Dean / Assistant Dean)
+        $collegeName = $collegeId ? optional(college::find($collegeId))->college_name : null;
+
+        // Optional: preselect a faculty when arriving from a request approval (e.g. Summer class "set schedule")
+        $selectedFacultyId = (int) request('user_id', 0);
+
+        return view('schedules', compact('schedules', 'faculty_list', 'courses', 'schoolYears', 'programs', 'rooms', 'selectedFacultyId', 'collegeName'));
     }
 
     public function store(Request $request)
