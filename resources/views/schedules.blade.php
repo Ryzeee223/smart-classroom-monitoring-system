@@ -23,16 +23,32 @@
 
 
 @php
-    $startTimes = [
-        "7:00:00", "7:30:00", "8:00:00", "8:30:00", "9:00:00", "9:30:00", "10:00:00", "10:30:00",
-        "11:00:00", "11:30:00", "12:00:00", "12:30:00", "1:00:00", "1:30:00", "2:00:00", "2:30:00",
-        "3:00:00", "3:30:00", "4:00:00", "4:30:00", "5:00:00"
-    ];
+    // $startTimes = [
+    //     "7:00:00", "7:30:00", "8:00:00", "8:30:00", "9:00:00", "9:30:00", "10:00:00", "10:30:00",
+    //     "11:00:00", "11:30:00", "12:00:00", "12:30:00", "1:00:00", "1:30:00", "2:00:00", "2:30:00",
+    //     "3:00:00", "3:30:00", "4:00:00", "4:30:00", "5:00:00"
+    // ];
 
-    $endTimes = [
-        "8:00:00","8:30:00", "9:00:00", "9:30:00", "10:00:00", "10:30:00", "11:00:00", "11:30:00", "12:00:00", "12:30:00", "1:00:00", "1:30:00", "2:00:00", "2:30:00", "3:00:00", "3:30:00",
-        "4:00:00", "4:30:00", "5:00:00", "5:30:00", "6:00:00"
-    ];
+    // $endTimes = [
+    //     "8:00:00","8:30:00", "9:00:00", "9:30:00", "10:00:00", "10:30:00", "11:00:00", "11:30:00", "12:00:00", "12:30:00", "1:00:00", "1:30:00", "2:00:00", "2:30:00", "3:00:00", "3:30:00",
+    //     "4:00:00", "4:30:00", "5:00:00", "5:30:00", "6:00:00"
+    // ];
+use Illuminate\Support\Carbon;
+    $startTimes = [];
+$endTimes = [];
+
+// Start at 07:00 AM, end loop at 05:00 PM (17:00)
+$startTime = Carbon::createFromTimeString('07:00:00');
+$endTimeLimit = Carbon::createFromTimeString('17:00:00');
+
+while ($startTime <= $endTimeLimit) {
+    $startTimes[] = $startTime->format('H:i:s'); // "07:00:00"
+    
+    // Assuming a 1-hour default duration slot (or change to 30 mins: addMinutes(30))
+    $endTimes[] = $startTime->copy()->addHour()->format('H:i:s'); 
+    
+    $startTime->addMinutes(30);
+    } // Step by 30-minute intervals
 @endphp
 
 <div class="app-shell">
@@ -41,6 +57,10 @@
     <main class="app-shell__content d-flex justify-content-center">
         <div class="container mt-5">
             <div class="row align-items-start">
+                {{-- Conflict alert --}}
+                                <div id="scheduleConflictAlert" class="alert alert-danger mt-3 d-none" role="alert">
+                                    Schedule conflict detected. Please choose another time or room.
+                                </div>
                 {{-- ADD SCHEDULE FORM --}}
                 <div class="col-md-9">
                     <div class="card">
@@ -203,10 +223,7 @@
                                     </button>
                                 </div>
 
-                                {{-- Conflict alert --}}
-                                <div id="scheduleConflictAlert" class="alert alert-danger mt-3 d-none" role="alert">
-                                    Schedule conflict detected. Please choose another time or room.
-                                </div>
+                                
 
                                 {{-- Conflict checker script --}}
                                 <script>
@@ -418,7 +435,7 @@
                                                                     <div class="row">
                                                                         <label class="form-label">Day</label>
                                         <div class="d-flex flex-wrap gap-3 mt-1">
-                                            @foreach(['Monday','Tuesday','Wednesday','Thursday','Friday'] as $day)
+                                            @foreach(['Mon','Tue','Wed','Thu','Fri'] as $day)
                                                 <label class="d-flex align-items-center gap-1">
                                                     <input type="checkbox" name="Day[]" value="{{ $day }}" class="form-check-input">
                                                     <span>{{ $day }}</span>

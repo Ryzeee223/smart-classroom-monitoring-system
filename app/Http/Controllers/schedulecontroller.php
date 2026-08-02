@@ -102,30 +102,66 @@ class schedulecontroller extends Controller
             'section' => ['required', 'string'],
         ]);
 
+$days = $validatedData['Day']; // Array of selected days like ['Mon', 'Wed']
 
-        $dayValue = implode(', ', $validatedData['Day']);
+// 1. Conflict Check Loop
+foreach ($days as $singleDay) {
+    $roomConflict = Schedule::where('room_id', $validatedData['Room'])
+        ->where('day', $singleDay)
+        ->where('School_year', $validatedData['School_year'])
+        ->where('Semester', $validatedData['Semester'])
+        ->where(function ($query) use ($validatedData) {
+            $query->where('start_time', '<', $validatedData['End_time'])
+                  ->where('end_time', '>', $validatedData['Start_time']);
+        })
+        ->exists();
 
-        // Blade submits Course and Room as IDs.
-        $courseId = $validatedData['Course'];
-        $roomId = $validatedData['Room'];
+    if ($roomConflict) {
+        return back()->withErrors([
+            'conflict' => "Schedule conflict: Room is already occupied on {$singleDay}."
+        ])->withInput();
+    }
+}
+
+// 2. Insert Loop (Creates 1 row per selected day)
+foreach ($days as $singleDay) {
+    Schedule::create([
+        'user_id'     => $validatedData['user_id'],
+        'program_id'  => $validatedData['program_id'],
+        'course_id'   => $validatedData['Course'],
+        'room_id'     => $validatedData['Room'],
+        'year_level'  => $validatedData['year_level'],
+        'section'     => $validatedData['section'],
+        'day'         => $singleDay, // Saves 'Mon', 'Tue', etc.
+        'start_time'  => $validatedData['Start_time'],
+        'end_time'    => $validatedData['End_time'],
+        'Semester'    => $validatedData['Semester'],
+        'School_year' => $validatedData['School_year'],
+    ]);
+}
+        // $dayValue = implode(', ', $validatedData['Day']);
+
+        // // Blade submits Course and Room as IDs.
+        // $courseId = $validatedData['Course'];
+        // $roomId = $validatedData['Room'];
 
         
-            Schedule::create([
-                'user_id' => $validatedData['user_id'],
-                'program_id' => $validatedData['program_id'],
-                'course_id' => $courseId,
-                'room_id' => $roomId,
+        //     Schedule::create([
+        //         'user_id' => $validatedData['user_id'],
+        //         'program_id' => $validatedData['program_id'],
+        //         'course_id' => $courseId,
+        //         'room_id' => $roomId,
 
-                'year_level' => $validatedData['year_level'],
-                'section' => $validatedData['section'],
+        //         'year_level' => $validatedData['year_level'],
+        //         'section' => $validatedData['section'],
 
-                'day' => $dayValue,
-                'start_time' => $validatedData['Start_time'],
-                'end_time' => $validatedData['End_time'],
+        //         'day' => $dayValue,
+        //         'start_time' => $validatedData['Start_time'],
+        //         'end_time' => $validatedData['End_time'],
 
-                'Semester' => $validatedData['Semester'],
-                'School_year' => $validatedData['School_year'],
-            ]);
+        //         'Semester' => $validatedData['Semester'],
+        //         'School_year' => $validatedData['School_year'],
+        //     ]);
         
 
             return redirect()->back()->with('success', 'Schedule added successfully!');
@@ -155,7 +191,8 @@ class schedulecontroller extends Controller
         $schedule = Schedule::findOrFail($id);
 
         $validatedData = $request->validate([
-            'Day' => ['required', 'array', 'min:1'],
+            'Day'        => ['required', 'array', 'min:1'],
+            'Day.*'      => ['string', 'in:Mon,Tue,Wed,Thu,Fri,Sat,Sun'],
 
             'program_id' => ['required', 'exists:Programs,id'],
             'Course'     => ['required', 'exists:courses,id'],
