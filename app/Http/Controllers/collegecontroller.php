@@ -27,10 +27,10 @@ class collegecontroller extends Controller
 
         $validated = $request->validate([
             'college_name' => 'required|string|max:128|unique:college,college_name',
-            'abbreviation' => 'required|string|max:10|unique:college,abbreviation',
-            'description' => 'nullable|string',
-        ],[],
-         [
+            'abbreviation' => 'required|string|max:30|unique:college,abbreviation',
+            'description' => 'nullable|string|max:255',
+        ],[], 
+        [
             'college_name' => 'College Name',
             'abbreviation' => 'College Abbreviation',
             'description' => 'Description',
@@ -40,12 +40,9 @@ class collegecontroller extends Controller
             'college_name' => $validated['college_name'],
             'abbreviation' => $validated['abbreviation'],
             'description' => $validated['description'] ?? null,
-          
         ]);
 
-
         return back()->with('success', 'College saved successfully!');
-
     }
 
     public function edit(college $college)
@@ -65,9 +62,9 @@ class collegecontroller extends Controller
         }
 
         $validated = $request->validate([
-            'college_name' => 'required|string|max:50|unique:college,college_name,' . $college->id,
-            'abbreviation' => 'required|string|max:10|unique:college,abbreviation,' . $college->id,
-            'description' => 'nullable|string',
+            'college_name' => 'required|string|max:128|unique:college,college_name,' . $college->id,
+            'abbreviation' => 'required|string|max:30|unique:college,abbreviation,' . $college->id,
+            'description' => 'nullable|string|max:255',
         ], [], [
             'college_name' => 'College Name',
             'abbreviation' => 'College Abbreviation',
@@ -94,6 +91,4 @@ class collegecontroller extends Controller
         return back()->with('success', 'College deleted successfully!');
     }
 }
-
-
 

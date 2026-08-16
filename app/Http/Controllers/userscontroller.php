@@ -21,12 +21,10 @@ class userscontroller extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:100',
+            'last_name' => 'required|string|max:100',
             'college_code' => 'nullable|string|max:255',
         ]);
-
-
 
         $user = User::findOrFail($id);
 
@@ -50,4 +48,3 @@ class userscontroller extends Controller
         return back()->with('success', 'User deleted successfully!');
     }
 }
-

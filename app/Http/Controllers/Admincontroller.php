@@ -43,14 +43,13 @@ class AdminController extends Controller
 
 
 
-    public function store(Request $request)
-
+public function store(Request $request)
     {
         $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'employee_ID' => 'required|string|unique:users,employee_ID',
-            'email' => 'required|email|unique:users,email',
+            'first_name' => 'required|string|max:100',
+            'last_name' => 'required|string|max:100',
+            'employee_ID' => 'required|string|max:255|unique:users,employee_ID',
+            'email' => 'required|email|max:100|unique:users,email',
             'password' => 'required|string|min:8',
             'role' => 'required|integer',
             'college_id' => 'required|exists:college,id',
@@ -145,11 +144,11 @@ class AdminController extends Controller
 
 
 
-    public function assignRfid(Request $request)
+public function assignRfid(Request $request)
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
-            'rfid_code' => 'required|string|max:255|unique:users,RFID_code',
+            'rfid_code' => 'required|string|max:50|unique:users,RFID_code',
         ]);
 
         $user = User::findOrFail($request->user_id);

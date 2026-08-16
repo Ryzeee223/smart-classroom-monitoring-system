@@ -11,8 +11,8 @@
 <body>
 <style>
 body {
-    overflow-x: hidden;
-    overflow-y:hidden;
+    overflow-x: auto;
+    overflow-y:auto;
 }
 </style>
 

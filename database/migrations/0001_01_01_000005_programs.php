@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('programs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('college_id')->constrained('college')->onDelete('cascade');
-            $table->string('Program_abbr')->unique();
-            $table->string('Program_name')->unique();
-            $table->string('description')->nullable();
+            $table->string('Program_abbr', 100)->unique();
+            $table->string('Program_name', 150)->unique();
+            $table->string('description', 255)->nullable();
             $table->timestamps();
         });
     }

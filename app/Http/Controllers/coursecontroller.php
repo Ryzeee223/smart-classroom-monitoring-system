@@ -34,12 +34,8 @@ class coursecontroller extends Controller
 
         $request->validate([
             'college_id' => 'required|integer|exists:college,id',
-            'course_code' => 'required|unique:courses,course_code',
-            
-
-
-            'course_name' => 'required|string|max:255',
-
+            'course_code' => 'required|string|max:100|unique:courses,course_code',
+            'course_name' => 'required|string|max:150',
             'description' => 'nullable|string',
         ]);
 
@@ -80,10 +76,9 @@ class coursecontroller extends Controller
 
         $request->validate([
             'college_id' => 'required|integer|exists:college,id',
-            'course_code' => 'required|string|max:10|unique:courses,course_code,' . $id,
-
-            'course_name' => 'required|string|max:65',
-            'description' => 'nullable|string|max:255',
+            'course_code' => 'required|string|max:100|unique:courses,course_code,' . $id,
+            'course_name' => 'required|string|max:150',
+            'description' => 'nullable|string',
         ]);
 
         $course = course::findOrFail($id);
@@ -119,4 +114,3 @@ class coursecontroller extends Controller
         return back()->with('success', 'Course deleted successfully!');
     }
 }
-

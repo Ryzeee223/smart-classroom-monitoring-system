@@ -32,7 +32,7 @@
             {{-- dashboard --}}
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold' : '' }}" href="{{ route('dashboard') }}">Dashboard</a></li>
             {{-- users --}}
-            <li class="nav-item"><a class="nav-link" href={{ route('users.index') }}>Users</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('users.index') ? 'active fw-bold' : '' }}" href={{ route('users.index') }}>Users</a></li>
             {{-- mysched --}}
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('myschedule') ? 'active fw-bold' : '' }}" href="{{ route('myschedule') }}">My Schedule</a></li>
             {{-- Subjects --}}
@@ -50,7 +50,7 @@
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold' : '' }}" href="{{ route('dashboard') }}">Dashboard</a></li>
             {{-- mysched --}}
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('myschedule') ? 'active fw-bold' : '' }}" href="{{ route('myschedule') }}">My Schedule</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ route('settings') }}">Settings</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('settings') ? 'active fw-bold' : '' }}" href="{{ route('settings') }}">Settings</a></li>
             
             @else
 
@@ -152,15 +152,22 @@
                 // If a card is active, and it's NOT the one we just handled
                 if (data.uid && data.uid !== lastDetectedUid) {
                     lastDetectedUid = data.uid;
-                    
-                    // Trigger your action here!
-                    handleRfidScanGlobally(data.uid);
+
+                    // Only call the handler if it is actually defined (avoids ReferenceError).
+                    // This global poller is loaded on every page (including the settings page),
+                    // so it must not break when a page does not define this function.
+                    if (typeof window.handleRfidScanGlobally === 'function') {
+                        window.handleRfidScanGlobally(data.uid);
+                    }
                 } else if (!data.uid) {
                     // Clear the last detected card once it expires from cache
                     lastDetectedUid = null;
                 }
             })
-            .catch(error => console.error('Error checking RFID:', error));
+            .catch(error => {
+                // A single failed poll must never break the whole page.
+                console.error('Error checking RFID:', error);
+            });
     }, 2000); // 2000ms = 2 seconds
 
 

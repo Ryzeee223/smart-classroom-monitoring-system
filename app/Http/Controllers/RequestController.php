@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Request as RequestModel;
-use App\Models\User;
+use App\Models\users;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RequestController extends Controller
 {
@@ -14,7 +15,23 @@ class RequestController extends Controller
      */
     public function index()
     {
-        $requests = RequestModel::with('user')->orderByDesc('created_at')->get();
+        $currentUserId = session('user_id') ?? auth()->id();
+        $currentUser = \App\Models\users::find($currentUserId);
+
+        $userRole = $currentUser ? (int) $currentUser->role : (int) (session('user_role') ?? 0);
+        $userCollegeId = $currentUser ? (int) $currentUser->college_id : (int) (session('college_id') ?? 0);
+
+        if (in_array($userRole, [2, 3], true) && $userCollegeId > 0) {
+            $requests = RequestModel::with('user')
+                ->whereHas('user', function ($q) use ($userCollegeId) {
+                    $q->whereIn('role', [2, 3, 4, 5])
+                      ->where('college_id', '=', $userCollegeId);
+                })
+                ->orderByDesc('created_at')
+                ->get();
+        } else {
+            $requests = RequestModel::with('user')->orderByDesc('created_at')->get();
+        }
 
         return view('partials.approve', [
             'requests' => $requests,
@@ -38,29 +55,42 @@ class RequestController extends Controller
     /**
      * Display the specified resource.
      */
-public function show($id)
-// display the request of faculties
-    {
-        $userRole = (int) (session('user_role') ?? 0);
 
-        // Only Dean (2) and Assistant Dean (3) can view the approval modal
-        $req = collect();
-        if (in_array($userRole, [2, 3], true)) {
-            $req = RequestModel::with('user')
-                ->whereHas('user', function ($q) {
-                    $q->whereIn('role', [2, 3, 4, 5]); // All roles that submit requests
-                })
-                ->where('status', 'pending') // Only pending requests
-                ->get()
-                ->groupBy('user_id');
-        }
+
+public function show($id)
+{
+    // 1. Resolve logged-in user ID safely
+    $currentUserId = session('user_id') ?? auth()->id();
+    
+    // 2. Fetch user instance to check credentials
+    $dean = \App\Models\users::find($currentUserId);
+    
+    $userCollegeId = $dean ? (int)$dean->college_id : (int)session('college_id');
+    $userRole = $dean ? (int)$dean->role : (int)session('user_role');
+
+    $req = collect();
+    $recent_faculty = collect();
+
+    // 3. Enforce strictly positive integer for college_id
+    if (in_array($userRole, [2, 3], true) && $userCollegeId > 0) {
+
+        $req = RequestModel::with('user')
+            ->whereHas('user', function ($q) use ($userCollegeId) {
+                $q->whereIn('role', [2, 3, 4, 5])
+                  ->where('college_id', '=', $userCollegeId);
+            })
+            ->where('status', 'pending')
+            ->get()
+            ->groupBy('user_id');
 
         $recent_faculty = \App\Models\users::whereIn('role', [2, 3, 4, 5])
+            ->where('college_id', '=', $userCollegeId)
             ->latest('created_at')
             ->get();
-
-        return view('partials.notifications-modal', compact('req', 'recent_faculty'));
     }
+
+    return view('partials.notifications-modal', compact('req', 'recent_faculty'));
+}
 
     /**
      * Show the form for editing the specified resource.
@@ -102,7 +132,7 @@ public function show($id)
         }
 
         $validated = $request->validate([
-            'letter' => 'required|string|max:50',
+            'letter' => 'required|string|max:255',
             'reason' => 'required|string|max:50',
         ]);
 
@@ -120,9 +150,8 @@ public function show($id)
    
     public function approval($id)
     {
-       $requestHandle = RequestModel::findOrFail($id);
-        $user =User::findOrFail($requestHandle->user_id);
-       
+        $requestHandle = RequestModel::findOrFail($id);
+        $user = users::findOrFail($requestHandle->user_id);
 
         $userStatus = match (strtolower($requestHandle->reason ?? '')) {
             'Sick leave' => 'Sick leave',
@@ -131,11 +160,10 @@ public function show($id)
             'absent' => 'Absent',
         };
         
-         $requestHandle->update(['status' => 'approved']);
+        $requestHandle->update(['status' => 'approved']);
         $user->update(['acc_status' => $userStatus]);
 
         return redirect()->route('dashboard')->with('success', 'Request Approved!');
-    
     }
 
     
@@ -154,4 +182,3 @@ public function show($id)
         return view('partials.approve', compact('RequestRecord'));
     }
 }
-

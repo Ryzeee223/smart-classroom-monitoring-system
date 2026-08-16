@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\course;
 use Illuminate\Http\Request;
 use App\Models\Programs;
-use App\Models\room
+use App\Models\room;
 
 class myschedulecontroller extends Controller
 {
@@ -51,8 +51,8 @@ class myschedulecontroller extends Controller
         }
 
         $request->validate([
-            'course_code' => 'required|string|max:255|unique:subjects,subject_code,' . $id,
-            'course_name' => 'required|string|max:255',
+            'course_code' => 'required|string|max:100|unique:subjects,subject_code,' . $id,
+            'course_name' => 'required|string|max:150',
             'description' => 'nullable|string',
             'course_id' => 'required|exists:Programs,id',
         ]);
@@ -79,4 +79,3 @@ class myschedulecontroller extends Controller
         return back()->with('success', 'Course deleted successfully!');
     }
 }
-

@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Schedule - eMonitor</title>
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <title>schedules - eMonitor</title>
     <link href="<?php echo e(asset('bootstrap-5.3.8-dist/css/bootstrap.min.css')); ?>" rel="stylesheet">
     <script src="<?php echo e(asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js')); ?>"></script>
-</head>
 
+</head>
 <body>
 <style>
     .app-shell { display: flex; min-height: 100vh; }
@@ -23,30 +23,24 @@
 
 
 <?php
-    // $startTimes = [
-    //     "7:00:00", "7:30:00", "8:00:00", "8:30:00", "9:00:00", "9:30:00", "10:00:00", "10:30:00",
-    //     "11:00:00", "11:30:00", "12:00:00", "12:30:00", "1:00:00", "1:30:00", "2:00:00", "2:30:00",
-    //     "3:00:00", "3:30:00", "4:00:00", "4:30:00", "5:00:00"
-    // ];
 
-    // $endTimes = [
-    //     "8:00:00","8:30:00", "9:00:00", "9:30:00", "10:00:00", "10:30:00", "11:00:00", "11:30:00", "12:00:00", "12:30:00", "1:00:00", "1:30:00", "2:00:00", "2:30:00", "3:00:00", "3:30:00",
-    //     "4:00:00", "4:30:00", "5:00:00", "5:30:00", "6:00:00"
-    // ];
 use Illuminate\Support\Carbon;
     $startTimes = [];
 $endTimes = [];
+$startTimesDisplay = [];
+$endTimesDisplay = [];
 
-// Start at 07:00 AM, end loop at 05:00 PM (17:00)
+// Start at 07:00 AM, end loop at 05:00 PM
 $startTime = Carbon::createFromTimeString('07:00:00');
 $endTimeLimit = Carbon::createFromTimeString('17:00:00');
 
 while ($startTime <= $endTimeLimit) {
     $startTimes[] = $startTime->format('H:i:s'); // "07:00:00"
-    
-    // Assuming a 1-hour default duration slot (or change to 30 mins: addMinutes(30))
-    $endTimes[] = $startTime->copy()->addHour()->format('H:i:s'); 
-    
+    $startTimesDisplay[] = $startTime->format('g:i A'); // "7:00 AM"
+
+    $endTimes[] = $startTime->copy()->addHour()->format('H:i:s');
+    $endTimesDisplay[] = $startTime->copy()->addHour()->format('g:i A');
+
     $startTime->addMinutes(30);
     } // Step by 30-minute intervals
 ?>
@@ -63,7 +57,7 @@ while ($startTime <= $endTimeLimit) {
                                 </div>
                 
                 <div class="col-md-9">
-                    <div class="card">
+                    <div class="card bg-light shadow ">
                         <div class="card-header">
                             <h5>Add Schedule for Faculty</h5>
                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($collegeName)): ?>
@@ -75,21 +69,8 @@ while ($startTime <= $endTimeLimit) {
                             <form method="POST" action="<?php echo e(route('schedules.store')); ?>">
                                 <?php echo csrf_field(); ?>
 
+                                <div class="row">
 
-                                
-                                    <div class="row">
-                                    <div class="col-md-12 mb-3">
-                                        <label class="form-label">Program</label>
-                                        <select class="form-select" name="program_id" required>
-                                            <option value="">Select Program</option>
-                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $programs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $program): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
-                                                <option value="<?php echo e($program->id); ?>"><?php echo e($program->Program_abbr); ?></option>
-                                               <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
-
-                                        </select>
-                                    </div>
-                                </div>
-                                
 
                                 <div class="row text-start">
                                     
@@ -104,6 +85,7 @@ while ($startTime <= $endTimeLimit) {
                                         <input type="hidden" name="Semester" value="<?php echo e($latestSemyr->semester ?? ''); ?>">
                                     </div>
 
+
                                     
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">School Year</label>
@@ -115,9 +97,7 @@ while ($startTime <= $endTimeLimit) {
                                 </div>
 
                                 
-                                <div class="row">
-                                    
-<div class="col-md-6 mb-3">
+                                    <div class="col-md-12 mb-3">
                                         <label class="form-label">Faculty</label>
                                         <select class="form-select" name="user_id" required>
                                             <option value="">Select Faculty</option>
@@ -130,8 +110,23 @@ while ($startTime <= $endTimeLimit) {
                                         </select>
                                     </div>
 
+                                <div class="row"> 
                                     
-                                    <div class="col-md-3 mb-3">
+                                    <div class="row">
+                                    <div class="col-md-12 mb-3 shadow-sm">
+                                        <label class="form-label">Program</label>
+                                        <select class="form-select" name="program_id" required>
+                                            <option value="">Select Program</option>
+                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $programs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $program): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                                <option value="<?php echo e($program->id); ?>"><?php echo e($program->Program_abbr); ?></option>
+                                               <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+
+                                        </select>
+                                    </div>
+                                </div>
+                                    
+                                    
+                                    <div class="col-md-6 mb-3">
                                         <label class="form-label">Year Level</label>
                                         <select class="form-select" name="year_level" required>
                                             <option value="">Year</option>
@@ -143,7 +138,7 @@ while ($startTime <= $endTimeLimit) {
                                     </div>
 
                                         
-                                    <div class="col-md-3 mb-3">
+                                    <div class="col-md-6 mb-3">
                                         <label class="form-label">Section</label>
                                         <select class="form-select" name="section" required>
                                             <option value="">Section</option>
@@ -168,13 +163,13 @@ while ($startTime <= $endTimeLimit) {
                                         </select>
                                     </div>
 
-                                        
+
                                     <div class="col-md-3 mb-3">
                                         <label class="form-label">Start Time</label>
                                         <select class="form-select" name="Start_time" required>
                                             <option value="">Select Start Time</option>
-                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $startTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $start): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
-                                                <option value="<?php echo e($start); ?>"><?php echo e($start); ?></option>
+                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $startTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $start): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                                <option value="<?php echo e($start); ?>"><?php echo e($startTimesDisplay[$index]); ?></option>
                                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                                         </select>
                                     </div>
@@ -184,8 +179,8 @@ while ($startTime <= $endTimeLimit) {
                                         <label class="form-label">End Time</label>
                                         <select class="form-select" name="End_time" required>
                                             <option value="">Select End Time</option>
-                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $endTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $end): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
-                                                <option value="<?php echo e($end); ?>"><?php echo e($end); ?></option>
+                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $endTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $end): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                                <option value="<?php echo e($end); ?>"><?php echo e($endTimesDisplay[$index]); ?></option>
                                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                                         </select>
                                     </div>
@@ -413,12 +408,12 @@ while ($startTime <= $endTimeLimit) {
 
 
                                                                     <div class="row">
-                                                                        <div class="col-md-6 mb-3">
+<div class="col-md-6 mb-3">
                                                                             <label class="form-label">Start Time</label>
                                                                             <select class="form-select" name="Start_time" required>
-                                                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $startTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $start): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $startTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $start): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                                                                                     <option value="<?php echo e($start); ?>" <?php echo e($schedule->Start_time == $start ? 'selected' : ''); ?>>
-                                                                                        <?php echo e($start); ?>
+                                                                                        <?php echo e($startTimesDisplay[$index]); ?>
 
                                                                                     </option>
                                                                                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
@@ -428,9 +423,9 @@ while ($startTime <= $endTimeLimit) {
                                                                         <div class="col-md-6 mb-3">
                                                                             <label class="form-label">End Time</label>
                                                                             <select class="form-select" name="End_time" required>
-                                                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $endTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $end): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $endTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $end): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                                                                                     <option value="<?php echo e($end); ?>" <?php echo e($schedule->End_time == $end ? 'selected' : ''); ?>>
-                                                                                        <?php echo e($end); ?>
+                                                                                        <?php echo e($endTimesDisplay[$index]); ?>
 
                                                                                     </option>
                                                                                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
@@ -482,4 +477,4 @@ while ($startTime <= $endTimeLimit) {
     </main>
 </div>
 </body>
-</html><?php /**PATH /Volumes/shared/capstone project/backups/emonitor 3rd phase copy/resources/views/schedules.blade.php ENDPATH**/ ?>
+<?php /**PATH /Volumes/shared/capstone project/backups/emonitor 3rd phase copy/resources/views/schedules.blade.php ENDPATH**/ ?>

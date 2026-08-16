@@ -16,8 +16,8 @@ class semyrcontroller extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'semester' => 'required|string|max:10',
-            'school_year' => 'required|string|max:20',
+            'semester' => 'required|string|max:20',
+            'school_year' => 'required|string|max:45',
         ]);
 
         // Only store if it doesn't exist; otherwise replace/update.

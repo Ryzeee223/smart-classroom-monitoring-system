@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Schedule - eMonitor</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>schedules - eMonitor</title>
     <link href="{{ asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}" rel="stylesheet">
     <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
-</head>
 
+</head>
 <body>
 <style>
     .app-shell { display: flex; min-height: 100vh; }
@@ -23,30 +23,24 @@
 
 
 @php
-    // $startTimes = [
-    //     "7:00:00", "7:30:00", "8:00:00", "8:30:00", "9:00:00", "9:30:00", "10:00:00", "10:30:00",
-    //     "11:00:00", "11:30:00", "12:00:00", "12:30:00", "1:00:00", "1:30:00", "2:00:00", "2:30:00",
-    //     "3:00:00", "3:30:00", "4:00:00", "4:30:00", "5:00:00"
-    // ];
 
-    // $endTimes = [
-    //     "8:00:00","8:30:00", "9:00:00", "9:30:00", "10:00:00", "10:30:00", "11:00:00", "11:30:00", "12:00:00", "12:30:00", "1:00:00", "1:30:00", "2:00:00", "2:30:00", "3:00:00", "3:30:00",
-    //     "4:00:00", "4:30:00", "5:00:00", "5:30:00", "6:00:00"
-    // ];
 use Illuminate\Support\Carbon;
     $startTimes = [];
 $endTimes = [];
+$startTimesDisplay = [];
+$endTimesDisplay = [];
 
-// Start at 07:00 AM, end loop at 05:00 PM (17:00)
+// Start at 07:00 AM, end loop at 05:00 PM
 $startTime = Carbon::createFromTimeString('07:00:00');
 $endTimeLimit = Carbon::createFromTimeString('17:00:00');
 
 while ($startTime <= $endTimeLimit) {
     $startTimes[] = $startTime->format('H:i:s'); // "07:00:00"
-    
-    // Assuming a 1-hour default duration slot (or change to 30 mins: addMinutes(30))
-    $endTimes[] = $startTime->copy()->addHour()->format('H:i:s'); 
-    
+    $startTimesDisplay[] = $startTime->format('g:i A'); // "7:00 AM"
+
+    $endTimes[] = $startTime->copy()->addHour()->format('H:i:s');
+    $endTimesDisplay[] = $startTime->copy()->addHour()->format('g:i A');
+
     $startTime->addMinutes(30);
     } // Step by 30-minute intervals
 @endphp
@@ -63,7 +57,7 @@ while ($startTime <= $endTimeLimit) {
                                 </div>
                 {{-- ADD SCHEDULE FORM --}}
                 <div class="col-md-9">
-                    <div class="card">
+                    <div class="card bg-light shadow ">
                         <div class="card-header">
                             <h5>Add Schedule for Faculty</h5>
                             @if(!empty($collegeName))
@@ -75,21 +69,8 @@ while ($startTime <= $endTimeLimit) {
                             <form method="POST" action="{{ route('schedules.store') }}">
                                 @csrf
 
+                                <div class="row">
 
-                                {{-- Programs --}}
-                                    <div class="row">
-                                    <div class="col-md-12 mb-3">
-                                        <label class="form-label">Program</label>
-                                        <select class="form-select" name="program_id" required>
-                                            <option value="">Select Program</option>
-                                                @foreach ($programs as $program)
-                                                <option value="{{ $program->id  }}">{{ $program->Program_abbr }}</option>
-                                               @endforeach
-
-                                        </select>
-                                    </div>
-                                </div>
-                                
 
                                 <div class="row text-start">
                                     {{-- Semester / School Year--}}
@@ -104,6 +85,7 @@ while ($startTime <= $endTimeLimit) {
                                         <input type="hidden" name="Semester" value="{{ $latestSemyr->semester ?? '' }}">
                                     </div>
 
+
                                     {{-- school year --}}
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">School Year</label>
@@ -114,10 +96,8 @@ while ($startTime <= $endTimeLimit) {
                                     </div>
                                 </div>
 
-                                
-                                <div class="row">
-                                    {{-- selec faculty --}}
-<div class="col-md-6 mb-3">
+                                {{-- selec faculty --}}
+                                    <div class="col-md-12 mb-3">
                                         <label class="form-label">Faculty</label>
                                         <select class="form-select" name="user_id" required>
                                             <option value="">Select Faculty</option>
@@ -129,8 +109,23 @@ while ($startTime <= $endTimeLimit) {
                                         </select>
                                     </div>
 
+                                <div class="row"> 
+                                    {{-- Programs --}}
+                                    <div class="row">
+                                    <div class="col-md-12 mb-3 shadow-sm">
+                                        <label class="form-label">Program</label>
+                                        <select class="form-select" name="program_id" required>
+                                            <option value="">Select Program</option>
+                                                @foreach ($programs as $program)
+                                                <option value="{{ $program->id  }}">{{ $program->Program_abbr }}</option>
+                                               @endforeach
+
+                                        </select>
+                                    </div>
+                                </div>
+                                    
                                     {{-- year level --}}
-                                    <div class="col-md-3 mb-3">
+                                    <div class="col-md-6 mb-3">
                                         <label class="form-label">Year Level</label>
                                         <select class="form-select" name="year_level" required>
                                             <option value="">Year</option>
@@ -142,7 +137,7 @@ while ($startTime <= $endTimeLimit) {
                                     </div>
 
                                         {{-- sectioning --}}
-                                    <div class="col-md-3 mb-3">
+                                    <div class="col-md-6 mb-3">
                                         <label class="form-label">Section</label>
                                         <select class="form-select" name="section" required>
                                             <option value="">Section</option>
@@ -167,13 +162,13 @@ while ($startTime <= $endTimeLimit) {
                                         </select>
                                     </div>
 
-                                        {{-- start time --}}
+{{-- start time --}}
                                     <div class="col-md-3 mb-3">
                                         <label class="form-label">Start Time</label>
                                         <select class="form-select" name="Start_time" required>
                                             <option value="">Select Start Time</option>
-                                            @foreach($startTimes as $start)
-                                                <option value="{{ $start }}">{{ $start }}</option>
+                                            @foreach($startTimes as $index => $start)
+                                                <option value="{{ $start }}">{{ $startTimesDisplay[$index] }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -183,8 +178,8 @@ while ($startTime <= $endTimeLimit) {
                                         <label class="form-label">End Time</label>
                                         <select class="form-select" name="End_time" required>
                                             <option value="">Select End Time</option>
-                                            @foreach($endTimes as $end)
-                                                <option value="{{ $end }}">{{ $end }}</option>
+                                            @foreach($endTimes as $index => $end)
+                                                <option value="{{ $end }}">{{ $endTimesDisplay[$index] }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -409,12 +404,12 @@ while ($startTime <= $endTimeLimit) {
 
 
                                                                     <div class="row">
-                                                                        <div class="col-md-6 mb-3">
+<div class="col-md-6 mb-3">
                                                                             <label class="form-label">Start Time</label>
                                                                             <select class="form-select" name="Start_time" required>
-                                                                                @foreach($startTimes as $start)
+                                                                                @foreach($startTimes as $index => $start)
                                                                                     <option value="{{ $start }}" {{ $schedule->Start_time == $start ? 'selected' : '' }}>
-                                                                                        {{ $start }}
+                                                                                        {{ $startTimesDisplay[$index] }}
                                                                                     </option>
                                                                                 @endforeach
                                                                             </select>
@@ -423,9 +418,9 @@ while ($startTime <= $endTimeLimit) {
                                                                         <div class="col-md-6 mb-3">
                                                                             <label class="form-label">End Time</label>
                                                                             <select class="form-select" name="End_time" required>
-                                                                                @foreach($endTimes as $end)
+                                                                                @foreach($endTimes as $index => $end)
                                                                                     <option value="{{ $end }}" {{ $schedule->End_time == $end ? 'selected' : '' }}>
-                                                                                        {{ $end }}
+                                                                                        {{ $endTimesDisplay[$index] }}
                                                                                     </option>
                                                                                 @endforeach
                                                                             </select>
@@ -476,4 +471,3 @@ while ($startTime <= $endTimeLimit) {
     </main>
 </div>
 </body>
-</html>

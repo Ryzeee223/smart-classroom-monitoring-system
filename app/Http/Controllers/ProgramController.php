@@ -45,9 +45,9 @@ class ProgramController extends Controller
         }
 
         $request->validate([
-            'program_abbr' => 'required|string|max:255|unique:Programs,Program_abbr',
-            'program_name' => 'required|string|max:255|unique:Programs,Program_name',
-            'description' => 'nullable|string',
+            'program_abbr' => 'required|string|max:100|unique:Programs,Program_abbr',
+            'program_name' => 'required|string|max:150|unique:Programs,Program_name',
+            'description' => 'nullable|string|max:255',
             'college_id' => 'required|integer|exists:college,id',
         ]);
 
@@ -95,9 +95,9 @@ class ProgramController extends Controller
         $Program = Programs::findOrFail($id);
 
         $request->validate([
-            'program_abbr' => 'required|string|max:255|unique:Programs,program_abbr,' . $Program->id,
-            'program_name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'program_abbr' => 'required|string|max:100|unique:Programs,program_abbr,' . $Program->id,
+            'program_name' => 'required|string|max:150',
+            'description' => 'nullable|string|max:255',
         ]);
 
         $Program->update([

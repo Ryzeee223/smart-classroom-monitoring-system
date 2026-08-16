@@ -26,7 +26,7 @@ class SemesterController extends Controller
 
         $validated = $request->validate([
             'semester' => 'required|string|max:20',
-            'school_year' => 'required|string|max:20',
+            'school_year' => 'required|string|max:45',
         ], [], [
             'semester' => 'Semester',
             'school_year' => 'School Year',
@@ -59,7 +59,7 @@ class SemesterController extends Controller
 
         $validated = $request->validate([
             'semester' => 'required|string|max:20',
-            'school_year' => 'required|string|max:20',
+            'school_year' => 'required|string|max:45',
         ], [], [
             'semester' => 'Semester',
             'school_year' => 'School Year',
@@ -79,8 +79,5 @@ class SemesterController extends Controller
         session(['active_school_year' => $validated['school_year']]);
 
         return redirect()->back()->with('success', 'School year and semester settings updated successfully!');
-    
-        }
-        
+    }
 }
-

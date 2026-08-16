@@ -16,18 +16,18 @@ return new class extends Migration
 
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name');
-            $table->string('last_name');
-            $table->string('middle_name');
-            $table->string('employee_ID')->unique();
-            $table->string('email')->unique();
-            $table->string('profile_picture')->nullable();
-            $table->string('password');
-            $table->integer('role');
+            $table->string('first_name', 100);
+            $table->string('last_name', 100);
+            $table->string('middle_name', 100);
+            $table->string('employee_ID', 255)->unique();
+            $table->string('email', 100)->unique();
+            $table->string('profile_picture', 255)->nullable();
+            $table->string('password', 50);
+            $table->integer('role', 1);
             $table->foreignId('college_id')->constrained('college')->onDelete('cascade');
-            $table->string('RFID_code')->nullable()->unique();
-            $table->string('acc_status')->default('present');
-            $table->timestamp('email_verified_at')->nullable();
+            $table->string('RFID_code', 50)->nullable()->unique();
+            $table->string('acc_status', 70)->default('present');
+            $table->timestamp('email_verified_at', 15)->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

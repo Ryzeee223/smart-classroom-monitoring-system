@@ -13,8 +13,8 @@ return new class extends Migration
     {
        Schema::create('semyr', function(Blueprint $table){
     $table->id();
-    $table->string('semester');
-    $table->string('school_year');
+    $table->string('semester', 20);
+    $table->string('school_year',45);
     $table->timestamps();
 });
     }

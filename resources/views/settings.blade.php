@@ -72,10 +72,11 @@
     const rfidInput = document.getElementById('rfid_input');
     const rfidLabel = document.getElementById('rfid_label');
 
-    // Poll your Laravel API endpoint every 2 seconds
+    
+    // POST /api/rfid-scan (sent by the ESP8266 when a card is tapped).
     const pollInterval = setInterval(async () => {
         try {
-            const response = await fetch('/api/check-latest-scan'); // The route we created earlier that reads Cache::get('latest_nfc_scan')
+            const response = await fetch('/api/check-latest-scan');
             const data = await response.json();
 
             if (data.uid && data.uid !== 'N/A') {
@@ -85,8 +86,10 @@
                 // 2. Update the visual span text
                 rfidLabel.textContent = data.uid;
 
-               
-            }        } catch (error) {
+                // 3. Capture and stop polling once a card is detected
+                clearInterval(pollInterval);
+            }
+        } catch (error) {
             console.error("Error fetching RFID scan:", error);
         }
     }, 2000);

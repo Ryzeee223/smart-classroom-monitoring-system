@@ -24,24 +24,34 @@ Route::get('/dashboard', function () {
     }
 
 
-    $recent_faculty = \App\Models\users::whereIn('role', [2, 3, 4, 5])
-        ->latest('created_at')
-        ->take(5)
-        ->get();
-
-    // Count ACTIVE faculty-related accounts: Dean(2), Assistant Dean(3), Faculty(4), Program Head(5)
-    $faculty_count = \App\Models\users::whereIn('role', [2, 3, 4, 5])->where('acc_status', 1)->count();
-    $pending_count = \App\Models\users::where('acc_status', 0)->count();
-
     $userRole = (int) (session('user_role') ?? 0);
+    $currentUserId = session('user_id') ?? auth()->id();
+    $currentUser = \App\Models\users::find($currentUserId);
+    $userCollegeId = $currentUser ? (int) $currentUser->college_id : (int) (session('college_id') ?? 0);
 
-    // Leave requests are only visible to Dean (2) and Assistant Dean (3)
-    $req = collect();
-    if (in_array($userRole, [2, 3], true)) {
+    // Recent faculty and counts: if Dean/Asst Dean, scope to their college
+    if (in_array($userRole, [2, 3], true) && $userCollegeId > 0) {
+        $recent_faculty = \App\Models\users::whereIn('role', [2, 3, 4, 5])
+            ->where('college_id', $userCollegeId)
+            ->latest('created_at')
+            ->take(5)
+            ->get();
+
+        $faculty_count = \App\Models\users::whereIn('role', [2, 3, 4, 5])
+            ->where('acc_status', 1)
+            ->where('college_id', $userCollegeId)
+            ->count();
+
+        $pending_count = \App\Models\users::where('acc_status', 0)
+            ->where('college_id', $userCollegeId)
+            ->count();
+
+        // Leave requests are only visible to Dean (2) and Assistant Dean (3) and scoped by college
         $requests = \Illuminate\Support\Facades\DB::table('requests')
             ->join('users', 'users.id', '=', 'requests.user_id')
-            ->whereIn('users.role', [2, 3, 4, 5]) // All roles that can submit requests (Dean, Asst Dean, Faculty, Program Head)
-            ->where('requests.status', 'pending') // Only show pending requests
+            ->whereIn('users.role', [2, 3, 4, 5])
+            ->where('users.college_id', $userCollegeId)
+            ->where('requests.status', 'pending')
             ->select(
                 'users.first_name',
                 'users.last_name',
@@ -56,9 +66,17 @@ Route::get('/dashboard', function () {
             ->orderByDesc('requests.created_at')
             ->get();
 
-
-        // Group by user id (who submitted the request)
         $req = $requests->groupBy('user_id');
+    } else {
+        $recent_faculty = \App\Models\users::whereIn('role', [2, 3, 4, 5])
+            ->latest('created_at')
+            ->take(5)
+            ->get();
+
+        $faculty_count = \App\Models\users::whereIn('role', [2, 3, 4, 5])->where('acc_status', 1)->count();
+        $pending_count = \App\Models\users::where('acc_status', 0)->count();
+
+        $req = collect();
     }
 
     $role_name = match ($userRole) {
@@ -151,8 +169,11 @@ Route::delete('/schedules/{id}', [App\Http\Controllers\schedulecontroller::class
 // Conflict checker (booking system)
 Route::post('/schedules/bookingsystem', [App\Http\Controllers\schedulecontroller::class, 'bookingsystem'])->name('schedules.bookingsystem');
 
-Route::get('/programs', [\App\Http\Controllers\ProgramController::class, 'index'])->name('program');
+Route::get('/programs', function(){
+    return view('programs');
+})->name('programs');
 
+Route::get('/programs', [\App\Http\Controllers\ProgramController::class, 'index'])->name('program');
 Route::post('/programs', [\App\Http\Controllers\ProgramController::class, 'store'])->name('programs.store');
 Route::get('/programs/{programs}/edit', [\App\Http\Controllers\ProgramController::class, 'edit'])->name('program.edit');
 Route::put('/programs/{programs}', [\App\Http\Controllers\ProgramController::class, 'update'])->name('program.update');

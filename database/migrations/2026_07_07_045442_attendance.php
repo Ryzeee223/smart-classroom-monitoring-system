@@ -14,10 +14,14 @@ return new class extends Migration
         Schema::create('attendance', function(Blueprint $table) 
         {
         $table ->id();
-       $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-       $table->time('time_in')->nullable();
-       $table->time('time_out')->nullable();
-        $table->timestamp('attendance_date')->nullable();
+        $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+        $table->foreignId('schedule_id')->constrained('schedule')->onDelete('cascade');
+        $table->time('time_in', 15)->nullable();
+        $table->time('time_out', 15)->nullable(); 
+        $table->timestamp('attendance_date', 255)->nullable();
+        $table->enum('status_in',['present', 'absent', 'late']);
+        $table->string('status_out', 50)->nullable();
+        $table->timestamps();
         });
     }
 

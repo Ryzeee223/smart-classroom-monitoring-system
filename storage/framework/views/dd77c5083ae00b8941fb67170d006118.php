@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users - eMonitor</title>
-    <link href="{{ asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="<?php echo e(asset('bootstrap-5.3.8-dist/css/bootstrap.min.css')); ?>" rel="stylesheet">
     <link rel="stylesheet" href="bootstrap-icons-1.10.5/bootstrap-icons.css">
-    <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="<?php echo e(asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js')); ?>"></script>
     <style>
         body {
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -42,7 +42,7 @@
 </style>
 <div class="mt-5" style=" margin-left:300px; ">
     <div class="d-none d-md-block app-sidebar">
-        @include('sidebar')
+        <?php echo $__env->make('sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     </div>
 
     <!-- content -->
@@ -52,7 +52,7 @@
 
         <!-- nav bar (mobile only) -->
         <div class="d-md-none mb-3">
-            @include('sidebar')
+            <?php echo $__env->make('sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
         </div>
 
         <!-- main content -->
@@ -61,23 +61,24 @@
             <h1 class="mb-4">Users Management</h1>
 
 
-         @if (session('success'))
+         <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('success')): ?>
          <div class="alert alert-success alert-dismissible fade show" role="alert">
-             {{ session('success') }}
+             <?php echo e(session('success')); ?>
+
              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
          </div>
-         @endif
+         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-         @if ($errors->any())
+         <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($errors->any()): ?>
          <div class="alert alert-danger" role="alert">
              <strong>Could not save user:</strong>
              <ul class="mb-0">
-                 @foreach ($errors->all() as $error)
-                     <li>{{ $error }}</li>
-                 @endforeach
+                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                     <li><?php echo e($error); ?></li>
+                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
              </ul>
          </div>
-         @endif
+         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
     <!-- Add Users -->
 
@@ -86,31 +87,32 @@
         <div class="card p-3 shadow-sm bg-white border-1" >
             <h2 class="h5 mb-2">Add User</h2>
 
-            <form action="{{ route('users.store') }}" method="POST">
-                 @csrf
+            <form action="<?php echo e(route('users.store')); ?>" method="POST">
+                 <?php echo csrf_field(); ?>
                 <div class="row g-3">
-                    {{-- college --}}
-                @php
+                    
+                <?php
                     $sessionRole = (int) (session('user_role') ?? 0);
                     $currentUser = \App\Models\User::find(session('user_id'));
                     $currentCollegeId = (int) ($currentUser?->college_id ?? 0);
                     $currentCollege = $currentCollegeId ? \App\Models\college::find($currentCollegeId) : null;
                     $currentCollegeName = $currentCollege?->college_name ?? '';
-                @endphp
+                ?>
 
                 <div class="mt-2">
                     <label class="form-label form-label-sm">College</label>
 
-                    <select name="college_id" id="collegeSelect" class="form-select form-select-sm" {{ in_array($sessionRole, [2, 3], true) ? 'disabled' : '' }}>
-                        @if(in_array($sessionRole, [2, 3], true))
-                            <option value="{{ $currentCollegeId }}" selected>
-                                {{ $currentCollegeName ?: 'Assigned college' }}
+                    <select name="college_id" id="collegeSelect" class="form-select form-select-sm" <?php echo e(in_array($sessionRole, [2, 3], true) ? 'disabled' : ''); ?>>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(in_array($sessionRole, [2, 3], true)): ?>
+                            <option value="<?php echo e($currentCollegeId); ?>" selected>
+                                <?php echo e($currentCollegeName ?: 'Assigned college'); ?>
+
                             </option>
-                        @else
+                        <?php else: ?>
                             <option value="" selected>Select College</option>
-                            @php $college = $college ?? collect(); @endphp
-                            @foreach($colleges as $college)
-                                @php
+                            <?php $college = $college ?? collect(); ?>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $colleges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $college): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                <?php
                                     $collegeId = (int) ($college->id ?? 0);
                                     // Hide the first-created college (id=1) from all user assignment choices.
                                     if ($collegeId === 1) {
@@ -119,17 +121,17 @@
                                     $collegeName = $college->college_name ?? $collegeId;
                                     $collegeCode = $college->abbreviation ?? '';
                                     $label = $collegeCode ? $collegeCode . ' - ' . $collegeName : $collegeName;
-                                @endphp
-                                <option value="{{ $collegeId }}">{{ $label }}</option>
-                            @endforeach
-                        @endif
+                                ?>
+                                <option value="<?php echo e($collegeId); ?>"><?php echo e($label); ?></option>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     </select>
 
-                    {{-- Dean/Assistant Dean: lock college_id to their assigned college. --}}
-                    {{-- Admin: choose the college for the new user. --}}
-                    @if(in_array($sessionRole, [2, 3], true))
-                        <input type="hidden" name="college_id" value="{{ $currentCollegeId }}">
-                    @endif
+                    
+                    
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(in_array($sessionRole, [2, 3], true)): ?>
+                        <input type="hidden" name="college_id" value="<?php echo e($currentCollegeId); ?>">
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
                 </div>
                       <div class="row g-2 mt-2">
@@ -137,37 +139,37 @@
                         <label class="form-label form-label-sm">Role</label>
                         <select class="form-select form-select-sm" name="role" id="role-lead">
                             <option selected>Select role</option>
-                            @php
+                            <?php
                                 
                                 $myRole = (int) (session('user_role') ?? 0);
-                            @endphp
+                            ?>
 
-                                {{-- admin=1||dean=2||asst=3||faculty=4||head=5 --}}
-                            @if($myRole === 1)
-                                {{-- Admin can add: Dean, Assistant Dean, Faculty, Program Head --}}
+                                
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($myRole === 1): ?>
+                                
                                 <option selected value="2">Dean</option>
                                 
                                 
                                 
-                            @elseif($myRole === 2)
-                                {{-- Dean can add: Assistant Dean, Faculty, Program Head --}}
+                            <?php elseif($myRole === 2): ?>
+                                
                                 <option value="3">Assistant Dean</option>
                                 <option value="4">Faculty</option>
                                 <option value="5">Program Head</option>
-                            @elseif($myRole === 3)
-                                {{-- Assistant Dean can add: Faculty, Program Head --}}
+                            <?php elseif($myRole === 3): ?>
+                                
                                 <option value="4">Faculty</option>
                                 <option value="5">Program Head</option>
-                            @else
-                                {{-- Faculty & Program Head cannot add roles --}}
-                            @endif
+                            <?php else: ?>
+                                
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </select>
                     </div>
                 
                 </div>
                     <div class="col-md">
 
-                        {{-- Fill-up form basic info  --}}
+                        
                         <label class="form-label form-label-sm">First Name</label>
                         <input type="text" class="form-control form-control-sm" name="first_name" id="first_name-lead" placeholder="Enter first name">
                     </div>
@@ -182,18 +184,18 @@
 
                 <div class="row g-2 mt-2">
                     <div class="col-md">
-                        {{-- employee id --}}
+                        
                         <label class="form-label form-label-sm">Employee ID</label>
                         <input type="text" class="form-control form-control-sm" name="employee_ID" id="employee_ID-lead" placeholder="Enter employee ID">
                     </div>
 
-                    {{-- email --}}
+                    
                     <div class="col-md">
                         <label class="form-label form-label-sm">Email</label>
                         <input type="email" class="form-control form-control-sm" name="email" id="email-lead" placeholder="Enter email">
                     </div>
                 </div>
-{{-- password --}}
+
                 <div class="mt-2">
                     <label class="form-label form-label-sm">Password</label>
                     <div class="input-group">
@@ -251,66 +253,66 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @php
+                        <?php
                             $all_users = collect();
                             $all_users = $all_users->merge($account_users ?? []);
-                        @endphp
+                        ?>
 
-@php
+<?php
                             $sessionRole = (int) (session('user_role') ?? 0);
-                        @endphp
+                        ?>
 
-                        @forelse($all_users as $user)
-                            @php
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $all_users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                            <?php
                                 $uRole = (int) ($user->role ?? 0);
                                 $canView = (
                                     $sessionRole === 1
                                         ? $uRole === 2
                                         : ($sessionRole === 2 ? in_array($uRole, [3,4,5], true) : in_array($uRole, [3,4,5], true))
                                 );
-                            @endphp
+                            ?>
 
-                            @continue(!$canView)
+                            <?php if(!$canView) continue; ?>
 
                             <tr>
-                                <td>{{ $user->first_name }} {{ $user->last_name }}</td>
+                                <td><?php echo e($user->first_name); ?> <?php echo e($user->last_name); ?></td>
                                 <td>
-                                    @switch($user->role)
-                                        @case(1) Admin @break
-                                        @case(2) Dean @break
-                                        @case(3) Assistant Dean @break
-                                        @case(4) Faculty @break
-                                        @case(5) Program Head @break
-                                        @default Unknown
-                                    @endswitch
+                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php switch($user->role):
+                                        case (1): ?> Admin <?php break; ?>
+                                        <?php case (2): ?> Dean <?php break; ?>
+                                        <?php case (3): ?> Assistant Dean <?php break; ?>
+                                        <?php case (4): ?> Faculty <?php break; ?>
+                                        <?php case (5): ?> Program Head <?php break; ?>
+                                        <?php default: ?> Unknown
+                                    <?php endswitch; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                 </td>
-                                <td><span class="badge {{ $user->acc_status ? 'bg-success' : 'bg-danger' }}">{{ $user->acc_status ? 'Active' : 'Inactive' }}</span></td>
+                                <td><span class="badge <?php echo e($user->acc_status ? 'bg-success' : 'bg-danger'); ?>"><?php echo e($user->acc_status ? 'Active' : 'Inactive'); ?></span></td>
                                 <td>
-                                    @if($user->RFID_code)
+                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($user->RFID_code): ?>
                                         <span class="badge bg-success">Assigned</span>
-                                    @else
+                                    <?php else: ?>
                                         <span class="badge bg-secondary">Not Assigned</span>
-                                    @endif
+                                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex flex-column align-items-center gap-2">
-                                        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                        <a href="<?php echo e(route('users.edit', $user->id)); ?>" class="btn btn-sm btn-outline-primary" title="Edit">
                                             Edit
                                         </a>
 
-                                        <form method="POST" action="{{ route('users.destroy', $user->id) }}" onsubmit="return confirm('Delete this user?')" class="m-0">
-                                            @csrf
-                                            @method('DELETE')
+                                        <form method="POST" action="<?php echo e(route('users.destroy', $user->id)); ?>" onsubmit="return confirm('Delete this user?')" class="m-0">
+                                            <?php echo csrf_field(); ?>
+                                            <?php echo method_field('DELETE'); ?>
                                             <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">Delete</button>
                                         </form>
                                     </div>
                                 </td>
                             </tr>
-                        @empty
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                         <tr>
                             <td colspan="5" class="text-center text-muted py-4">No User accounts</td>
                         </tr>
-                        @endforelse
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -325,3 +327,4 @@
 
 
 
+<?php /**PATH /Volumes/shared/capstone project/backups/emonitor 3rd phase copy/resources/views/users.blade.php ENDPATH**/ ?>

@@ -17,8 +17,8 @@ class room_bldg_controller extends Controller
         }
 
         $request->validate([
-            'room_name' => 'required|string|max:30',
-            'room_type' => 'required|string|max:30',
+            'room_name' => 'required|string|max:170',
+            'room_type' => 'required|string|max:40',
             'bldg_id'   => 'nullable|exists:building,id',
 
         ]);
@@ -71,8 +71,8 @@ class room_bldg_controller extends Controller
 
        
         $request->validate([
-            'bldg_name' => 'required|string|max:100',
-            'bldg_abbr' => 'required|string|max:20|unique:building,bldg_abbr',
+            'bldg_name' => 'required|string|max:150',
+            'bldg_abbr' => 'required|string|max:100|unique:building,bldg_abbr',
             'college_id' => 'nullable|exists:college,id',
         ]);
 
@@ -116,4 +116,3 @@ class room_bldg_controller extends Controller
     }
 
 }
-
