@@ -20,16 +20,21 @@
     </style>
 
     <div class="app-shell">
-    <main class="app-shell__content container mt-4 mb-5 p-4 gap-4">
+    <main class="app-shell__content container mt-4 mb-5 p-4 gap-4">  
+        @if (session('success'))
+                                <div class="alert alert-success mt-3">{{ session('success') }}</div>
+                            @endif
         <div class="row">
             <div class="col-12 col-lg-6 mb-4">
                 <div class="card shadow">
+                  
                     <div class="card-header">
                         
                         <!-- create -->
                         <h3 class="card-title mb-0">Add New Program</h3>
                     </div>
                     <div class="card-body">
+                         
 <form method="POST" action="{{ route('programs.store') }}">
 
     @php
@@ -75,9 +80,9 @@
 
     @csrf
     <button type="submit" class="btn btn-primary">Save Program</button>
-                            @if (session('success'))
+                            {{-- @if (session('success'))
                                 <div class="alert alert-success mt-3">{{ session('success') }}</div>
-                            @endif
+                            @endif --}}
                         </form>
                     </div>
                 </div>

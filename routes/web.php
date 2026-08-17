@@ -223,3 +223,7 @@ Route::get('/partials.approve',function() {
 
 Route::get('/partials.approve/{id}',[App\Http\Controllers\RequestController::class, 'showreason'])->name('showReason');
 Route::get('/partials.notifications-modal/{id}',[App\Http\Controllers\RequestController::class, 'showreason'])->name('showReqReason');
+
+Route::get('/reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports');
+
+Route::post('/reports/generate', [App\Http\Controllers\ReportController::class, 'generate'])->name('reports.generate');

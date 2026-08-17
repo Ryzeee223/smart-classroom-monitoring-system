@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link href="{{ asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}" rel="stylesheet">
-    <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
+    <link href="<?php echo e(asset('bootstrap-5.3.8-dist/css/bootstrap.min.css')); ?>" rel="stylesheet">
+    <script src="<?php echo e(asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js')); ?>"></script>
     <title>Faculty Schedule Reports</title>
     <style>
         body {
@@ -73,7 +73,7 @@
     </style>
 </head>
 <body>
-    @include('sidebar')
+    <?php echo $__env->make('sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <div class="container-fluid p-4 mt-3">
         <div class="row justify-content-end">
@@ -83,9 +83,10 @@
                        <form action="">
                         <div>
                             <h5 class="mb-1 fw-bold text-dark">Faculty Schedule Overview</h5>
-                            <small class="text-muted d-block">{{ $todayLabel ?? now()->translatedFormat('l, F d, Y') }}</small>
+                            <small class="text-muted d-block"><?php echo e($todayLabel ?? now()->translatedFormat('l, F d, Y')); ?></small>
                             <small class="text-muted d-block">
-                                {{ $currentSemester ?? 'Current Semester' }} • {{ $currentSchoolYear ?? 'Current School Year' }}
+                                <?php echo e($currentSemester ?? 'Current Semester'); ?> • <?php echo e($currentSchoolYear ?? 'Current School Year'); ?>
+
                             </small>
                         </div>
                         <button class="btn btn-primary px-4">Generate Report</button>
@@ -97,66 +98,68 @@
                             <div class="col-lg-8">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h6 class="mb-0 fw-bold text-dark">Today's Faculty Classes</h6>
-                                    <span class="badge bg-light text-dark border">{{ count($facultySchedules) }} scheduled</span>
+                                    <span class="badge bg-light text-dark border"><?php echo e(count($facultySchedules)); ?> scheduled</span>
                                 </div>
 
-                                @forelse ($facultySchedules as $class)
-                                    <div class="schedule-item {{ $class['is_live'] ? 'live' : '' }}">
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $facultySchedules; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $class): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                    <div class="schedule-item <?php echo e($class['is_live'] ? 'live' : ''); ?>">
                                         <div class="row align-items-center g-3">
                                             <div class="col-md-3">
-                                                <div class="subject-code">{{ $class['course_code'] }}</div>
-                                                <div class="fw-bold text-dark mt-1">{{ $class['subject'] }}</div>
+                                                <div class="subject-code"><?php echo e($class['course_code']); ?></div>
+                                                <div class="fw-bold text-dark mt-1"><?php echo e($class['subject']); ?></div>
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="text-muted small">Faculty</div>
-                                                <div class="fw-semibold">{{ $class['faculty'] }}</div>
+                                                <div class="fw-semibold"><?php echo e($class['faculty']); ?></div>
                                             </div>
                                             <div class="col-md-2">
                                                 <div class="text-muted small">Classroom</div>
-                                                <div class="fw-semibold">{{ $class['room'] }}</div>
+                                                <div class="fw-semibold"><?php echo e($class['room']); ?></div>
                                             </div>
                                             <div class="col-md-2">
                                                 <div class="text-muted small">Date</div>
-                                                <div class="fw-semibold">{{ $class['date_display'] }}</div>
+                                                <div class="fw-semibold"><?php echo e($class['date_display']); ?></div>
                                             </div>
                                             <div class="col-md-2 text-md-end">
                                                 <div class="text-muted small">Start</div>
-                                                <div class="schedule-time">{{ $class['start_display'] }}</div>
+                                                <div class="schedule-time"><?php echo e($class['start_display']); ?></div>
                                                 <div class="text-muted small mt-2">End</div>
-                                                <div class="fw-semibold">{{ $class['end_display'] }}</div>
-                                                <span class="status-badge mt-2 d-inline-block {{ $class['is_live'] ? 'bg-success text-white' : 'bg-light text-dark border' }}">
-                                                    {{ $class['label'] }}
+                                                <div class="fw-semibold"><?php echo e($class['end_display']); ?></div>
+                                                <span class="status-badge mt-2 d-inline-block <?php echo e($class['is_live'] ? 'bg-success text-white' : 'bg-light text-dark border'); ?>">
+                                                    <?php echo e($class['label']); ?>
+
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
-                                @empty
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                                     <div class="alert alert-light border mb-0">No faculty schedules available.</div>
-                                @endforelse
+                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                             </div>
 
-                            @if ($nextClass)
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($nextClass): ?>
                                 <div class="col-lg-4">
                                     <div class="upcoming-box h-100">
                                         <div class="text-muted small text-uppercase fw-bold mb-2">Next Class</div>
-                                        <h6 class="fw-bold mb-2">{{ $nextClass['faculty'] }}</h6>
-                                        <div class="fw-bold text-dark">{{ $nextClass['course_code'] }} • {{ $nextClass['subject'] }}</div>
-                                        <div class="mt-2 text-muted">{{ $nextClass['day'] }} • {{ $nextClass['date_display'] }}</div>
+                                        <h6 class="fw-bold mb-2"><?php echo e($nextClass['faculty']); ?></h6>
+                                        <div class="fw-bold text-dark"><?php echo e($nextClass['course_code']); ?> • <?php echo e($nextClass['subject']); ?></div>
+                                        <div class="mt-2 text-muted"><?php echo e($nextClass['day']); ?> • <?php echo e($nextClass['date_display']); ?></div>
 
                                         <div class="mt-3 border rounded p-3 bg-light">
                                             <div class="small text-muted">Time Slot</div>
                                             <div class="fw-bold text-primary">
-                                                {{ $nextClass['start_display'] }} - {{ $nextClass['end_display'] }}
+                                                <?php echo e($nextClass['start_display']); ?> - <?php echo e($nextClass['end_display']); ?>
+
                                             </div>
                                         </div>
 
                                         <div class="mt-3 border rounded p-3 bg-light">
                                             <div class="small text-muted">Classroom</div>
-                                            <div class="fw-bold">{{ $nextClass['room'] }}</div>
+                                            <div class="fw-bold"><?php echo e($nextClass['room']); ?></div>
                                         </div>
                                     </div>
                                 </div>
-                            @endif
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -164,4 +167,4 @@
         </div>
     </div>
 </body>
-</html>
+</html><?php /**PATH /Volumes/shared/capstone project/backups/emonitor 3rd phase copy/resources/views/reports.blade.php ENDPATH**/ ?>

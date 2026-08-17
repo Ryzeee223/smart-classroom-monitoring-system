@@ -45,15 +45,20 @@
             <li class="nav-item"><a class="nav-link" href="{{ route('settings') }}">Settings</a></li>
             
             {{-- for faculty and head--}}
-@elseif ($role === 4 || $role === 5)
+        @elseif ($role === 4)
             {{-- dashboard --}}
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold' : '' }}" href="{{ route('dashboard') }}">Dashboard</a></li>
             {{-- mysched --}}
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('myschedule') ? 'active fw-bold' : '' }}" href="{{ route('myschedule') }}">My Schedule</a></li>
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('settings') ? 'active fw-bold' : '' }}" href="{{ route('settings') }}">Settings</a></li>
-            
+        @elseif ($role === 5)
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold' : '' }}" href="{{ route('dashboard') }}">Dashboard</a></li>
+            {{-- mysched --}}
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('myschedule') ? 'active fw-bold' : '' }}" href="{{ route('myschedule') }}">My Schedule</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('settings') ? 'active fw-bold' : '' }}" href="{{ route('settings') }}">Settings</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('reports') ? 'active fw-bold' : '' }}" href="{{ route('reports') }}">Reports</a></li>
             @else
-
+            
             <li class="nav-item"><a class="nav-link" href="/">Logout</a></li>
             @endif
         </ul>
@@ -153,9 +158,6 @@
                 if (data.uid && data.uid !== lastDetectedUid) {
                     lastDetectedUid = data.uid;
 
-                    // Only call the handler if it is actually defined (avoids ReferenceError).
-                    // This global poller is loaded on every page (including the settings page),
-                    // so it must not break when a page does not define this function.
                     if (typeof window.handleRfidScanGlobally === 'function') {
                         window.handleRfidScanGlobally(data.uid);
                     }

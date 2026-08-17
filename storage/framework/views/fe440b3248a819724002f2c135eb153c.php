@@ -45,15 +45,20 @@
             <li class="nav-item"><a class="nav-link" href="<?php echo e(route('settings')); ?>">Settings</a></li>
             
             
-<?php elseif($role === 4 || $role === 5): ?>
+        <?php elseif($role === 4): ?>
             
             <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('dashboard') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('dashboard')); ?>">Dashboard</a></li>
             
             <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('myschedule') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('myschedule')); ?>">My Schedule</a></li>
             <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('settings') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('settings')); ?>">Settings</a></li>
+        <?php elseif($role === 5): ?>
+        <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('dashboard') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('dashboard')); ?>">Dashboard</a></li>
             
+            <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('myschedule') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('myschedule')); ?>">My Schedule</a></li>
+            <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('settings') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('settings')); ?>">Settings</a></li>
+        <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('reports') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('reports')); ?>">Reports</a></li>
             <?php else: ?>
-
+            
             <li class="nav-item"><a class="nav-link" href="/">Logout</a></li>
             <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         </ul>
@@ -153,9 +158,6 @@
                 if (data.uid && data.uid !== lastDetectedUid) {
                     lastDetectedUid = data.uid;
 
-                    // Only call the handler if it is actually defined (avoids ReferenceError).
-                    // This global poller is loaded on every page (including the settings page),
-                    // so it must not break when a page does not define this function.
                     if (typeof window.handleRfidScanGlobally === 'function') {
                         window.handleRfidScanGlobally(data.uid);
                     }
