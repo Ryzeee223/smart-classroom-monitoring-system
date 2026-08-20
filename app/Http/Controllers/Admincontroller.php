@@ -3,9 +3,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\users;
+use App\Models\Schedule;
+use App\Models\semyr;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Programs;
 use App\Models\college;
+use Illuminate\Support\Carbon;
 
 
 class AdminController extends Controller
@@ -68,7 +72,7 @@ public function store(Request $request)
             'college_id' => $request->college_id,
             'profile_picture' => null,
             'RFID_code' => null,
-            'acc_status' => 'present',
+            'acc_status' => 'Present',
         ]);
 
         return back()->with('success', 'User saved successfully!');
@@ -169,7 +173,44 @@ public function assignRfid(Request $request)
         $faculty_count = User::where('role', [2,3,4,5])->where('acc_status', 1)->count();
         // Pending accounts (acc_status=0) for faculty-related roles only: 2,3,4,5 (exclude admin role 1)
         $pending_count = User::whereIn('role', [2, 3, 4, 5])->where('rfid_code', 0)->count();
-        return view('dashboard', compact('recent_faculty', 'role_name', 'faculty_count', 'pending_count'));
+        
+        // Fetch ongoing classes
+        $now = Carbon::now();
+        $todayDay = $now->translatedFormat('D');
+        
+        $schedules = Schedule::with(['User', 'course', 'room', 'program'])
+            ->where('day', $todayDay)
+            ->whereTime('start_time', '>=', '07:00:00')
+            ->whereTime('start_time', '<=', '18:00:00')
+            ->orderBy('start_time', 'asc')
+            ->get();
+        
+        $ongoingClasses = $schedules->map(function ($schedule) use ($now) {
+            $startDateTime = Carbon::today()->setTimeFromTimeString($schedule->start_time);
+            $endDateTime = Carbon::today()->setTimeFromTimeString($schedule->end_time);
+            
+            if ($endDateTime->lt($startDateTime)) {
+                $endDateTime->addDay();
+            }
+            
+            $isLive = $now->between($startDateTime, $endDateTime, true);
+            
+            return [
+                'id' => $schedule->id,
+                'faculty' => trim(($schedule->User->first_name ?? '') . ' ' . ($schedule->User->last_name ?? '')) ?: 'Faculty',
+                'course_code' => $schedule->course?->course_code ?? 'N/A',
+                'subject' => $schedule->course?->course_name ?? 'N/A',
+                'room' => $schedule->room?->room_name ?? 'N/A',
+                'start' => $startDateTime->format('H:i:s'),
+                'end' => $endDateTime->format('H:i:s'),
+                'start_display' => $startDateTime->format('g:i A'),
+                'end_display' => $endDateTime->format('g:i A'),
+                'is_live' => $isLive,
+                'status' => $isLive ? 'Ongoing' : 'Scheduled',
+            ];
+        })->values();
+        
+        return view('dashboard', compact('recent_faculty', 'role_name', 'faculty_count', 'pending_count', 'ongoingClasses'));
 
     }
 

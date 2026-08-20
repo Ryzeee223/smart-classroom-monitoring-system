@@ -20,12 +20,10 @@
         <div class="d-none d-md-block">
             @include('sidebar')
         </div>
-        <div class="d-md-none">
-            @include('sidebar')
-        </div>
+      
 
         
-                <div class="app-shell__content">
+            <div class="app-shell__content">
             <div class="container mt-5">
 
 

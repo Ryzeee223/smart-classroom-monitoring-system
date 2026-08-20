@@ -286,7 +286,15 @@
                                         <?php default: ?> Unknown
                                     <?php endswitch; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                 </td>
-                                <td><span class="badge <?php echo e($user->acc_status ? 'bg-success' : 'bg-danger'); ?>"><?php echo e($user->acc_status ? 'Active' : 'Inactive'); ?></span></td>
+                                <td>
+                                    <?php
+                                        $accountStatus = strtolower((string) ($user->acc_status ?? ''));
+                                    ?>
+                                    <span class="badge <?php echo e($accountStatus === 'Present' ? 'bg-success' : 'bg-danger'); ?>">
+                                        <?php echo e($user->acc_status ?? 'N/A'); ?>
+
+                                    </span>
+                                </td>
                                 <td>
                                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($user->RFID_code): ?>
                                         <span class="badge bg-success">Assigned</span>

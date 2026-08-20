@@ -284,7 +284,14 @@
                                         @default Unknown
                                     @endswitch
                                 </td>
-                                <td><span class="badge {{ $user->acc_status ? 'bg-success' : 'bg-danger' }}">{{ $user->acc_status ? 'Active' : 'Inactive' }}</span></td>
+                                <td>
+                                    @php
+                                        $accountStatus = strtolower((string) ($user->acc_status ?? ''));
+                                    @endphp
+                                    <span class="badge {{ $accountStatus === 'Present' ? 'bg-success' : 'bg-danger' }}">
+                                        {{ $user->acc_status ?? 'N/A' }}
+                                    </span>
+                                </td>
                                 <td>
                                     @if($user->RFID_code)
                                         <span class="badge bg-success">Assigned</span>

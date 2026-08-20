@@ -6,6 +6,7 @@ use App\Models\Schedule;
 use App\Models\semyr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use App\Models\report;
 
 class ReportController extends Controller
 {
@@ -73,7 +74,31 @@ class ReportController extends Controller
             'currentSchoolYear' => $currentSchoolYear,
         ]);
     }
+public function GetAttendance(Request $request)
+    {
+$validatedData = $request->validate([
+            'user_id' => 'required|integer',
+            'schedule_id' => 'required|integer',
+            'time_in' => 'required|date_format:H:i:s',
+            'time_out' => 'nullable|date_format:H:i:s',
+            'attendance_date' => 'required|date',
+            'status_in' => 'required|string',
+            'status_out' => 'nullable|string',
+        ]);
 
+        $attendanceRecord = report::CreateAttendance(
+            $validatedData['user_id'],
+            $validatedData['schedule_id'],
+            $validatedData['time_in'],
+            $validatedData['time_out'] ?? null,
+            $validatedData['attendance_date'],
+            $validatedData['status_in'],
+            $validatedData['status_out'] ?? null
+        );
+return view('dashboard', [
+            'attendanceRecord' => $attendanceRecord,
+        ]);
+    }
     public function generate(Request $request)
     {
         return $this->index();

@@ -22,12 +22,12 @@ return new class extends Migration
             $table->string('employee_ID', 255)->unique();
             $table->string('email', 100)->unique();
             $table->string('profile_picture', 255)->nullable();
-            $table->string('password', 50);
-            $table->integer('role', 1);
+            $table->string('password');
+            $table->integer('role');
             $table->foreignId('college_id')->constrained('college')->onDelete('cascade');
             $table->string('RFID_code', 50)->nullable()->unique();
-            $table->string('acc_status', 70)->default('present');
-            $table->timestamp('email_verified_at', 15)->nullable();
+            $table->string('acc_status', 70)->default('Present');
+            $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

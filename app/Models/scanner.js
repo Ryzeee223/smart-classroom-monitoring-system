@@ -24,24 +24,15 @@ document.addEventListener("keydown", (e) => {
 });
 
 function handleRFID(uid) {
-    fetch("/api/rfid", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ uid }),
-    });
-}
-
-function handleRFID(uid) {
-    fetch("/api/room-scan", {
+    fetch("/api/attendance-scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             uid: uid,
-            room_id: 1,
         }),
     })
         .then((res) => res.json())
-        .then((data) => updateRoomUI(data.status));
+        .then((data) => updateRoomUI(data.attendance_status || data.status));
 }
 
 function updateRoomUI(status) {

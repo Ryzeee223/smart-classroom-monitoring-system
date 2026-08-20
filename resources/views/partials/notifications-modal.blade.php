@@ -1,4 +1,4 @@
-<div class="modal fade " id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel" aria-hidden="true" style="">
+<div class="modal fade" id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
@@ -122,63 +122,3 @@
     </div>
 </div>
 
-{{-- Set Schedule modal --}}
-<div class="modal fade" id="setschedmodal" tabindex="-1" aria-labelledby="setschedmodalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="setschedmodalLabel">Set Schedule</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-3">
-                <p>Set schedule for this faculty.</p>
-                {{-- The form fields below are intentionally simple -- encode your own inputs here --}}
-                <form action="{{ route('schedules.store') }}" method="POST">
-                    @csrf
-                    <div class="mb-3">
-                        <label class="form-label">Faculty</label>
-                        <input type="text" name="faculty_name" class="form-control" placeholder="Faculty name" value="">
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Program</label>
-                            <input type="text" name="program_id" class="form-control" placeholder="Program">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Course</label>
-                            <input type="text" name="Course" class="form-control" placeholder="Course">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Room</label>
-                            <input type="text" name="Room" class="form-control" placeholder="Room">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Day</label>
-                            <input type="text" name="Day" class="form-control" placeholder="e.g. Monday, Tuesday">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Start Time</label>
-                            <input type="time" name="Start_time" class="form-control">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">End Time</label>
-                            <input type="time" name="End_time" class="form-control">
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Schedule</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>

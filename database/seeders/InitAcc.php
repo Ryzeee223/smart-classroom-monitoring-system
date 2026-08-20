@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use App\Models\users;
 use App\Models\college;
 use App\Models\semyr;
+use App\Models\course;
 use Illuminate\Support\Facades\Hash;
 
 class InitAcc extends Seeder
@@ -87,6 +88,12 @@ class InitAcc extends Seeder
         semyr::create([
             'semester' => '1st Semester',
             'school_year' => '2025-2026',
+        ]);
+
+        course::create([
+            'college_id' => 2,
+            'course_code' => 'IT101',
+            'course_name' => 'Introduction to Programming'
         ]);
     }
 }

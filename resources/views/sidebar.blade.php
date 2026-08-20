@@ -2,16 +2,22 @@
     $role = (int) (session('user_role') ?? 0);
 @endphp
 
-<nav class="app-sidebar card-body border" aria-label="Sidebar">
-    <div class="app-sidebar__brand">
-        <a class="app-sidebar__brand-link" href="/">eMonitor</a>
-@if(session('logged_in'))
-            <div class="app-sidebar__user">{{ session('user_name') ?? '' }}</div>
-        @endif
-
-        {{-- Profile button should appear for any logged in user (all roles) --}}
-        @if(session('logged_in'))
-        @endif
+<nav class="app-sidebar" aria-label="Sidebar">
+    <div class="app-sidebar__header">
+        <div class="app-sidebar__brand">
+            <a class="app-sidebar__brand-link" href="/">RFInsiDe</a>
+            @if(session('logged_in'))
+                <div class="app-sidebar__user">{{ session('user_name') ?? '' }}</div>
+            @endif
+        </div>
+        {{-- notification --}}
+        <button type="button"
+                class="app-sidebar__notifications btn btn-light btn-sm rounded-circle"
+                aria-label="Open notifications"
+                title="Notifications"
+                data-notifications-url="{{ route('notifications.modal') }}">
+            <span aria-hidden="true">&#128276;</span>
+        </button>
     </div>
 
     <div class="app-sidebar__body card-body">
@@ -40,7 +46,7 @@
             {{-- schedule --}}
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('schedules') ? 'active fw-bold' : '' }}" href="{{ route('schedules') }}">Create Schedules</a></li>
            {{-- College --}}
-<li class="nav-item"><a class="nav-link {{ request()->routeIs('programs') ? 'active fw-bold' : '' }}" href="/programs">Programs</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('programs') ? 'active fw-bold' : '' }}" href="/programs">Programs</a></li>
             {{-- settings --}}
             <li class="nav-item"><a class="nav-link" href="{{ route('settings') }}">Settings</a></li>
             
@@ -111,6 +117,14 @@
         flex-direction:column;
     }
 
+    .app-sidebar__header{
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+        gap:12px;
+        margin-bottom:16px;
+    }
+
     /* default desktop content offset (safe on mobile via media query below) */
     .page-content{
         margin-left:260px;
@@ -125,20 +139,31 @@
         color:inherit;
     }
     .app-sidebar__user{font-size:.85rem;color:#6c757d;margin-top:4px;}
+    .app-sidebar__notifications{
+        width:36px;
+        height:36px;
+        padding:0;
+        flex:0 0 auto;
+    }
     .app-sidebar__body{flex:1; overflow:auto; padding-right:6px;}
     .app-sidebar__body .nav-link{border-radius:10px; margin:2px 0; color:#212529;}
     .app-sidebar__body .nav-link.active{background:#0d6efd22; color:#0d6efd;}
     .app-sidebar__footer{padding-top:12px;}
 
     
-    .app-shell{display:flex; min-height:100vh;}
-    .app-shell__content{flex:1; min-width:0;}
+    .app-shell{display:block; min-height:100vh;}
+    .app-shell__content{
+        min-width:0;
+        margin-left:260px;
+        width:calc(100% - 260px);
+    }
 
     
     @media (max-width: 767.98px){
         /* keep sidebar content visible when included on mobile pages */
         .app-sidebar{display:block; position:relative; width:100%; height:auto; border-right:none; padding:12px;}
         .app-sidebar__body{max-height:none; overflow:visible;}
+        .app-shell__content{margin-left:0; width:100%;}
         /* prevent pages from being pushed off-screen on mobile */
         .page-content{margin-left:0 !important; width:100% !important;}
     }
@@ -173,4 +198,30 @@
     }, 2000); // 2000ms = 2 seconds
 
 
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const button = document.querySelector('.app-sidebar__notifications');
+        if (!button) return;
+
+        button.addEventListener('click', async function () {
+            let modal = document.getElementById('notificationsModal');
+
+            if (!modal) {
+                const response = await fetch(button.dataset.notificationsUrl, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                if (!response.ok) return;
+
+                document.body.insertAdjacentHTML('beforeend', await response.text());
+                modal = document.getElementById('notificationsModal');
+            }
+
+            if (modal && window.bootstrap) {
+                bootstrap.Modal.getOrCreateInstance(modal).show();
+            }
+        });
+    });
 </script>

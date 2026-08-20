@@ -11,8 +11,23 @@
 <body>
 <style>
 body {
-    overflow-x: auto;
+    background:#f5f7fb;
+    overflow-x:hidden;
     overflow-y:auto;
+}
+.dashboard-container {
+    padding-top:16px;
+    padding-bottom:32px;
+}
+.dashboard-container .card {
+    border:0;
+    border-radius:10px;
+}
+.dashboard-container .card-header {
+    border-bottom:1px solid rgba(0,0,0,.06);
+}
+.dashboard-container .stats-card {
+    min-height:132px;
 }
 </style>
 
@@ -21,29 +36,22 @@ body {
 
 <main role="main" class="page-content">
 
-            <div class="container p-4" style="padding-top:16px;">
+            <div class="container-fluid dashboard-container px-4">
                 
                 <div class="mb-2 d-flex justify-content-end " style="radius:10px;">
             <button type="button"
                     class="btn btn-sm btn-light shadow-sm rounded-circle d-flex align-items-center justify-content-center "
-                    style="margin-right:50px; z-index: 10;"
+                    style="z-index: 10;"
                     aria-label="Open notifications"
                     data-bs-toggle="modal"
                     data-bs-target="#notificationsModal">
-                <img src="{{ asset('storage/icons/bell.svg') }}" alt="Notifications" style="width:18px; height:18px; display:block;"/>
+                <span aria-hidden="true">&#128276;</span>
              </button>
-                </div>
-                <br>
-
-              <!-- Stats Cards -->
-        <div id="stats-cards" class="mt-2 position-relative">
-      
-        </div>
-    
+                     </div>
             <div class="row justify-content-center row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
 
             <div class="col">
-                <div class="card h-100 shadow border-1">
+                <div class="card stats-card h-100 shadow-sm">
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
                         <h6 class="text-muted mb-2">Rooms</h6>
                         <div class="display-4 fw-bold text-primary mb-0">{{ $showrm ?? $roomnm ?? 0 }}</div>
@@ -53,7 +61,7 @@ body {
             </div>
 
             <div class="col">
-                <div class="card h-100 shadow border-1">
+                <div class="card stats-card h-100 shadow-sm">
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
                         <h6 class="text-muted mb-2">Occupied</h6>
                         <div class="display-4 fw-bold text-success mb-0">0</div>
@@ -61,7 +69,7 @@ body {
                 </div>
             </div>
             <div class="col">
-                <div class="card h-100 shadow border-1">
+                <div class="card stats-card h-100 shadow-sm">
 
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
                         <h6 class="text-muted mb-2">Faculty</h6>
@@ -72,7 +80,7 @@ body {
             </div>
 
             <div class="col">
-                <div class="card h-100 shadow border-1">
+                <div class="card stats-card h-100 shadow-sm">
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
                         <h6 class="text-muted mb-2">Pending RFID</h6>
                         <div class="display-4 fw-bold text-warning mb-0">{{ $pending_count ?? 0 }}</div>
@@ -82,15 +90,12 @@ body {
 
             </div>
 
-            </div>
-        </div>
-
         <!-- Main Content Row -->
-        <div class="row g-3 mb-5 " style="overflow-y:auto; max-height:calc(100vh - 300px);">
+        <div class="row g-4 mb-4">
 
 
             <!-- Live Classroom Status -->
-            <div class="col-lg-12 ">
+            <div class="col-12">
                 <div class="card shadow-lg">
                     <div class="card-header bg-primary bg-opacity-10">
                         <h5 class="mb-0 fw-bold text-dark">Live Classroom Status</h5>
@@ -140,7 +145,7 @@ body {
 
                         {{-- Room data for the selected building tab --}}
                         @php
-                            // We expect controller to have $rooms (with building relationship loaded).
+                        
                             // If not present, fall back to empty.
                             $roomsForGrid = $rooms ?? collect();
 
@@ -237,37 +242,18 @@ body {
                 </div>
             </div>
 
-            <!-- Right Column -->
-            <div class="col-lg-4">
-
-                <!-- Leave Requests (Dean / Assistant Dean only) -->
-                @php
-                    $viewerRole = (int) (session('user_role') ?? 0);
-                @endphp
+            @php
+                $viewerRole = (int) (session('user_role') ?? 0);
+            @endphp
 
 
-@if(in_array($viewerRole, [2, 3], true))
-                  
-                @endif
 
-                    @if (in_array($viewerRole, [1, 2, 3], true))
-            </div>
-</div>
-@endif
-                </div>
-
-                <div>
-                    @include('partials.notifications-modal')
-                </div>
-
-                {{-- Building tab + filter script (basic for current static cards) --}}
-
-
-            <!-- Recent Logs (inside Right Column) -->
+            <div class="row g-3 mb-5">
+            <!-- My Attendance -->
                     <div class="col-lg-12 mt-3 width-100">
                         <div class="card shadow">
                             <div class="card-header">
-                                <h5 class="mb-0 fw-bold">Recent Logs</h5>
+                                <h5 class="mb-0 fw-bold">My Attendance</h5>
                             </div>
                             <div class="card-body p-0">
                                 <div class="table-responsive">
@@ -283,17 +269,30 @@ body {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr class="table-active">
-                                                <td colspan="6" class="text-center py-4 text-muted">No recent activity. Check back later</td>
-                                            </tr>
+                                            @forelse(($myAttendance ?? collect()) as $attendance)
+                                                @php $schedule = $attendance->schedule; @endphp
+                                                <tr>
+                                                    <td>{{ $schedule?->course?->course_code ?? 'N/A' }}</td>
+                                                    <td>{{ trim(($schedule?->user?->first_name ?? '') . ' ' . ($schedule?->user?->last_name ?? '')) ?: 'N/A' }}</td>
+                                                    <td>{{ $schedule?->room?->room_name ?? 'N/A' }}</td>
+                                                    <td>{{ $attendance->time_in ?? '-' }}</td>
+                                                    <td>{{ $schedule?->course?->course_name ?? 'N/A' }}</td>
+                                                    <td>{{ ucfirst(str_replace('_', ' ', $attendance->status_in ?? 'N/A')) }}</td>
+                                                </tr>
+                                            @empty
+                                                <tr class="table-active">
+                                                    <td colspan="6" class="text-center py-4 text-muted">No attendance records found.</td>
+                                                </tr>
+                                            @endforelse
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
                     </div>
+            </div>
         </div>
-</div>
+    </main>
 </body>
 </html>
 

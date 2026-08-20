@@ -20,12 +20,10 @@
         <div class="d-none d-md-block">
             <?php echo $__env->make('sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
         </div>
-        <div class="d-md-none">
-            <?php echo $__env->make('sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-        </div>
+      
 
         
-                <div class="app-shell__content">
+            <div class="app-shell__content">
             <div class="container mt-5">
 
 
