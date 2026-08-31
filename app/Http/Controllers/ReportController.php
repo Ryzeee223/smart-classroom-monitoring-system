@@ -158,6 +158,7 @@ public function GetAttendance(Request $request)
             //  logic for checking the schedule for its start time and end time of the class and 
             // check if there is no update
             
+            
         return view('dashboard', [
             'attendanceRecord' => $attendanceRecord,
         ]);
