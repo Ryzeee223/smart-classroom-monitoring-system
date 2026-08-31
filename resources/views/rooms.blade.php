@@ -13,8 +13,8 @@
     body {
         font-family: system-ui , "Segoe UI", Roboto, sans-serif;
         background-color: #f8f9fa;
-        overflow-x: hidden;
-        overflow-y: hidden;
+        overflow-x: auto;
+        overflow-y: auto;
     }
 </style>
 
@@ -236,6 +236,7 @@
         filterBuildingsByCollege();
     });
 </script>
+@include('partials.notifications-modal')
 </body>
 </html>
 

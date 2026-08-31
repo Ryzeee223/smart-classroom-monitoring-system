@@ -8,5 +8,5 @@ use Illuminate\Support\Facades\Log;
 
 class settingscontroller extends Controller
 {
-    //
+    
 }

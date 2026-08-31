@@ -3,12 +3,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\users;
 use App\Models\Schedule;
 use App\Models\semyr;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Programs;
 use App\Models\college;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Carbon;
 
 
@@ -148,18 +148,43 @@ public function store(Request $request)
 
 
 
+// public function assignRfid(Request $request)
+//     {
+//         $request->validate([
+//             'user_id' => 'required|exists:users,id',
+//             'rfid_code' => 'required|string|max:50|unique:users,RFID_code',
+//         ]);
+
+//         $user = User::findOrFail($request->user_id);
+//         $user->update(['RFID_code' => $request->rfid_code]);
+
+//         return back()->with('success', 'RFID assigned successfully!');
+//     }
+
 public function assignRfid(Request $request)
-    {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'rfid_code' => 'required|string|max:50|unique:users,RFID_code',
-        ]);
+{
+    $request->validate([
+        'user_id' => 'required|exists:users,id',
+        'rfid_code' => 'required|string',
+    ]);
 
-        $user = User::findOrFail($request->user_id);
-        $user->update(['RFID_code' => $request->rfid_code]);
+$existingUser = User::where('RFID_code')
+        ->where('id', '!=', $request->user_id)
+        ->first();
 
-        return back()->with('success', 'RFID assigned successfully!');
+    if ($existingUser) {
+        return redirect()->back()->with('error', "This RFID card is already assigned.");
     }
+
+    $user = User::findOrFail($request->user_id);
+    $user->update(['RFID_code' => strtoupper(trim($request->rfid_code))]);
+
+    // Clear cache so it doesn't leak into subsequent polls
+    Cache::forget('latest_assignment_scan');
+    Cache::forget('latest_assignment_scan_data');
+
+    return redirect()->back()->with('success', 'RFID assigned successfully.');
+}
 
     public function dashboard()
     {

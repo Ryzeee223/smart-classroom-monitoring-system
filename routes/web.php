@@ -17,11 +17,9 @@ Route::post('/', [App\Http\Controllers\Auth\LoginController::class, 'login'])->n
 Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 
 // {{-- 1=admin 2=dean 3=asst. dean 4=faculty 5=programhead --}}
-Route::get('/dashboard', function () {
-    // 1=admin 2=dean 3=asst. dean 4=faculty 5=programhead
-    if (!session('logged_in') || !in_array((int) session('user_role'), [1, 2, 3, 4, 5], true)) {
-        return redirect('/');
-    }
+Route::get('/dashboard', function () 
+{if (!session('logged_in') || !in_array((int) session('user_role'), [1, 2, 3, 4, 5], true)) {return redirect('/'); }
+    
 
 
     $userRole = (int) (session('user_role') ?? 0);
@@ -98,12 +96,31 @@ Route::get('/dashboard', function () {
         ->orderBy('first_name')
         ->get();
 
-    // Fetch ongoing classes
+    // Fetch ongoing classes based on the actual weekday values stored in schedule.day.
     $now = \Illuminate\Support\Carbon::now();
-    $todayDay = $now->translatedFormat('D');
-    
+    $todayDay = $now->format('D');
+    $todayFullDay = $now->format('l');
+    $matchingDays = array_values(array_unique([
+        $todayDay,
+        $todayFullDay,
+        strtolower($todayDay),
+        strtolower($todayFullDay),
+        ucfirst(strtolower($todayDay)),
+        ucfirst(strtolower($todayFullDay)),
+        'Sat',
+        'Saturday',
+        'sat',
+        'saturday',
+    ]));
+
     $schedules = \App\Models\Schedule::with(['User', 'course', 'room', 'program'])
-        ->where('day', $todayDay)
+        ->where(function ($query) use ($matchingDays) {
+            foreach ($matchingDays as $day) {
+                $normalizedDay = strtolower(trim((string) $day));
+                $query->orWhereRaw('LOWER(day) = ?', [$normalizedDay])
+                    ->orWhereRaw('LOWER(day) LIKE ?', ['%' . $normalizedDay . '%']);
+            }
+        })
         ->whereTime('start_time', '>=', '07:00:00')
         ->whereTime('start_time', '<=', '18:00:00')
         ->orderBy('start_time', 'asc')
@@ -124,9 +141,12 @@ Route::get('/dashboard', function () {
 
         if (!$attendance) {
             $attendance = \App\Models\report::create([
+                'room_id' => $schedule->room_id,
                 'user_id' => $schedule->user_id,
                 'schedule_id' => $schedule->id,
-                'attendance_date' => $startDateTime,
+                'day' => $schedule->day,
+                'attendance_date' => $startDateTime->toDateString(),
+                'status_in' => 'waiting',
             ]);
         }
 
@@ -164,47 +184,70 @@ Route::get('/dashboard', function () {
         ];
     })->filter()->values();
 
-    $dayOffsets = [
-        'Sun' => 0,
-        'Mon' => 1,
-        'Tue' => 2,
-        'Wed' => 3,
-        'Thu' => 4,
-        'Fri' => 5,
-        'Sat' => 6,
-    ];
+    // 1) Get the relevant schedules for today based on the user's role.
+    $todaySchedulesQuery = \App\Models\Schedule::with(['User', 'course', 'room', 'program'])
+        ->where(function ($query) use ($matchingDays) {
+            foreach ($matchingDays as $day) {
+                $normalizedDay = strtolower(trim((string) $day));
+                $query->orWhereRaw('LOWER(day) = ?', [$normalizedDay])
+                    ->orWhereRaw('LOWER(day) LIKE ?', ['%' . $normalizedDay . '%']);
+            }
+        })
+        ->orderBy('start_time', 'asc');
 
-    $mySchedule = \App\Models\Schedule::where('user_id', $currentUserId)
-        ->orderBy('id')
-        ->first();
+    if (in_array($userRole, [2, 3], true)) {
+        $facultyIds = \App\Models\users::where('college_id', $userCollegeId)->pluck('id');
+        $todaySchedulesQuery->whereIn('user_id', $facultyIds);
+    } elseif (in_array($userRole, [4, 5], true)) {
+        $todaySchedulesQuery->where('user_id', $currentUserId);
+    }
 
-    if ($mySchedule) {
-        $scheduleDay = ucfirst(strtolower(substr((string) $mySchedule->day, 0, 3)));
-        $todayOffset = \Illuminate\Support\Carbon::today()->dayOfWeek;
-        $scheduleOffset = $dayOffsets[$scheduleDay] ?? null;
+    $todaySchedules = $todaySchedulesQuery->get();
 
-        if ($scheduleOffset !== null) {
-            $daysUntilSchedule = ($scheduleOffset - $todayOffset + 7) % 7;
-            $attendanceDate = \Illuminate\Support\Carbon::today()->addDays($daysUntilSchedule);
+    // 2) Keep the upcoming-class logic separate from attendance display.
+    $upcomingClass = $todaySchedules->filter(function ($schedule) use ($now) {
+        $startDateTime = \Illuminate\Support\Carbon::today()->setTimeFromTimeString($schedule->start_time);
+        $endDateTime = \Illuminate\Support\Carbon::today()->setTimeFromTimeString($schedule->end_time);
 
+        if ($endDateTime->lt($startDateTime)) {
+            $endDateTime->addDay();
+        }
+
+        return $now->lt($endDateTime);
+    })->sortBy(function ($schedule) {
+        return \Illuminate\Support\Carbon::today()->setTimeFromTimeString($schedule->start_time)->timestamp;
+    })->first();
+
+    // 3) Create attendance rows for the relevant today's schedules if they are missing.
+    //    This keeps attendance as the source of truth for the dashboard table.
+    if (in_array($userRole, [2, 3, 4, 5], true)) {
+        foreach ($todaySchedules as $schedule) {
             \App\Models\report::firstOrCreate(
                 [
-                    'user_id' => $currentUserId,
-                    'schedule_id' => $mySchedule->id,
-                    'attendance_date' => $attendanceDate->toDateString(),
+                    'user_id' => $schedule->user_id,
+                    'schedule_id' => $schedule->id,
+                    'attendance_date' => $now->toDateString(),
                 ],
                 [
+                    'room_id' => $schedule->room_id,
+                    'day' => $schedule->day,
                     'status_in' => 'waiting',
                 ]
             );
         }
     }
 
-    $myAttendance = \App\Models\report::with(['schedule.user', 'schedule.course', 'schedule.room'])
-        ->where('user_id', $currentUserId)
-        ->latest('attendance_date')
-        ->take(1)
-        ->get();
+    // 4) Final attendance query for the dashboard: only the logged-in user's own attendance rows.
+    $myAttendanceQuery = \App\Models\report::with(['schedule.user', 'schedule.course', 'schedule.room'])
+        ->whereDate('attendance_date', $now->toDateString())
+        ->where('user_id', $currentUserId);
+
+    $myAttendance = $myAttendanceQuery
+        ->get()
+        ->sortBy(function ($attendance) {
+            return $attendance->schedule?->start_time ?? '23:59:59';
+        })
+        ->values();
 
     return view('dashboard', compact(
         'recent_faculty',
@@ -325,6 +368,7 @@ Route::delete('/college/{college}', [App\Http\Controllers\collegecontroller::cla
 
 Route::post('/rooms/', [App\Http\Controllers\room_bldg_controller::class, 'storeRoom'])->name('storeRoom.store');
 Route::get('/rooms/', [App\Http\Controllers\room_bldg_controller::class, 'show'])->name('rooms.index');
+Route::get('/dashboard', [App\Http\Controllers\room_bldg_controller::class, 'display'])->name('dashboard');
 
 Route::post('/rooms/store', [App\Http\Controllers\room_bldg_controller::class, 'storeBldg'])->name('storeBldg.store');
 Route::get('/rooms/{id}', [App\Http\Controllers\room_bldg_controller::class, 'show']);

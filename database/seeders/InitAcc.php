@@ -8,6 +8,9 @@ use App\Models\users;
 use App\Models\college;
 use App\Models\semyr;
 use App\Models\course;
+use App\Models\Programs;
+use App\Models\room;
+use App\Models\bldg as building;
 use Illuminate\Support\Facades\Hash;
 
 class InitAcc extends Seeder
@@ -28,6 +31,12 @@ class InitAcc extends Seeder
             'abbreviation' => 'CCIT',
             'description' => '',
         ]);
+         building::create ([
+        'college_id' => '2',
+        'bldg_name' => 'College of Communication and Information Technology',
+        'bldg_abbr' => 'CCIT'
+        ]);
+        
     users::create([
         'first_name' => 'Eron',
         'last_name' => 'Tobia',
@@ -95,6 +104,21 @@ class InitAcc extends Seeder
             'course_code' => 'IT101',
             'course_name' => 'Introduction to Programming'
         ]);
+
+        Programs::create([
+        'college_id' => '2',
+        'Program_abbr' => 'BSIT',
+        'Program_name' => 'Bachelor of Science in Information Technology',
+        'description' => ''
+        ]);
+
+        room::create ([
+    'room_name' => 'CC101',
+    'room_type' => 'Lab',
+    'status' => 'vacant',
+    'bldg_id' => '1'
+        ]);
     }
+   
 }
 

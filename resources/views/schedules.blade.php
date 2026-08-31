@@ -201,7 +201,7 @@ while ($startTime <= $endTimeLimit) {
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Day</label>
                                         <div class="d-flex flex-wrap gap-3 mt-1">
-                                            @foreach(['Mon','Tue','Wed','Thu','Fri'] as $day)
+                                            @foreach(['Mon','Tue','Wed','Thu','Fri', 'Sat'] as $day)
                                                 <label class="d-flex align-items-center gap-1">
                                                     <input type="checkbox" name="Day[]" value="{{ $day }}" class="form-check-input">
                                                     <span>{{ $day }}</span>
@@ -469,5 +469,6 @@ while ($startTime <= $endTimeLimit) {
             </div>
         </div>
     </main>
+    @include('partials.notifications-modal')
 </div>
 </body>

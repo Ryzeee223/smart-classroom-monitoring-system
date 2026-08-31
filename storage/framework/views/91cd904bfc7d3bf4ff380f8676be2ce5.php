@@ -202,7 +202,7 @@ while ($startTime <= $endTimeLimit) {
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Day</label>
                                         <div class="d-flex flex-wrap gap-3 mt-1">
-                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = ['Mon','Tue','Wed','Thu','Fri']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $day): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = ['Mon','Tue','Wed','Thu','Fri', 'Sat']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $day): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                                                 <label class="d-flex align-items-center gap-1">
                                                     <input type="checkbox" name="Day[]" value="<?php echo e($day); ?>" class="form-check-input">
                                                     <span><?php echo e($day); ?></span>
@@ -475,6 +475,7 @@ while ($startTime <= $endTimeLimit) {
             </div>
         </div>
     </main>
+    <?php echo $__env->make('partials.notifications-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </div>
 </body>
 <?php /**PATH /Volumes/shared/capstone project/backups/emonitor 3rd phase copy/resources/views/schedules.blade.php ENDPATH**/ ?>

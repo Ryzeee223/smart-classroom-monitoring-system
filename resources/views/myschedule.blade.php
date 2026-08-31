@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}">
     <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
-    <title>eMonitor - My Schedule</title>
+    <title>RFInsiDe - My Schedule</title>
 </head>
 <body>
     <style>
@@ -13,6 +13,11 @@
         .app-shell__content{flex:1; min-width:0; margin-left:260px;}
         @media (max-width: 767.98px){
             .app-shell__content{margin-left:0;}
+        }
+
+        body{
+            overflow-x:auto;
+            overflow-y:auto;
         }
     </style>
 
@@ -78,9 +83,21 @@
                                                             </td>
                                                             <td>{{ $schedule->day ?? ($schedule->Day ?? 'N/A') }}</td>
                                                             <td>
-                                                                {{ $schedule->start_time ?? ($schedule->Start_time ?? 'N/A') }}
+                                                                @php
+                                                                    $startTime = $schedule->start_time ?? ($schedule->Start_time ?? null);
+                                                                    $endTime = $schedule->end_time ?? ($schedule->End_time ?? null);
+                                                                @endphp
+                                                                @if($startTime)
+                                                                    {{ \Illuminate\Support\Carbon::parse($startTime)->format('g:i A') }}
+                                                                @else
+                                                                    N/A
+                                                                @endif
                                                                 -
-                                                                {{ $schedule->end_time ?? ($schedule->End_time ?? 'N/A') }}
+                                                                @if($endTime)
+                                                                    {{ \Illuminate\Support\Carbon::parse($endTime)->format('g:i A') }}
+                                                                @else
+                                                                    N/A
+                                                                @endif
                                                             </td>
                                                             <td>{{ $schedule->room?->room_name }}</td>
                                                          
@@ -103,6 +120,7 @@
             </div>
         </div>
     </div>
+    @include('partials.notifications-modal')
 </body>
 </html>
 

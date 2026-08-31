@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings - eMonitor</title>
+    <title>Settings - RFInsiDe</title>
     <link href="{{ asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}" rel="stylesheet">
     <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
 </head>
@@ -28,6 +28,12 @@
 <div class="page-content">
     <main class="container mt-4 mb-5">
 
+        @if (session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
@@ -64,7 +70,7 @@
 <div class="mb-3">
     <label class="form-label">RFID Code <small class="text-muted">(Tap card)</small></label>
     <input type="hidden" name="rfid_code" id="rfid_input">
-    <span id="rfid_label" class="form-control bg-light" style="font-family:monospace">N/A</span>
+    <span id="rfid_label" class="form-control bg-light" style="font-family:monospace">Waiting for card...</span>
 </div>
 
 {{-- logic of the assigning ID --}}
@@ -76,21 +82,22 @@
     // POST /api/rfid-scan (sent by the ESP8266 when a card is tapped).
     const pollInterval = setInterval(async () => {
         try {
-            const response = await fetch('/api/check-latest-scan');
+            const response = await fetch('/api/check-latest-assignment', { cache: 'no-store' });
+            if (!response.ok) throw new Error(`Scan check failed: ${response.status}`);
             const data = await response.json();
 
-            if (data.uid && data.uid !== 'N/A') {
+            if (data.uid && data.uid !== 'N/A' && data.uid !== rfidInput.value) {
                 // 1. Update the hidden input value
                 rfidInput.value = data.uid;
 
                 // 2. Update the visual span text
                 rfidLabel.textContent = data.uid;
 
-                // 3. Capture and stop polling once a card is detected
-                clearInterval(pollInterval);
+                // Keep polling so the next card can also be detected.
             }
         } catch (error) {
             console.error("Error fetching RFID scan:", error);
+            rfidLabel.textContent = 'Unable to read scanner';
         }
     }, 2000);
 </script>
@@ -158,6 +165,7 @@
         </div>
     </main>
 </div>
+@include('partials.notifications-modal')
 </body>
 </html>
 

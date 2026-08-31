@@ -102,8 +102,8 @@ class schedulecontroller extends Controller
             'section' => ['required', 'string', 'max:1'],
         ]);
 
-        $days = $validatedData['Day']; // Array of selected days like ['Mon', 'Wed']
-
+        $days = $validatedData['Day']; 
+        
         // 1. Conflict Check Loop
         foreach ($days as $singleDay) {
             $roomConflict = Schedule::where('room_id', $validatedData['Room'])
@@ -139,8 +139,8 @@ class schedulecontroller extends Controller
                 'School_year' => $validatedData['School_year'],
             ]);
         }
-
         return redirect()->back()->with('success', 'Schedule added successfully!');
+
     }
 
     public function destroy($id)

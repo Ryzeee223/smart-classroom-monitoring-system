@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\users;
 use App\Models\room;
 use App\Models\bldg;
 use App\Models\college;
@@ -112,7 +113,20 @@ class room_bldg_controller extends Controller
             ->with('building')
             ->get();
 
-        return view('dashboard', compact('buildings', 'rooms'));
-    }
+        $countRoom =room::count();
+        $occupiedRooms =room::where('status', 'occupied')->count();
 
+        // display faculty count
+        if (!session('logged_in')){
+            return redirect('/');
+        }
+
+        $userColId = session('college_id');
+        if (!$userColId && session('user_id')) {
+        $user = users::find(session('user_id'));
+        $userColId = $user ? $user->college_id : null;
+    }
+        $facultyCount = users::where('college_id', $userColId)->count();
+        return view('dashboard', compact('buildings', 'rooms', 'countRoom', 'occupiedRooms', 'facultyCount'));
+    }
 }

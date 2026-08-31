@@ -215,6 +215,7 @@
             </div>
         </div>
     </div>
+    <?php echo $__env->make('partials.notifications-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
 </html>
 

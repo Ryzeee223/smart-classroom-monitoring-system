@@ -16,11 +16,12 @@ return new class extends Migration
         $table ->id();
         $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
         $table->foreignId('schedule_id')->constrained('schedule')->onDelete('cascade');
+        $table->foreignId('room_id')->constrained('room')->onDelete('cascade');
         $table->time('time_in')->nullable();
-        $table->time('time_out')->nullable(); 
+        $table->time('time_out')->nullable();
+        $table->string('day'); 
         $table->timestamp('attendance_date');
-        $table->enum('status_in',['attended', 'absent', 'late', 'on_leave', 'waiting'])->default('waiting');
-        $table->string('status_out', 50)->nullable();
+        $table->enum('status',['attended', 'absent', 'late', 'on_leave', 'waiting'])->default('waiting');
         $table->timestamps();
         });
     }

@@ -3,17 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Users - eMonitor</title>
+    <title>Users - RFInsiDe</title>
     <link href="{{ asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="bootstrap-icons-1.10.5/bootstrap-icons.css">
     <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
     <style>
-        body {
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-            background-color: #f8f9fa;
-            overflow-x: hidden;
-            overflow-y: hidden;
-        }
+        
+body {
+    background:#f5f7fb;
+    overflow-x:hidden;
+    overflow-y:auto;
+}
+.dashboard-container {
+    padding-top:16px;
+    padding-bottom:32px;
+}
+.dashboard-container .card {
+    border:0;
+    border-radius:10px;
+}
+.dashboard-container .card-header {
+    border-bottom:1px solid rgba(0,0,0,.06);
+}
+.dashboard-container .stats-card {
+    min-height:132px;
+}
         .account-row .col {
             padding: 0.25rem 0.5rem;
         }
@@ -36,11 +50,10 @@
         });
     </script>
 </head>
-<body>
-<style>
-    
-</style>
-<div class="mt-5" style=" margin-left:300px; ">
+
+
+    <main role="main" class="page-content">
+<div class="container-fluid dashboard-container px-4" >
     <div class="d-none d-md-block app-sidebar">
         @include('sidebar')
     </div>
@@ -288,7 +301,7 @@
                                     @php
                                         $accountStatus = strtolower((string) ($user->acc_status ?? ''));
                                     @endphp
-                                    <span class="badge {{ $accountStatus === 'Present' ? 'bg-success' : 'bg-danger' }}">
+                                    <span class="badge {{ $accountStatus === 'Present' ? 'bg-success' : 'bg-success' }}">
                                         {{ $user->acc_status ?? 'N/A' }}
                                     </span>
                                 </td>
@@ -296,7 +309,7 @@
                                     @if($user->RFID_code)
                                         <span class="badge bg-success">Assigned</span>
                                     @else
-                                        <span class="badge bg-secondary">Not Assigned</span>
+                                        <span class="badge bg-danger">Not Assigned</span>
                                     @endif
                                 </td>
                                 <td class="text-center">
@@ -327,7 +340,9 @@
         </main>
     </div>
 </div>
-</body>
+@include('partials.notifications-modal')
+</main>
+
 </html>
 
 

@@ -215,6 +215,7 @@
             </div>
         </div>
     </div>
+    @include('partials.notifications-modal')
 </body>
 </html>
 

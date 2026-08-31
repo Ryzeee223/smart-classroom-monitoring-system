@@ -110,6 +110,7 @@
                                             <div class="col-md-3">
                                                 <div class="text-muted small">Faculty</div>
                                                 <div class="fw-semibold">{{ $class['faculty'] }}</div>
+                                                <div class="text-muted small">{{ $class['role'] }}</div>
                                             </div>
                                             <div class="col-md-2">
                                                 <div class="text-muted small">Classroom</div>
@@ -124,6 +125,14 @@
                                                 <div class="schedule-time">{{ $class['start_display'] }}</div>
                                                 <div class="text-muted small mt-2">End</div>
                                                 <div class="fw-semibold">{{ $class['end_display'] }}</div>
+                                                <div class="text-muted small mt-2">Attendance</div>
+                                                <div class="fw-semibold text-capitalize">{{ str_replace('_', ' ', $class['attendance_status']) }}</div>
+                                                @if ($class['time_in'])
+                                                    <div class="text-muted small">In: {{ $class['time_in'] }}</div>
+                                                @endif
+                                                @if ($class['time_out'])
+                                                    <div class="text-muted small">Out: {{ $class['time_out'] }}</div>
+                                                @endif
                                                 <span class="status-badge mt-2 d-inline-block {{ $class['is_live'] ? 'bg-success text-white' : 'bg-light text-dark border' }}">
                                                     {{ $class['label'] }}
                                                 </span>
@@ -163,5 +172,7 @@
             </div>
         </div>
     </div>
+    @include('partials.notifications-modal')
 </body>
+
 </html>

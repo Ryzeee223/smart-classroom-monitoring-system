@@ -28,6 +28,7 @@ class LoginController extends Controller
         Session::put('logged_in', true);
         Session::put('user_id', $user->id);
         Session::put('user_role', (int) ($user->role ?? 0));
+        Session::put('college_id', $user->college_id ?? 0);
 
         // Redirect based on role
         return match((int) ($user->role ?? 0)) {

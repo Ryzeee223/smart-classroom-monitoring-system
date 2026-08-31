@@ -15,6 +15,7 @@ return new class extends Migration
     $table->id();
     $table->string('room_name', 170)->unique();
     $table->string('room_type', 40);
+    $table->enum('status', ['vacant','occupied'])->default('vacant');
     $table->foreignId('bldg_id')->constrained('building')->onDelete('cascade');
     $table->timestamps();
 });

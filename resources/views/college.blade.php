@@ -5,22 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}" rel="stylesheet">
     <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
-    <title>eMonitor - Colleges</title>
+    <title>RFInsiDe - Colleges</title>
 </head>
 <body>
     @include('sidebar')
 
-    <style>
-       body {
-            font-family: system-ui, "Segoe UI", Roboto, sans-serif;
-            background-color: #f8f9fa;
-            overflow-x: hidden;
-            
-        }
-    </style>
-
-    <div class="" style="margin-left:260px;">
-    <main class=" container mt-4 mb-5 p-4 gap-4">
+    <div class="app-shell">
+        <main class="app-shell__content container mt-4 mb-5 p-4 gap-4">
+            <div class="container-fluid dashboard-container px-4">
         <div class="row">
             <div class="col-12 col-lg-6 mb-4">
                 @if ($errors->any())
@@ -97,6 +89,8 @@
                 </div>
             </div>
         </div>
-    </main>
+        </main>
+    </div>
+    @include('partials.notifications-modal')
 </body>
 </html>

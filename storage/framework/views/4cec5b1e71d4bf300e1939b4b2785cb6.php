@@ -13,8 +13,8 @@
     body {
         font-family: system-ui , "Segoe UI", Roboto, sans-serif;
         background-color: #f8f9fa;
-        overflow-x: hidden;
-        overflow-y: hidden;
+        overflow-x: auto;
+        overflow-y: auto;
     }
 </style>
 
@@ -239,6 +239,7 @@
         filterBuildingsByCollege();
     });
 </script>
+<?php echo $__env->make('partials.notifications-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
 </html>
 

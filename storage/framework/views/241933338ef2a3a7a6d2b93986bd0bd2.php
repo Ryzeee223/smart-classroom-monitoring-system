@@ -5,22 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="<?php echo e(asset('bootstrap-5.3.8-dist/css/bootstrap.min.css')); ?>" rel="stylesheet">
     <script src="<?php echo e(asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js')); ?>"></script>
-    <title>eMonitor - Colleges</title>
+    <title>RFInsiDe - Colleges</title>
 </head>
 <body>
     <?php echo $__env->make('sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-    <style>
-       body {
-            font-family: system-ui, "Segoe UI", Roboto, sans-serif;
-            background-color: #f8f9fa;
-            overflow-x: hidden;
-            
-        }
-    </style>
-
-    <div class="" style="margin-left:260px;">
-    <main class=" container mt-4 mb-5 p-4 gap-4">
+    <div class="app-shell">
+        <main class="app-shell__content container mt-4 mb-5 p-4 gap-4">
+            <div class="container-fluid dashboard-container px-4">
         <div class="row">
             <div class="col-12 col-lg-6 mb-4">
                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($errors->any()): ?>
@@ -97,7 +89,9 @@
                 </div>
             </div>
         </div>
-    </main>
+        </main>
+    </div>
+    <?php echo $__env->make('partials.notifications-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
 </html>
 <?php /**PATH /Volumes/shared/capstone project/backups/emonitor 3rd phase copy/resources/views/college.blade.php ENDPATH**/ ?>

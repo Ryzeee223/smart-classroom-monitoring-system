@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="<?php echo e(asset('bootstrap-5.3.8-dist/css/bootstrap.min.css')); ?>">
     <script src="<?php echo e(asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js')); ?>"></script>
-    <title>eMonitor - My Schedule</title>
+    <title>RFInsiDe - My Schedule</title>
 </head>
 <body>
     <style>
@@ -13,6 +13,11 @@
         .app-shell__content{flex:1; min-width:0; margin-left:260px;}
         @media (max-width: 767.98px){
             .app-shell__content{margin-left:0;}
+        }
+
+        body{
+            overflow-x:auto;
+            overflow-y:auto;
         }
     </style>
 
@@ -79,11 +84,23 @@
                                                             </td>
                                                             <td><?php echo e($schedule->day ?? ($schedule->Day ?? 'N/A')); ?></td>
                                                             <td>
-                                                                <?php echo e($schedule->start_time ?? ($schedule->Start_time ?? 'N/A')); ?>
+                                                                <?php
+                                                                    $startTime = $schedule->start_time ?? ($schedule->Start_time ?? null);
+                                                                    $endTime = $schedule->end_time ?? ($schedule->End_time ?? null);
+                                                                ?>
+                                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($startTime): ?>
+                                                                    <?php echo e(\Illuminate\Support\Carbon::parse($startTime)->format('g:i A')); ?>
 
+                                                                <?php else: ?>
+                                                                    N/A
+                                                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                                                 -
-                                                                <?php echo e($schedule->end_time ?? ($schedule->End_time ?? 'N/A')); ?>
+                                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($endTime): ?>
+                                                                    <?php echo e(\Illuminate\Support\Carbon::parse($endTime)->format('g:i A')); ?>
 
+                                                                <?php else: ?>
+                                                                    N/A
+                                                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                                             </td>
                                                             <td><?php echo e($schedule->room?->room_name); ?></td>
                                                          
@@ -106,6 +123,7 @@
             </div>
         </div>
     </div>
+    <?php echo $__env->make('partials.notifications-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
 </html>
 

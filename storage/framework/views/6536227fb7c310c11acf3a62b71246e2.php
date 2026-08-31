@@ -111,6 +111,7 @@
                                             <div class="col-md-3">
                                                 <div class="text-muted small">Faculty</div>
                                                 <div class="fw-semibold"><?php echo e($class['faculty']); ?></div>
+                                                <div class="text-muted small"><?php echo e($class['role']); ?></div>
                                             </div>
                                             <div class="col-md-2">
                                                 <div class="text-muted small">Classroom</div>
@@ -125,6 +126,14 @@
                                                 <div class="schedule-time"><?php echo e($class['start_display']); ?></div>
                                                 <div class="text-muted small mt-2">End</div>
                                                 <div class="fw-semibold"><?php echo e($class['end_display']); ?></div>
+                                                <div class="text-muted small mt-2">Attendance</div>
+                                                <div class="fw-semibold text-capitalize"><?php echo e(str_replace('_', ' ', $class['attendance_status'])); ?></div>
+                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($class['time_in']): ?>
+                                                    <div class="text-muted small">In: <?php echo e($class['time_in']); ?></div>
+                                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($class['time_out']): ?>
+                                                    <div class="text-muted small">Out: <?php echo e($class['time_out']); ?></div>
+                                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                                 <span class="status-badge mt-2 d-inline-block <?php echo e($class['is_live'] ? 'bg-success text-white' : 'bg-light text-dark border'); ?>">
                                                     <?php echo e($class['label']); ?>
 
@@ -166,5 +175,7 @@
             </div>
         </div>
     </div>
+    <?php echo $__env->make('partials.notifications-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
+
 </html><?php /**PATH /Volumes/shared/capstone project/backups/emonitor 3rd phase copy/resources/views/reports.blade.php ENDPATH**/ ?>
