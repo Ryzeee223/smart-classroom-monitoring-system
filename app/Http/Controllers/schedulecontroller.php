@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Schedule;
-use App\Models\course;
+use App\Models\Course;
 use App\Models\Programs;
 use App\Models\User;
 use App\Models\room;
@@ -65,7 +65,7 @@ class schedulecontroller extends Controller
         }
 
         $programs = Programs::all();
-        $courses = course::all();
+        $courses = Course::all();
         $rooms = room::all();
 
         // Current college name for display (used by Dean / Assistant Dean)

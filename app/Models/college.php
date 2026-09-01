@@ -22,6 +22,6 @@ class college extends Model
 
     public function course()
     {
-        return $this->hasMany(course::class);
+        return $this->hasMany(Course::class);
     }
 }

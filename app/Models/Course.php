@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class course extends Model
+class Course extends Model
 {
     use HasFactory;
-protected $table = 'courses';
+
+    protected $table = 'courses';
+
     protected $fillable = [
         'college_id',
         'course_code',
@@ -18,8 +20,9 @@ protected $table = 'courses';
 
     public function course()
     {
-        return $this->hasMany(course::class);
+        return $this->hasMany(Course::class);
     }
+
     public function college()
     {
         return $this->belongsTo(college::class, 'college_id');

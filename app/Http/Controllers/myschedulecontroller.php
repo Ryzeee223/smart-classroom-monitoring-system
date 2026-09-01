@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\course;
+use App\Models\Course;
 use Illuminate\Http\Request;
 use App\Models\Programs;
 use App\Models\room;
@@ -11,9 +11,9 @@ class myschedulecontroller extends Controller
 {
     public function index()
     {
-        $courses = course::with('course')->get();
+        $courses = Course::with('course')->get();
         $programs = Programs::all();
-        $courses = course::all();
+        $courses = Course::all();
         $rooms = room::all();
         
         return view('myschedule', compact('courses', 'programs', 'rooms') );
@@ -40,7 +40,7 @@ class myschedulecontroller extends Controller
             return redirect('/');
         }
         $programs = Programs::all();
-        $course = course::findOrFail($id);
+        $course = Course::findOrFail($id);
         return view('course.edit', compact('course', 'programs'));
     }
 

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\course;
+use App\Models\Course;
 
 class CourseController extends Controller
 {
@@ -13,7 +13,7 @@ class CourseController extends Controller
         $currentUser = \App\Models\User::find(session('user_id'));
         $currentCollegeId = (int) ($currentUser?->college_id ?? 0);
 
-        $query = course::query();
+        $query = Course::query();
         if (in_array($sessionRole, [2, 3], true) && $currentCollegeId) {
             $query->where('college_id', $currentCollegeId);
         }
@@ -49,7 +49,7 @@ class CourseController extends Controller
             }
         }
 
-        course::create([
+        Course::create([
             'college_id' => $collegeId,
             'course_code' => $request->course_code,
             'course_name' => $request->course_name,
@@ -64,7 +64,7 @@ class CourseController extends Controller
         if (!session('logged_in')) {
             return redirect('/');
         }
-        $course = course::findOrFail($id);
+        $course = Course::findOrFail($id);
         return view('courses.edit', compact('course'));
     }
 
@@ -81,7 +81,7 @@ class CourseController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $course = course::findOrFail($id);
+        $course = Course::findOrFail($id);
         // Prevent forging: keep college_id as the logged-in user's assigned college for dean/assistant dean
         $collegeId = (int) $request->input('college_id');
         $sessionRole = (int) (session('user_role') ?? 0);
@@ -109,7 +109,7 @@ class CourseController extends Controller
             return redirect('/');
         }
 
-        course::findOrFail($id)->delete();
+        Course::findOrFail($id)->delete();
 
         return back()->with('success', 'Course deleted successfully!');
     }
