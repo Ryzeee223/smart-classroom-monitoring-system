@@ -25,6 +25,6 @@ class Course extends Model
 
     public function college()
     {
-        return $this->belongsTo(college::class, 'college_id');
+        return $this->belongsTo(College, 'college_id');
     }
 }
