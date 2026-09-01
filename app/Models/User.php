@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\College;
 
 class User extends Authenticatable
 {
@@ -36,12 +37,11 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            
         ];
     }
-    public function college()
-{
-    
-    return $this->belongsTo(College, 'college_id');
-}
+
+    public function College()
+    {
+        return $this->belongsTo(College::class, 'college_id');
+    }
 }
