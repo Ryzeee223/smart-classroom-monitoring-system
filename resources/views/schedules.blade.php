@@ -115,10 +115,10 @@ while ($startTime <= $endTimeLimit) {
                                     <div class="row">
                                     <div class="col-md-12 mb-3 shadow-sm">
                                         <label class="form-label">Program</label>
-                                        <select class="form-select" name="Program_id" required>
+                                        <select class="form-select" name="program_id" required>
                                             <option value="">Select Program</option>
-                                                @foreach ($Programs as $Program)
-                                                <option value="{{ $Program->id  }}">{{ $Program->Program_abbr }}</option>
+                                                @foreach ($programs as $program)
+                                                <option value="{{ $program->id }}">{{ $program->program_abbr }}</option>
                                                @endforeach
 
                                         </select>
@@ -335,7 +335,7 @@ while ($startTime <= $endTimeLimit) {
                                                     <div class="d-flex justify-content-between align-items-start">
                                                         <div>
                                                             {{-- Schedule fields (match schedule table columns) --}}
-                                                            <strong>{{ $schedule->Program?->Program_abbr ?? $schedule->Programs?->Program_abbr ?? 'N/A' }} {{ $schedule->year_level ?? '' }} {{$schedule->section }}</strong><br>
+                                                            <strong>{{ $schedule->Program?->program_abbr ?? $schedule->programs?->program_abbr ?? 'N/A' }} {{ $schedule->year_level ?? '' }} {{$schedule->section }}</strong><br>
                                                             <strong>{{ $schedule->course->course_code ?? 'N/A' }}</strong><br>
                                                             <small class="text-muted">
                                                                 {{ $schedule->day ?? ($schedule->Day ?? 'N/A') }} |
@@ -392,11 +392,11 @@ while ($startTime <= $endTimeLimit) {
                                                                     <div class="row">
                                                                         <div class="col-md-12 mb-3">
                                                                             <label class="form-label">Program</label>
-                                                                            <select class="form-select" name="Program_id" required>
+                                                                            <select class="form-select" name="program_id" required>
                                                                                 <option value="">Select Program</option>
-                                                                                @foreach($Programs as $Program)
-                                                                                    <option value="{{ $Program->id }}" {{ (isset($schedule->Program_id) && (int)$schedule->Program_id === (int)$Program->id) ? 'selected' : '' }}>
-                                                                                        {{ $Program->Program_abbr }}
+                                                                                @foreach($programs as $program)
+                                                                                    <option value="{{ $program->id }}" {{ (isset($schedule->program_id) && (int)$schedule->program_id === (int)$program->id) ? 'selected' : '' }}>
+                                                                                        {{ $program->program_abbr }}
                                                                                     </option>
                                                                                 @endforeach
                                                                             </select>

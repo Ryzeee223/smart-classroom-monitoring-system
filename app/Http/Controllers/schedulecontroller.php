@@ -87,7 +87,7 @@ class schedulecontroller extends Controller
             'Day' => ['required', 'array', 'min:1'],
             'Day.*' => ['string'],
 
-            'Program_id' => ['required', 'exists:Programs,id'],
+            'program_id' => ['required', 'exists:programs,id'],
             'Course' => ['required', 'exists:courses,id'],
             'Room' => ['required', 'exists:room,id'],
             'user_id' => ['required', 'exists:users,id'],
@@ -170,7 +170,7 @@ class schedulecontroller extends Controller
             'Day'        => ['required', 'array', 'min:1'],
             'Day.*'      => ['string', 'in:Mon,Tue,Wed,Thu,Fri,Sat,Sun'],
 
-            'Program_id' => ['required', 'exists:Programs,id'],
+            'program_id' => ['required', 'exists:programs,id'],
             'Course'     => ['required', 'exists:courses,id'],
             'Room'       => ['required', 'exists:room,id'],
 

@@ -79,7 +79,7 @@
                                                 <tbody>
                                                     @foreach($groupItems as $schedule)
                                                         <tr>
-                                                            <td>{{ $schedule->Program?->Program_abbr ?? $schedule->Programs?->Program_abbr ?? $schedule->Programs?->Program_name ?? 'N/A' }} {{$schedule->year_level}} {{$schedule->section}}</td>
+                                                            <td>{{ $schedule->Program?->program_abbr ?? $schedule->programs?->program_abbr ?? $schedule->programs?->program_name ?? 'N/A' }} {{$schedule->year_level}} {{$schedule->section}}</td>
                                                             <td>
                                                                 {{ $schedule->course?->course_code }}
                                                             </td>

@@ -58,7 +58,7 @@
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('course') ? 'active fw-bold' : '' }}" href="{{ route ('course') }}">Course</a></li>
             {{-- schedule --}}
            {{-- College --}}
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('Programs') ? 'active fw-bold' : '' }}" href="/Programs">Programs</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('programs') || request()->routeIs('programs.index') ? 'active fw-bold' : '' }}" href="{{ route('programs') }}">Programs</a></li>
             {{-- settings --}}
             <li class="nav-item"><a class="nav-link" href="{{ route('settings') }}">Settings</a></li>
 
@@ -74,7 +74,7 @@
             {{-- schedule --}}
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('schedules') ? 'active fw-bold' : '' }}" href="{{ route('schedules') }}">Create Schedules</a></li>
            {{-- College --}}
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('Programs') ? 'active fw-bold' : '' }}" href="/Programs">Programs</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('programs') ? 'active fw-bold' : '' }}" href="{{ route('programs') }}">Programs</a></li>
             {{-- settings --}}
             <li class="nav-item"><a class="nav-link" href="{{ route('settings') }}">Settings</a></li>
 
