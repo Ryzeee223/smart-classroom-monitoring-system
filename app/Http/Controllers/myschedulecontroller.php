@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\course;
 use Illuminate\Http\Request;
-use App\Models\Programs;
+use App\Models\programs;
 use App\Models\room;
 
 class myschedulecontroller extends Controller
@@ -12,11 +12,11 @@ class myschedulecontroller extends Controller
     public function index()
     {
         $courses = course::with('course')->get();
-        $Programs = Programs::all();
+        $programs = programs::all();
         $courses = course::all();
         $rooms = room::all();
         
-        return view('myschedule', compact('courses', 'Programs', 'rooms') );
+        return view('myschedule', compact('courses', 'programs', 'rooms') );
     }
 
     public function store(Request $request)
@@ -39,9 +39,9 @@ class myschedulecontroller extends Controller
         if (!session('logged_in')) {
             return redirect('/');
         }
-        $Programs = Programs::all();
+        $programs = programs::all();
         $course = course::findOrFail($id);
-        return view('course.edit', compact('course', 'Programs'));
+        return view('course.edit', compact('course', 'programs'));
     }
 
     public function update(Request $request, $id)
@@ -54,7 +54,7 @@ class myschedulecontroller extends Controller
             'course_code' => 'required|string|max:100|unique:subjects,subject_code,' . $id,
             'course_name' => 'required|string|max:150',
             'description' => 'nullable|string',
-            'course_id' => 'required|exists:Programs,id',
+            'course_id' => 'required|exists:programs,id',
         ]);
 
         $course = course::findOrFail($id);

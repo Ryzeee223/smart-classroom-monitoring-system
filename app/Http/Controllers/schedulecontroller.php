@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Schedule;
 use App\Models\course;
-use App\Models\Programs;
+use App\Models\programs;
 use App\Models\User;
 use App\Models\room;
 use App\Models\semyr;
@@ -64,7 +64,7 @@ class schedulecontroller extends Controller
             $schedules = Schedule::all();
         }
 
-        $Programs = Programs::all();
+        $programs = programs::all();
         $courses = course::all();
         $rooms = room::all();
 
@@ -74,7 +74,7 @@ class schedulecontroller extends Controller
         // Optional: preselect a faculty when arriving from a request approval (e.g. Summer class "set schedule")
         $selectedFacultyId = (int) request('user_id', 0);
 
-        return view('schedules', compact('schedules', 'faculty_list', 'courses', 'schoolYears', 'Programs', 'rooms', 'selectedFacultyId', 'collegeName'));
+        return view('schedules', compact('schedules', 'faculty_list', 'courses', 'schoolYears', 'programs', 'rooms', 'selectedFacultyId', 'collegeName'));
     }
 
     public function store(Request $request)
@@ -127,7 +127,7 @@ class schedulecontroller extends Controller
         foreach ($days as $singleDay) {
             Schedule::create([
                 'user_id'     => $validatedData['user_id'],
-                'Program_id'  => $validatedData['Program_id'],
+                'program_id'  => $validatedData['program_id'],
                 'course_id'   => $validatedData['Course'],
                 'room_id'     => $validatedData['Room'],
                 'year_level'  => $validatedData['year_level'],
@@ -191,7 +191,7 @@ class schedulecontroller extends Controller
         $roomId = $validatedData['Room'];
 
         $schedule->update([
-            'Program_id' => $validatedData['Program_id'],
+            'program_id' => $validatedData['program_id'],
             'course_id' => $courseId,
             'room_id' => $roomId,
 

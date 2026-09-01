@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Models\Schedule;
 use App\Models\semyr;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Programs;
+use App\Models\programs;
 use App\Models\college;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Carbon;
