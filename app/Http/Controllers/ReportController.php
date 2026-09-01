@@ -52,7 +52,7 @@ public function index()
     $currentUser = \App\Models\users::find($currentUserId);
     $collegeId = (int) ($currentUser?->college_id ?? session('college_id') ?? 0);
 
-    $schedules = Schedule::with(['user', 'course', 'room', 'program'])
+    $schedules = Schedule::with(['user', 'course', 'room', 'Program'])
         ->where(function ($query) use ($matchingDays, $todayLetter) {
             foreach ($matchingDays as $day) {
                 $query->orWhere('day', $day)

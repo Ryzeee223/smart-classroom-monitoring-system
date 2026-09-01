@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\programs;
 use App\Models\User;
 
-
 class ProgramController extends Controller
 {
     public function index()
@@ -15,7 +14,6 @@ class ProgramController extends Controller
             return redirect('/');
         }
 
-        // Dean/Assistant Dean should only see programs within their own college
         $userId = session('user_id');
         $user = User::find($userId);
 
@@ -26,8 +24,6 @@ class ProgramController extends Controller
         }
 
         return view('programs', compact('programs'));
-
-
     }
 
     public function store(Request $request)
@@ -45,14 +41,12 @@ class ProgramController extends Controller
         }
 
         $request->validate([
-            'program_abbr' => 'required|string|max:100|unique:programs,Program_abbr',
-            'program_name' => 'required|string|max:150|unique:programs,Program_name',
+            'program_abbr' => 'required|string|max:100|unique:programs,program_abbr',
+            'program_name' => 'required|string|max:150|unique:programs,program_name',
             'description' => 'nullable|string|max:255',
             'college_id' => 'required|integer|exists:college,id',
         ]);
 
-
-        // Prevent forging: dean/assistant dean can only create inside their assigned college
         $collegeId = (int) $request->input('college_id');
         if (in_array($role, [2, 3], true)) {
             $collegeId = (int) ($user?->college_id ?? 0);
@@ -63,15 +57,13 @@ class ProgramController extends Controller
 
         programs::create([
             'college_id' => $collegeId,
-            'Program_abbr' => $request->program_abbr,
-            'Program_name' => $request->program_name,
-            'description' => $request->description ?? '',            
+            'program_abbr' => $request->program_abbr,
+            'program_name' => $request->program_name,
+            'description' => $request->description ?? '',
         ]);
 
         return back()->with('success', 'Program saved successfully!');
     }
-
-
 
     public function edit($id)
     {
@@ -79,12 +71,9 @@ class ProgramController extends Controller
             return redirect('/');
         }
 
-        $Program = programs::findOrFail($id);
-        return view('program.edit', compact('Program'));
+        $program = programs::findOrFail($id);
+        return view('program.edit', compact('program'));
     }
-
-    
-
 
     public function update(Request $request, $id)
     {
@@ -92,21 +81,21 @@ class ProgramController extends Controller
             return redirect('/');
         }
 
-        $Program = programs::findOrFail($id);
+        $program = programs::findOrFail($id);
 
         $request->validate([
-            'program_abbr' => 'required|string|max:100|unique:programs,program_abbr,' . $Program->id,
+            'program_abbr' => 'required|string|max:100|unique:programs,program_abbr,' . $program->id,
             'program_name' => 'required|string|max:150',
             'description' => 'nullable|string|max:255',
         ]);
 
-        $Program->update([
+        $program->update([
             'program_abbr' => $request->program_abbr,
             'program_name' => $request->program_name,
             'description' => $request->description ?? '',
         ]);
 
-        return redirect()->route('program')->with('success', 'Course updated successfully!');
+        return redirect()->route('programs')->with('success', 'Program updated successfully!');
     }
 
     public function destroy($id)
@@ -115,10 +104,10 @@ class ProgramController extends Controller
             return redirect('/');
         }
 
-        $Program = programs::findOrFail($id);
-        $Program->delete();
+        $program = programs::findOrFail($id);
+        $program->delete();
 
-        return redirect()->route('program')->with('success', 'Program deleted successfully!');
+        return redirect()->route('programs')->with('success', 'Program deleted successfully!');
     }
 }
 

@@ -66,7 +66,7 @@
                         <h3 class="card-title mb-0">Existing College</h3>
                     </div>
                     <div class="card-body">
-                        <p>List of program currently in the system.</p>
+                        <p>List of Program currently in the system.</p>
                         <ul class="list-group list-group-flush">
                                     @forelse($college ?? [] as $college)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -84,7 +84,7 @@
                                 </div>
                             </li>
 @empty
-                            <li class="list-group-item text-muted">No program yet.</li>
+                            <li class="list-group-item text-muted">No Program yet.</li>
 @endforelse
                         </ul>
                     </div>

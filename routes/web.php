@@ -16,7 +16,7 @@ Route::get('/', function () {
 Route::post('/', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login');
 Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 
-// {{-- 1=admin 2=dean 3=asst. dean 4=faculty 5=programhead --}}
+// {{-- 1=admin 2=dean 3=asst. dean 4=faculty 5=Programhead --}}
 Route::get('/dashboard', function () 
 {if (!session('logged_in') || !in_array((int) session('user_role'), [1, 2, 3, 4, 5], true)) {return redirect('/'); }
     
@@ -113,7 +113,7 @@ Route::get('/dashboard', function ()
         'saturday',
     ]));
 
-    $schedules = \App\Models\Schedule::with(['User', 'course', 'room', 'program'])
+    $schedules = \App\Models\Schedule::with(['User', 'course', 'room', 'Program'])
         ->where(function ($query) use ($matchingDays) {
             foreach ($matchingDays as $day) {
                 $normalizedDay = strtolower(trim((string) $day));
@@ -185,7 +185,7 @@ Route::get('/dashboard', function ()
     })->filter()->values();
 
     // 1) Get the relevant schedules for today based on the user's role.
-    $todaySchedulesQuery = \App\Models\Schedule::with(['User', 'course', 'room', 'program'])
+    $todaySchedulesQuery = \App\Models\Schedule::with(['User', 'course', 'room', 'Program'])
         ->where(function ($query) use ($matchingDays) {
             foreach ($matchingDays as $day) {
                 $normalizedDay = strtolower(trim((string) $day));
@@ -281,10 +281,10 @@ Route::get('/myschedule', function () {
     $user_id = session('user_id');
     $current_user = \App\Models\User::find($user_id);
     $schedules = \App\Models\Schedule::where('user_id', $user_id)->get();
-    $programs = \App\Models\programs::all();
+    $Programs = \App\Models\Programs::all();
     
 
-    return view('myschedule', compact('current_user', 'schedules', 'programs'));
+    return view('myschedule', compact('current_user', 'schedules', 'Programs'));
 })->name('myschedule');
 
 
@@ -334,11 +334,11 @@ Route::get('/programs', function(){
     return view('programs');
 })->name('programs');
 
-Route::get('/programs', [\App\Http\Controllers\ProgramController::class, 'index'])->name('program');
+Route::get('/programs', [\App\Http\Controllers\ProgramController::class, 'index'])->name('programs.index');
 Route::post('/programs', [\App\Http\Controllers\ProgramController::class, 'store'])->name('programs.store');
-Route::get('/programs/{programs}/edit', [\App\Http\Controllers\ProgramController::class, 'edit'])->name('program.edit');
-Route::put('/programs/{programs}', [\App\Http\Controllers\ProgramController::class, 'update'])->name('program.update');
-Route::delete('/programs/{programs}', [\App\Http\Controllers\ProgramController::class, 'destroy'])->name('program.destroy');
+Route::get('/programs/{programs}/edit', [\App\Http\Controllers\ProgramController::class, 'edit'])->name('programs.edit');
+Route::put('/programs/{programs}', [\App\Http\Controllers\ProgramController::class, 'update'])->name('programs.update');
+Route::delete('/programs/{programs}', [\App\Http\Controllers\ProgramController::class, 'destroy'])->name('programs.destroy');
 
 Route::get('/settings', [App\Http\Controllers\AdminController::class, 'settings'])->name('settings');
 Route::post('/settings/assign_rfid', [App\Http\Controllers\AdminController::class, 'assignRfid'])->name('settings.assign_rfid');

@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<title>RFInsiDe - programs</title>
+<title>RFInsiDe - Programs</title>
 </head>
 <body>
     @include('sidebar')
@@ -93,20 +93,20 @@
                 <!-- list -->
                 <div class="card shadow">
                     <div class="card-header">
-                        <h3 class="card-title mb-0">Existing programs</h3>
+                        <h3 class="card-title mb-0">Existing Programs</h3>
                     </div>
                     <div class="card-body">
-                        <p>List of programs currently in the system.</p>
+                        <p>List of Programs currently in the system.</p>
                         <ul class="list-group list-group-flush">
 @forelse($programs as $program)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <strong>{{ $program->Program_abbr }}</strong> - <strong>{{ $program->Program_name }}</strong>
+                                    <strong>{{ $program->program_abbr }}</strong> - <strong>{{ $program->program_name }}</strong>
                                     @if($program->description)<br><small>{{ $program->description }}</small>@endif
                                 </div>
                                 <div class="d-flex flex-column gap-1">
-                                    <a class="btn btn-sm btn-outline-secondary" href="{{ route('program.edit', $program->id) }}">Edit</a>
-                                    <form method="POST" action="{{ route('program.destroy', $program->id) }}">
+                                    <a class="btn btn-sm btn-outline-secondary" href="{{ route('programs.edit', $program->id) }}">Edit</a>
+                                    <form method="POST" action="{{ route('programs.destroy', $program->id) }}">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold" onclick="return confirm('Delete this program?')">Delete</button>
@@ -114,7 +114,7 @@
                                 </div>
                             </li>
 @empty
-                            <li class="list-group-item text-muted">No program yet.</li>
+                            <li class="list-group-item text-muted">No Program yet.</li>
 @endforelse
                         </ul>
                     </div>

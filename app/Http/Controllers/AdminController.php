@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Models\Schedule;
 use App\Models\semyr;
 use Illuminate\Support\Facades\Hash;
-use App\Models\programs;
+use App\Models\Programs;
 use App\Models\college;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Carbon;
@@ -37,11 +37,11 @@ class AdminController extends Controller
         $account_users = $account_usersQuery->get();
         $faculty_users = $faculty_usersQuery->get();
 
-        $programs = programs::query()->from('programs')->get();
+        $Programs = Programs::query()->from('Programs')->get();
 
         $colleges = \App\Models\college::query()->select(['id','college_name','abbreviation','description'])->get();
 
-        return view('users', compact('account_users', 'faculty_users', 'programs', 'colleges'));
+        return view('users', compact('account_users', 'faculty_users', 'Programs', 'colleges'));
     }
 
 
@@ -203,7 +203,7 @@ $existingUser = User::where('RFID_code')
         $now = Carbon::now();
         $todayDay = $now->translatedFormat('D');
         
-        $schedules = Schedule::with(['User', 'course', 'room', 'program'])
+        $schedules = Schedule::with(['User', 'course', 'room', 'Program'])
             ->where('day', $todayDay)
             ->whereTime('start_time', '>=', '07:00:00')
             ->whereTime('start_time', '<=', '18:00:00')

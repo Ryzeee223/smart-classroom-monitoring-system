@@ -15,7 +15,7 @@ class Schedule extends Model
 
     protected $fillable = [
         'user_id',
-        'program_id',
+        'Program_id',
         'room_id',
         'course_id',
 
@@ -33,15 +33,15 @@ public function User()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
-public function programs()
+public function Programs()
 {
-    return $this->belongsTo(programs::class, 'program_id', 'id');
+    return $this->belongsTo(Programs::class, 'Program_id', 'id');
 }
 
 // Optional: lower-case relationship name (handy in other views)
-public function program()
+public function Program()
 {
-    return $this->belongsTo(programs::class, 'program_id', 'id');
+    return $this->belongsTo(Programs::class, 'Program_id', 'id');
 }
 
 public function course()
