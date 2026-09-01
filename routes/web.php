@@ -349,11 +349,11 @@ Route::get('/users/{id}/edit', [App\Http\Controllers\userscontroller::class, 'ed
 Route::put('/users/{id}', [App\Http\Controllers\userscontroller::class, 'update'])->name('users.update');
 Route::delete('/users/{id}', [App\Http\Controllers\userscontroller::class, 'destroy'])->name('users.destroy');
 
-Route::get('/course', [App\Http\Controllers\courseController::class, 'index'])->name('course');
-Route::post('/course', [App\Http\Controllers\courseController::class, 'store'])->name('course.store');
-Route::get('/course/{course}/edit', [App\Http\Controllers\courseController::class, 'edit'])->name('course.edit');
-Route::put('/course/{course}', [App\Http\Controllers\courseController::class, 'update'])->name('course.update');
-Route::delete('/course/{course}', [App\Http\Controllers\courseController::class, 'destroy'])->name('course.destroy');
+Route::get('/course', [App\Http\Controllers\CourseController::class, 'index'])->name('course');
+Route::post('/course', [App\Http\Controllers\CourseController::class, 'store'])->name('course.store');
+Route::get('/course/{course}/edit', [App\Http\Controllers\CourseController::class, 'edit'])->name('course.edit');
+Route::put('/course/{course}', [App\Http\Controllers\CourseController::class, 'update'])->name('course.update');
+Route::delete('/course/{course}', [App\Http\Controllers\CourseController::class, 'destroy'])->name('course.destroy');
 
 Route::get('/college', [App\Http\Controllers\collegecontroller::class, 'index'])->name('college');
 Route::post('/college', [App\Http\Controllers\collegecontroller::class, 'store'])->name('college.store');
