@@ -36,12 +36,12 @@ public function User()
 
 public function programs()
 {
-    return $this->belongsTo(programs::class, 'program_id', 'id');
+    return $this->belongsTo(Programs::class, 'program_id', 'id');
 }
 
 public function Program()
 {
-    return $this->belongsTo(programs::class, 'program_id', 'id');
+    return $this->belongsTo(Programs::class, 'program_id', 'id');
 }
 
 public function course()

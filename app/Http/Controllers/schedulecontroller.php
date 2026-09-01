@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Schedule;
 use App\Models\course;
-use App\Models\programs;
+use App\Models\Programs;
 use App\Models\User;
 use App\Models\room;
 use App\Models\semyr;
@@ -64,7 +64,7 @@ class schedulecontroller extends Controller
             $schedules = Schedule::all();
         }
 
-        $programs = programs::all();
+        $programs = Programs::all();
         $courses = course::all();
         $rooms = room::all();
 

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\course;
 use Illuminate\Http\Request;
-use App\Models\programs;
+use App\Models\Programs;
 use App\Models\room;
 
 class myschedulecontroller extends Controller
@@ -12,7 +12,7 @@ class myschedulecontroller extends Controller
     public function index()
     {
         $courses = course::with('course')->get();
-        $programs = programs::all();
+        $programs = Programs::all();
         $courses = course::all();
         $rooms = room::all();
         
@@ -39,7 +39,7 @@ class myschedulecontroller extends Controller
         if (!session('logged_in')) {
             return redirect('/');
         }
-        $programs = programs::all();
+        $programs = Programs::all();
         $course = course::findOrFail($id);
         return view('course.edit', compact('course', 'programs'));
     }

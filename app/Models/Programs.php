@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class programs extends Model
+class Programs extends Model
 {
     use HasFactory;
 
@@ -20,6 +20,6 @@ class programs extends Model
 
     public function subjects()
     {
-        return $this->hasMany(programs::class);
+        return $this->hasMany(Programs::class);
     }
 }
