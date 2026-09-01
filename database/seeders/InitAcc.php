@@ -8,7 +8,7 @@ use App\Models\users;
 use App\Models\college;
 use App\Models\semyr;
 use App\Models\course;
-use App\Models\Programs;
+use App\Models\programs;
 use App\Models\room;
 use App\Models\bldg as building;
 use Illuminate\Support\Facades\Hash;
@@ -105,7 +105,7 @@ class InitAcc extends Seeder
             'course_name' => 'Introduction to Programming'
         ]);
 
-        Programs::create([
+        programs::create([
         'college_id' => '2',
         'Program_abbr' => 'BSIT',
         'Program_name' => 'Bachelor of Science in Information Technology',

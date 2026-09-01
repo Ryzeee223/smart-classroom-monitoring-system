@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Models\Schedule;
 use App\Models\semyr;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Programs;
+use App\Models\programs;
 use App\Models\college;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Carbon;
@@ -37,11 +37,11 @@ class AdminController extends Controller
         $account_users = $account_usersQuery->get();
         $faculty_users = $faculty_usersQuery->get();
 
-        $Programs = Programs::query()->from('Programs')->get();
+        $programs = programs::query()->from('programs')->get();
 
         $colleges = \App\Models\college::query()->select(['id','college_name','abbreviation','description'])->get();
 
-        return view('users', compact('account_users', 'faculty_users', 'Programs', 'colleges'));
+        return view('users', compact('account_users', 'faculty_users', 'programs', 'colleges'));
     }
 
 

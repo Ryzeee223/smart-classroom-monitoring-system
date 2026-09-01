@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Programs;
+use App\Models\programs;
 use App\Models\User;
 
 
@@ -20,12 +20,12 @@ class ProgramController extends Controller
         $user = User::find($userId);
 
         if (in_array((int) session('user_role'), [2, 3], true) && $user?->college_id) {
-            $Programs = Programs::where('college_id', $user->college_id)->get();
+            $programs = programs::where('college_id', $user->college_id)->get();
         } else {
-            $Programs = Programs::all();
+            $programs = programs::all();
         }
 
-        return view('programs', compact('Programs'));
+        return view('programs', compact('programs'));
 
 
     }
@@ -45,8 +45,8 @@ class ProgramController extends Controller
         }
 
         $request->validate([
-            'program_abbr' => 'required|string|max:100|unique:Programs,Program_abbr',
-            'program_name' => 'required|string|max:150|unique:Programs,Program_name',
+            'program_abbr' => 'required|string|max:100|unique:programs,Program_abbr',
+            'program_name' => 'required|string|max:150|unique:programs,Program_name',
             'description' => 'nullable|string|max:255',
             'college_id' => 'required|integer|exists:college,id',
         ]);
@@ -61,7 +61,7 @@ class ProgramController extends Controller
             }
         }
 
-        Programs::create([
+        programs::create([
             'college_id' => $collegeId,
             'Program_abbr' => $request->program_abbr,
             'Program_name' => $request->program_name,
@@ -79,7 +79,7 @@ class ProgramController extends Controller
             return redirect('/');
         }
 
-        $Program = Programs::findOrFail($id);
+        $Program = programs::findOrFail($id);
         return view('program.edit', compact('Program'));
     }
 
@@ -92,10 +92,10 @@ class ProgramController extends Controller
             return redirect('/');
         }
 
-        $Program = Programs::findOrFail($id);
+        $Program = programs::findOrFail($id);
 
         $request->validate([
-            'program_abbr' => 'required|string|max:100|unique:Programs,program_abbr,' . $Program->id,
+            'program_abbr' => 'required|string|max:100|unique:programs,program_abbr,' . $Program->id,
             'program_name' => 'required|string|max:150',
             'description' => 'nullable|string|max:255',
         ]);
@@ -115,7 +115,7 @@ class ProgramController extends Controller
             return redirect('/');
         }
 
-        $Program = Programs::findOrFail($id);
+        $Program = programs::findOrFail($id);
         $Program->delete();
 
         return redirect()->route('program')->with('success', 'Program deleted successfully!');

@@ -111,7 +111,7 @@ while ($startTime <= $endTimeLimit) {
                                     </div>
 
                                 <div class="row"> 
-                                    {{-- Programs --}}
+                                    {{-- programs --}}
                                     <div class="row">
                                     <div class="col-md-12 mb-3 shadow-sm">
                                         <label class="form-label">Program</label>
@@ -335,7 +335,7 @@ while ($startTime <= $endTimeLimit) {
                                                     <div class="d-flex justify-content-between align-items-start">
                                                         <div>
                                                             {{-- Schedule fields (match schedule table columns) --}}
-                                                            <strong>{{ $schedule->program?->Program_abbr ?? $schedule->Programs?->Program_abbr ?? 'N/A' }} {{ $schedule->year_level ?? '' }} {{$schedule->section }}</strong><br>
+                                                            <strong>{{ $schedule->program?->Program_abbr ?? $schedule->programs?->Program_abbr ?? 'N/A' }} {{ $schedule->year_level ?? '' }} {{$schedule->section }}</strong><br>
                                                             <strong>{{ $schedule->course->course_code ?? 'N/A' }}</strong><br>
                                                             <small class="text-muted">
                                                                 {{ $schedule->day ?? ($schedule->Day ?? 'N/A') }} |

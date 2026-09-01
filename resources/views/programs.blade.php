@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<title>RFInsiDe - Programs</title>
+<title>RFInsiDe - programs</title>
 </head>
 <body>
     @include('sidebar')
@@ -98,7 +98,7 @@
                     <div class="card-body">
                         <p>List of programs currently in the system.</p>
                         <ul class="list-group list-group-flush">
-@forelse($Programs as $program)
+@forelse($programs as $program)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
                                     <strong>{{ $program->Program_abbr }}</strong> - <strong>{{ $program->Program_name }}</strong>

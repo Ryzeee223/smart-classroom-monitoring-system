@@ -281,10 +281,10 @@ Route::get('/myschedule', function () {
     $user_id = session('user_id');
     $current_user = \App\Models\User::find($user_id);
     $schedules = \App\Models\Schedule::where('user_id', $user_id)->get();
-    $Programs = \App\Models\Programs::all();
+    $programs = \App\Models\programs::all();
     
 
-    return view('myschedule', compact('current_user', 'schedules', 'Programs'));
+    return view('myschedule', compact('current_user', 'schedules', 'programs'));
 })->name('myschedule');
 
 

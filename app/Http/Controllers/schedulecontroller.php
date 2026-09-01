@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Schedule;
 use App\Models\course;
-use App\Models\Programs;
+use App\Models\programs;
 use App\Models\User;
 use App\Models\room;
 use App\Models\semyr;
@@ -64,7 +64,7 @@ class schedulecontroller extends Controller
             $schedules = Schedule::all();
         }
 
-        $programs = Programs::all();
+        $programs = programs::all();
         $courses = course::all();
         $rooms = room::all();
 
@@ -87,7 +87,7 @@ class schedulecontroller extends Controller
             'Day' => ['required', 'array', 'min:1'],
             'Day.*' => ['string'],
 
-            'program_id' => ['required', 'exists:Programs,id'],
+            'program_id' => ['required', 'exists:programs,id'],
             'Course' => ['required', 'exists:courses,id'],
             'Room' => ['required', 'exists:room,id'],
             'user_id' => ['required', 'exists:users,id'],
@@ -170,7 +170,7 @@ class schedulecontroller extends Controller
             'Day'        => ['required', 'array', 'min:1'],
             'Day.*'      => ['string', 'in:Mon,Tue,Wed,Thu,Fri,Sat,Sun'],
 
-            'program_id' => ['required', 'exists:Programs,id'],
+            'program_id' => ['required', 'exists:programs,id'],
             'Course'     => ['required', 'exists:courses,id'],
             'Room'       => ['required', 'exists:room,id'],
 
