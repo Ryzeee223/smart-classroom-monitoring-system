@@ -13,7 +13,7 @@ class userscontroller extends Controller
         $user = User::findOrFail($id);
 
         // Fill dropdown from college table (hide the first-created college: id=1)
-        $courses = college::query()->select(['id','college_name','abbreviation','description'])->where('id', '!=', 1)->get();
+        $courses = College::query()->select(['id','college_name','abbreviation','description'])->where('id', '!=', 1)->get();
 
         return view('users.edit', compact('user', 'courses'));
     }

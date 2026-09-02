@@ -20,13 +20,13 @@ class InitAcc extends Seeder
      */
     public function run(): void
     {
-        college::create([
+        College::create([
             'college_name' => 'Admin',
             'abbreviation' => 'admin',
             'description' => '',
         ]);
 
-        college::create([
+        College::create([
             'college_name' => 'College of Communication and Information technology',
             'abbreviation' => 'CCIT',
             'description' => '',

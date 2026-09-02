@@ -49,7 +49,7 @@
     @php
         $currentCollege = null;
         if ($currentCollegeId) {
-            $currentCollege = \App\Models\college::find($currentCollegeId);
+            $currentCollege = \App\Models\College::find($currentCollegeId);
         }
         $currentCollegeName = $currentCollege?->college_name ?? '';
     @endphp
