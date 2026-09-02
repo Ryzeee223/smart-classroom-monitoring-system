@@ -9,7 +9,7 @@ use App\Models\Programs;
 use App\Models\User;
 use App\Models\room;
 use App\Models\semyr;
-use App\Models\college;
+use App\Models\College;
 
 
 class schedulecontroller extends Controller
@@ -69,7 +69,7 @@ class schedulecontroller extends Controller
         $rooms = room::all();
 
         // Current college name for display (used by Dean / Assistant Dean)
-        $collegeName = $collegeId ? optional(college::find($collegeId))->college_name : null;
+        $collegeName = $collegeId ? optional(College::find($collegeId))->college_name : null;
 
         // Optional: preselect a faculty when arriving from a request approval (e.g. Summer class "set schedule")
         $selectedFacultyId = (int) request('user_id', 0);
