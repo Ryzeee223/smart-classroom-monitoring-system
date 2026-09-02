@@ -15,7 +15,7 @@ class collegecontroller extends Controller
             return redirect('/');
         }
 
-        $college = college::all();
+        $college = College::all();
         return view('college', compact('college'));
     }
 
@@ -36,7 +36,7 @@ class collegecontroller extends Controller
             'description' => 'Description',
         ]);
 
-        college::create([
+        College::create([
             'college_name' => $validated['college_name'],
             'abbreviation' => $validated['abbreviation'],
             'description' => $validated['description'] ?? null,
@@ -45,17 +45,17 @@ class collegecontroller extends Controller
         return back()->with('success', 'College saved successfully!');
     }
 
-    public function edit(college $college)
+    public function edit(College $college)
     {
         if (!session('logged_in')) {
-            return redirect('/');
+            return redirect('/');  
         }
 
         // Reuse the same page; form can be wired later.
-        return view('college', ['college' => college::all(), 'editing' => $college]);
+        return view('college', ['college' =>College::all(), 'editing' => $college]);
     }
 
-    public function update(Request $request, college $college)
+    public function update(Request $request, College $college)
     {
         if (!session('logged_in')) {
             return redirect('/');
@@ -80,7 +80,7 @@ class collegecontroller extends Controller
         return back()->with('success', 'College updated successfully!');
     }
 
-    public function destroy(college $college)
+    public function destroy(College $college)
     {
         if (!session('logged_in')) {
             return redirect('/');
