@@ -153,11 +153,12 @@ public function show($id)
         $requestHandle = RequestModel::findOrFail($id);
         $user = users::findOrFail($requestHandle->user_id);
 
-        $userStatus = match (strtolower($requestHandle->reason ?? '')) {
-            'Sick leave' => 'Sick leave',
+        $userStatus = match (strtolower(trim($requestHandle->reason ?? ''))) {
+            'sick leave' => 'Sick leave',
             'official business leave' => 'Business Leave',
             'vacation' => 'Vacation',
             'absent' => 'Absent',
+            default => 'Active',
         };
         
         $requestHandle->update(['status' => 'approved']);

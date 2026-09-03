@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Report;
+use App\Models\Schedule;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 class ProfileController extends Controller
 {
@@ -14,6 +17,22 @@ class ProfileController extends Controller
  
         $userId = session('user_id');
         $user = $userId ? User::with('college')->find($userId) : null;
+
+        if ($user) {
+            $now = Carbon::now();
+            $today = $now->format('l');
+            $schedules = Schedule::with('User')
+                ->where('user_id', $user->id)
+                ->where(function ($query) use ($today) {
+                    $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($today) . '%'])
+                        ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower(substr($today, 0, 3)) . '%']);
+                })
+                ->get();
+
+            foreach ($schedules as $schedule) {
+                Report::syncForSchedule($schedule, $now->toDateString(), $now);
+            }
+        }
        
         // Load requests for this user (for the profile display)
         $requests = $userId ? \Illuminate\Support\Facades\DB::table('requests')

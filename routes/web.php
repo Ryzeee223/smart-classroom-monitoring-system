@@ -156,21 +156,10 @@ $attendanceClasses = $todaySchedules
         $end = \Illuminate\Support\Carbon::parse("{$todayDate} {$schedule->end_time}");
         if ($end->lt($start)) $end->addDay();
 
-        // Skip ended classes
+        $attendance = Report::syncForSchedule($schedule, $todayDate, $now);
+
+        // Ended classes are synchronized above but are not shown in the live grid.
         if ($end->lt($now)) return null;
-
-        $attendance = Report::where('schedule_id', $schedule->id)
-            ->whereDate('attendance_date', $todayDate)
-            ->first();
-
-        // Auto-mark absent after 15 minutes grace period
-        $status = strtolower($schedule->User->acc_status ?? '');
-        $isOnLeave = str_contains($status, 'leave') || str_contains($status, 'sick');
-
-        if ($attendance && !$isOnLeave && $attendance->status === 'waiting' && !$attendance->time_in && $now->gte($start->copy()->addMinutes(15))) {
-            $attendance->update(['status' => 'absent']);
-            $schedule->User?->update(['acc_status' => 'Absent']);
-        }
 
         return [
             'id' => $schedule->id,
@@ -207,6 +196,20 @@ Route::get('/dashboard/attendance', function () {
 
     if (!$userId) {
         return response()->json(['attendance' => []], 401);
+    }
+
+    $today = now();
+    $todayDay = $today->format('l');
+    $schedules = \App\Models\Schedule::with('User')
+        ->where('user_id', $userId)
+        ->where(function ($query) use ($todayDay) {
+            $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayDay) . '%'])
+                ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower(substr($todayDay, 0, 3)) . '%']);
+        })
+        ->get();
+
+    foreach ($schedules as $schedule) {
+        Report::syncForSchedule($schedule, $today->toDateString(), $today);
     }
 
     $attendance = Report::with(['schedule.user', 'schedule.course', 'schedule.room'])
