@@ -39,7 +39,7 @@ class AdminController extends Controller
 
         $programs = Programs::query()->from('programs')->get();
 
-        $colleges = \App\Models\College::query()->select(['id','college_name','abbreviation','description'])->get();
+        $colleges = \App\Models\college::query()->select(['id','college_name','abbreviation','description'])->get();
 
         return view('users', compact('account_users', 'faculty_users', 'programs', 'colleges'));
     }

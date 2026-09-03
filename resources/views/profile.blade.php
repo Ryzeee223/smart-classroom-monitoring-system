@@ -68,7 +68,7 @@
                                         @php
                                                     // Get the college name if the user has a college_id
                                    $currentCollegeId = (int) ($user?->college_id ?? 0);
-                    $currentCollege = $currentCollegeId ? \App\Models\College::find($currentCollegeId) : null;
+                    $currentCollege = $currentCollegeId ? \App\Models\college::find($currentCollegeId) : null;
                     $currentCollegeName = $currentCollege?->abbreviation ?? '';
                                         @endphp
                                         <div><Strong>College:</Strong>{{$currentCollegeName ?? 'No College Assigned' }}</div>

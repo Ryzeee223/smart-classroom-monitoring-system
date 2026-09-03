@@ -37,7 +37,7 @@
                                         $currentUser = \App\Models\User::find(session('user_id'));
                                         $currentCollegeId = (int) ($currentUser?->college_id ?? 0);
                                         $currentCollegeName = $currentCollegeId
-                                            ? (\App\Models\College::query()->where('id', $currentCollegeId)->value('college_name'))
+                                            ? (\App\Models\college::query()->where('id', $currentCollegeId)->value('college_name'))
                                             : null;
                                     @endphp
 
