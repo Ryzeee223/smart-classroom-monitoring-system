@@ -274,7 +274,7 @@ body {
                                                 <th>Status</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody id="my-attendance-body">
     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = ($myAttendance ?? collect()); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attendance): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
         <?php $schedule = $attendance->schedule; ?>
         <tr>
@@ -291,8 +291,8 @@ body {
             </td>
             <td><?php echo e($schedule?->course?->course_name ?? 'N/A'); ?></td>
             <td>
-                <span class="badge <?php echo e($attendance->status_in === 'present' ? 'bg-success' : ($attendance->status_in === 'absent' ? 'bg-danger' : 'bg-warning')); ?>">
-                    <?php echo e(ucfirst(str_replace('_', ' ', $attendance->status_in ?? 'N/A'))); ?>
+                <span class="badge <?php echo e(in_array($attendance->status, ['attended', 'present']) ? 'bg-success' : ($attendance->status === 'absent' ? 'bg-danger' : 'bg-warning')); ?>">
+                    <?php echo e(ucfirst(str_replace('_', ' ', $attendance->status ?? 'N/A'))); ?>
 
                 </span>
             </td>
@@ -315,6 +315,48 @@ body {
                     <script>
     let lastHandledUid = null;
 
+    function formatAttendanceTime(value) {
+        if (!value) return '-';
+        const [hours, minutes] = value.split(':');
+        const date = new Date(2000, 0, 1, Number(hours), Number(minutes));
+        return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    }
+
+    function renderAttendance(records) {
+        const body = document.getElementById('my-attendance-body');
+        if (!body) return;
+
+        body.innerHTML = records.length ? records.map(record => {
+            const status = record.status || 'waiting';
+            const badgeClass = ['attended', 'present'].includes(status)
+                ? 'bg-success'
+                : status === 'absent' ? 'bg-danger' : 'bg-warning';
+
+            return `<tr>
+                <td>${record.class}</td>
+                <td>${record.faculty}</td>
+                <td>${record.room}</td>
+                <td>${formatAttendanceTime(record.time_in)}</td>
+                <td>${formatAttendanceTime(record.time_out)}</td>
+                <td>${record.course}</td>
+                <td><span class="badge ${badgeClass}">${status.replaceAll('_', ' ').replace(/^\\w/, letter => letter.toUpperCase())}</span></td>
+            </tr>`;
+        }).join('') : `<tr class="table-active">
+            <td colspan="7" class="text-center py-4 text-muted">No attendance records found for today.</td>
+        </tr>`;
+    }
+
+    async function refreshAttendanceTable() {
+        const response = await fetch('<?php echo e(route('dashboard.attendance')); ?>', { headers: { Accept: 'application/json' } });
+        if (response.ok) {
+            const data = await response.json();
+            renderAttendance(data.attendance || []);
+        }
+    }
+
+    refreshAttendanceTable().catch(err => console.error('Attendance refresh error:', err));
+    setInterval(() => refreshAttendanceTable().catch(err => console.error('Attendance refresh error:', err)), 2000);
+
     setInterval(async () => {
         try {
             const response = await fetch('/api/check-latest-attendance');
@@ -325,6 +367,7 @@ body {
 
                 if (scan.status === 'accepted') {
                     lastHandledUid = data.uid;
+                    refreshAttendanceTable().catch(err => console.error('Attendance refresh error:', err));
 
                     // Locate table row by attendance ID or User ID
                     const statusBadge = document.querySelector(`#status-badge-${scan.attendance_id}`) 

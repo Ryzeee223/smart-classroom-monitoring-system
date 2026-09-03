@@ -135,7 +135,7 @@ if (in_array($userRole, [2, 3, 4, 5], true) && $todaySchedules->isNotEmpty()) {
             'attendance_date' => $todayDate,
             'room_id'         => $schedule->room_id,
             'day'             => $schedule->day,
-            'status_in'       => 'waiting',
+            'status'          => 'waiting',
             'created_at'      => $nowTimestamp,
             'updated_at'      => $nowTimestamp,
         ];
@@ -167,8 +167,8 @@ $attendanceClasses = $todaySchedules
         $status = strtolower($schedule->User->acc_status ?? '');
         $isOnLeave = str_contains($status, 'leave') || str_contains($status, 'sick');
 
-        if ($attendance && !$isOnLeave && $attendance->status_in === 'waiting' && !$attendance->time_in && $now->gte($start->copy()->addMinutes(15))) {
-            $attendance->update(['status_in' => 'absent']);
+        if ($attendance && !$isOnLeave && $attendance->status === 'waiting' && !$attendance->time_in && $now->gte($start->copy()->addMinutes(15))) {
+            $attendance->update(['status' => 'absent']);
             $schedule->User?->update(['acc_status' => 'Absent']);
         }
 
@@ -183,7 +183,7 @@ $attendanceClasses = $todaySchedules
             'start_display' => $start->format('g:i A'),
             'end_display' => $end->format('g:i A'),
             'is_live' => $now->between($start, $end, true),
-            'status' => $attendance?->status_in ?? 'waiting',
+            'status' => $attendance?->status ?? 'waiting',
             'time_in' => $attendance?->time_in,
         ];
     })->filter()->values();
@@ -201,6 +201,33 @@ return view('dashboard', compact(
     'req', 'buildings', 'rooms', 'currentDeans', 'attendanceClasses', 'myAttendance'
 ));
 });
+
+Route::get('/dashboard/attendance', function () {
+    $userId = session('user_id') ?? auth()->id();
+
+    if (!$userId) {
+        return response()->json(['attendance' => []], 401);
+    }
+
+    $attendance = Report::with(['schedule.user', 'schedule.course', 'schedule.room'])
+        ->whereDate('attendance_date', now()->toDateString())
+        ->where('user_id', $userId)
+        ->get()
+        ->sortBy(fn ($record) => $record->schedule?->start_time ?? '23:59:59')
+        ->values()
+        ->map(fn ($record) => [
+            'id' => $record->id,
+            'class' => $record->schedule?->course?->course_code ?? 'N/A',
+            'faculty' => trim(($record->schedule?->user?->first_name ?? '') . ' ' . ($record->schedule?->user?->last_name ?? '')) ?: 'N/A',
+            'room' => $record->schedule?->room?->room_name ?? 'N/A',
+            'time_in' => $record->time_in,
+            'time_out' => $record->time_out,
+            'course' => $record->schedule?->course?->course_name ?? 'N/A',
+            'status' => $record->status ?? 'waiting',
+        ]);
+
+    return response()->json(['attendance' => $attendance]);
+})->name('dashboard.attendance');
 
 Route::get('/college', function(){
     return view('college');
