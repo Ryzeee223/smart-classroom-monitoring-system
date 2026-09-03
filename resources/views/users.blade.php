@@ -109,7 +109,7 @@ body {
                     $sessionRole = (int) (session('user_role') ?? 0);
                     $currentUser = \App\Models\User::find(session('user_id'));
                     $currentCollegeId = (int) ($currentUser?->college_id ?? 0);
-                    $currentCollege = $currentCollegeId ? \App\Models\College::find($currentCollegeId) : null;
+                    $currentCollege = $currentCollegeId ? \App\Models\college::find($currentCollegeId) : null;
                     $currentCollegeName = $currentCollege?->college_name ?? '';
                 @endphp
 

@@ -15,7 +15,7 @@ class collegecontroller extends Controller
             return redirect('/');
         }
 
-        $college = College::all();
+        $college = college::all();
         return view('college', compact('college'));
     }
 
@@ -36,7 +36,7 @@ class collegecontroller extends Controller
             'description' => 'Description',
         ]);
 
-        College::create([
+        college::create([
             'college_name' => $validated['college_name'],
             'abbreviation' => $validated['abbreviation'],
             'description' => $validated['description'] ?? null,
@@ -52,7 +52,7 @@ class collegecontroller extends Controller
         }
 
         // Reuse the same page; form can be wired later.
-        return view('college', ['college' =>College::all(), 'editing' => $college]);
+        return view('college', ['college' =>college::all(), 'editing' => $college]);
     }
 
     public function update(Request $request, College $college)

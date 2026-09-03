@@ -42,6 +42,6 @@ class User extends Authenticatable
 
     public function College()
     {
-        return $this->belongsTo(College::class, 'college_id');
+        return $this->belongsTo(college::class, 'college_id');
     }
 }

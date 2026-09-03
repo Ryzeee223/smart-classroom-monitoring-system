@@ -94,7 +94,7 @@ class room_bldg_controller extends Controller
     public function show()
     {
         $bldgModel = bldg::all();
-        $colleges = College::all();
+        $colleges = college::all();
 
         // Existing rooms to display in the UI
         $rooms = room::query()
