@@ -9,7 +9,7 @@ use App\Models\Programs;
 use App\Models\User;
 use App\Models\room;
 use App\Models\semyr;
-use App\Models\College;
+use App\Models\college;
 
 
 class schedulecontroller extends Controller
