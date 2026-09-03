@@ -55,7 +55,7 @@
                                     
                                 @endphp
 
-                                <img
+                                 <img
                                     src="{{ $profileUrl ?? asset('images/default-avatar.png') }}"
                                     alt="Profile picture"
                                     style="width:140px; height:140px; object-fit:cover; border-radius:50%;"
@@ -94,14 +94,14 @@
                             @endif
 
                             <div class="mt-3 text-center">
-                                <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" id="profilePicForm">
+                                 <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" id="profilePicForm">
                                     @csrf
                                     <input type="file" name="profile_picture" id="profilePictureInput" accept="image/*" style="display:none;" required>
                                     {{-- display account status --}}
 
                                     <button type="button" class="btn btn-outline-primary" id="changePhotoBtn">Add / Replace Image</button>
                                     <button type="submit" class="btn btn-primary" id="savePhotoBtn" style="display:none;">Save</button>
-                                </form>
+                                </form> 
                             </div>
 
                             <script>

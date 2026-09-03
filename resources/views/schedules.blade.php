@@ -210,8 +210,7 @@ while ($startTime <= $endTimeLimit) {
                                             @endforeach
                                         </div>
                                     </div>
-
-
+                                </div>
 
                                 <div class="mt-4">
                                     <button type="submit" class="btn btn-primary w-100" onclick="return confirm('Save this schedule?')">

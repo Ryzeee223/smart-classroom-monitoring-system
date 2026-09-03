@@ -1,10 +1,10 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
-class report extends Model
+class Report extends Model
 {
     protected $table = 'attendance';
 
@@ -29,24 +29,28 @@ class report extends Model
         return $this->belongsTo(users::class, 'user_id');
     }
 
-    public static function CreateAttendance($userId, $scheduleId, $timeIn, $timeOut, $attendanceDate, $statusIn, $statusOut)
+    public static function CreateAttendance($userId, $scheduleId, $timeIn, $timeOut, $attendanceDate, $status, $statusOut = null)
     {
         $schedule = Schedule::findOrFail($scheduleId);
 
-        $attendanceDate = $attendanceDate instanceof \DateTimeInterface
-            ? \Illuminate\Support\Carbon::parse($attendanceDate)->toDateString()
-            : \Illuminate\Support\Carbon::parse((string) $attendanceDate)->toDateString();
+        $attendanceDate = $attendanceDate
+            ? Carbon::parse($attendanceDate)->toDateString()
+            : Carbon::today()->toDateString();
 
-        return self::create([
-            'user_id' => $userId,
-            'schedule_id' => $scheduleId,
-            'room_id' => $schedule->room_id,
-            'day' => $schedule->day,
-            'time_in' => $timeIn,
-            'time_out' => $timeOut,
-            'attendance_date' => $attendanceDate,
-            'status_in' => $statusIn,
-            'status_out' => $statusOut,
-        ]);
+        return self::updateOrCreate(
+            [
+                'user_id' => $userId,
+                'schedule_id' => $scheduleId,
+                'attendance_date' => $attendanceDate,
+            ],
+            [
+                'room_id' => $schedule->room_id,
+                'day' => $schedule->day,
+                'time_in' => $timeIn,
+                'time_out' => $timeOut,
+                'status' => $status,
+            ]
+        );
     }
 }
+

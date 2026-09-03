@@ -274,29 +274,31 @@ body {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse(($myAttendance ?? collect()) as $attendance)
-                                                @php $schedule = $attendance->schedule; @endphp
-                                                <tr>
-                                                    <td>{{ $schedule?->course?->course_code ?? 'N/A' }}</td>
-                                                    <td>{{ trim(($schedule?->user?->first_name ?? '') . ' ' . ($schedule?->user?->last_name ?? '')) ?: 'N/A' }}</td>
-                                                    <td>{{ $schedule?->room?->room_name ?? 'N/A' }}</td>
-                                                    <td>
-                                                        @if ($attendance->time_in)
-                                                            {{ \Illuminate\Support\Carbon::parse($attendance->time_in)->format('g:i A') }}
-                                                        @else
-                                                            -
-                                                        @endif
-                                                    </td>
-                                                    <td></td>
-                                                    <td>{{ $schedule?->course?->course_name ?? 'N/A' }}</td>
-                                                    <td>{{ ucfirst(str_replace('_', ' ', $attendance->status_in ?? 'N/A')) }}</td>
-                                                </tr>
-                                            @empty
-                                                <tr class="table-active">
-                                                    <td colspan="6" class="text-center py-4 text-muted">No attendance records found.</td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
+    @forelse(($myAttendance ?? collect()) as $attendance)
+        @php $schedule = $attendance->schedule; @endphp
+        <tr>
+            <td>{{ $schedule?->course?->course_code ?? 'N/A' }}</td>
+            <td>{{ trim(($schedule?->user?->first_name ?? '') . ' ' . ($schedule?->user?->last_name ?? '')) ?: 'N/A' }}</td>
+            <td>{{ $schedule?->room?->room_name ?? 'N/A' }}</td>
+            <td>
+                {{ $attendance->time_in ? \Illuminate\Support\Carbon::parse($attendance->time_in)->format('g:i A') : '-' }}
+            </td>
+            <td>
+                {{ $attendance->time_out ? \Illuminate\Support\Carbon::parse($attendance->time_out)->format('g:i A') : '-' }}
+            </td>
+            <td>{{ $schedule?->course?->course_name ?? 'N/A' }}</td>
+            <td>
+                <span class="badge {{ $attendance->status_in === 'present' ? 'bg-success' : ($attendance->status_in === 'absent' ? 'bg-danger' : 'bg-warning') }}">
+                    {{ ucfirst(str_replace('_', ' ', $attendance->status_in ?? 'N/A')) }}
+                </span>
+            </td>
+        </tr>
+    @empty
+        <tr class="table-active">
+            <td colspan="7" class="text-center py-4 text-muted">No attendance records found for today.</td>
+        </tr>
+    @endforelse
+</tbody>
                                     </table>
                                 </div>
                             </div>

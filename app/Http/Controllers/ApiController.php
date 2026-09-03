@@ -83,9 +83,8 @@ class ApiController extends Controller
     private function processAttendanceForUser(User $user, string $scannedUid): array
     {
         $now = Carbon::now();
-        $today = $now->format('l'); // Matches full day names (e.g. 'Monday')
+        $today = $now->format('l');
 
-        // 1. Find the active schedule for current time and day
         $schedule = Schedule::where('user_id', $user->id)
             ->where('day', $today)
             ->whereTime('start_time', '<=', $now->format('H:i:s'))
@@ -100,7 +99,7 @@ class ApiController extends Controller
                 'user' => [
                     'id' => $user->id,
                     'name' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
-                ]
+                ],
             ];
         }
 
@@ -119,6 +118,7 @@ class ApiController extends Controller
             ]);
 
             return [
+                'status' => 'denied',
                 'message' => 'This RFID card is not assigned to the scheduled faculty.',
                 'uid' => $scannedUid,
             ];
@@ -138,18 +138,20 @@ class ApiController extends Controller
         }
 
         $start = Carbon::today()->setTimeFromTimeString($schedule->start_time);
+        $end = Carbon::today()->setTimeFromTimeString($schedule->end_time);
 
-        // 2. Fetch existing 'waiting' record or create new record for today
         $attendance = report::firstOrCreate(
             [
                 'user_id' => $user->id,
                 'schedule_id' => $schedule->id,
-                'room_id' => $schedule->room_id,
                 'attendance_date' => $now->toDateString(),
             ],
             [
                 'room_id' => $schedule->room_id,
-                'status_in' => 'waiting', // Uses default enum from migration
+                'day' => $schedule->day,
+                'time_in' => null,
+                'time_out' => null,
+                'status' => 'waiting',
             ]
         );
 
@@ -157,58 +159,103 @@ class ApiController extends Controller
         $isOnLeave = in_array($accountStatus, ['sick leave', 'on leave', 'leave', 'sick'], true);
 
         if ($isOnLeave) {
-            $attendance->update([
-                'status_in' => 'on_leave',
-                'time_in' => $attendance->time_in ?? $now->format('H:i:s'),
-            ]);
-            $user->update(['acc_status' => 'On Leave']);
-            $status = 'on_leave';
-        } else {
-            // Check if user is logging IN or logging OUT
-            if ($attendance->status_in === 'waiting' || !$attendance->time_in) {
-                // FIRST TAP: record the faculty member as attended.
-                $status = 'attended';
-                
-                $attendanceSaved = $attendance->update([
-                    'time_in' => $now->format('H:i:s'),
-                    'status_in' => $status,
-                ]);
+            $attendance->time_in = $attendance->time_in ?? $now->format('H:i:s');
+            $attendance->status = 'on_leave';
+            $attendance->save();
 
-                if ($attendanceSaved
-                    && $attendance->status_in === 'attended'
-                    && $attendance->time_in
-                    && (int) $attendance->room_id === (int) $schedule->room_id
-                ) {
-                    $schedule->room()->update(['status' => 'occupied']);
-                }
-                
-                $user->update(['acc_status' => ucfirst($status)]);
-            } else {
-                // SECOND TAP: Record time_out and status_out
-                $attendance->update([
-                    'time_out' => $now->format('H:i:s'),
-                    'status_out' => 'completed',
-                ]);
-                
-                $status = $attendance->status_in; // Retain original status_in ('attended' or 'late')
-                $user->update(['acc_status' => 'Checked Out']);
+            $user->update(['acc_status' => 'On Leave']);
+
+            return [
+                'status' => 'accepted',
+                'attendance_status' => 'on_leave',
+                'status_in' => 'on_leave',
+                'time_in' => $attendance->time_in,
+                'time_out' => $attendance->time_out,
+                'message' => 'On leave',
+                'uid' => $scannedUid,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
+                ],
+                'attendance_id' => $attendance->id,
+            ];
+        }
+
+        if (empty($attendance->time_in) && empty($attendance->time_out)) {
+            $attendance->time_in = $now->format('H:i:s');
+            $attendance->status = $now->gt($start->copy()->addMinutes(15)) ? 'late' : 'attended';
+            $attendance->save();
+
+            $user->update(['acc_status' => ucfirst($attendance->status)]);
+
+            return [
+                'status' => 'accepted',
+                'attendance_status' => $attendance->status,
+                'status_in' => $attendance->status,
+                'time_in' => $attendance->time_in,
+                'time_out' => $attendance->time_out,
+                'message' => ucfirst($attendance->status),
+                'uid' => $scannedUid,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
+                ],
+                'attendance_id' => $attendance->id,
+            ];
+        }
+
+        if (!empty($attendance->time_in) && empty($attendance->time_out)) {
+            if ($now->lt($end)) {
+                return [
+                    'status' => 'ignored',
+                    'attendance_status' => $attendance->status,
+                    'status_in' => $attendance->status,
+                    'time_in' => $attendance->time_in,
+                    'time_out' => $attendance->time_out,
+                    'message' => 'Duplicate tap ignored before class end time.',
+                    'uid' => $scannedUid,
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
+                    ],
+                    'attendance_id' => $attendance->id,
+                ];
             }
+
+            $attendance->time_out = $now->format('H:i:s');
+            $attendance->save();
+
+            $user->update(['acc_status' => 'Checked Out']);
+
+            return [
+                'status' => 'accepted',
+                'attendance_status' => $attendance->status,
+                'status_in' => $attendance->status,
+                'time_in' => $attendance->time_in,
+                'time_out' => $attendance->time_out,
+                'message' => 'Checked out',
+                'uid' => $scannedUid,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
+                ],
+                'attendance_id' => $attendance->id,
+            ];
         }
 
         return [
             'status' => 'accepted',
-            'attendance_status' => $status,
-            'status_in' => $attendance->status_in,
-            'status_out' => $attendance->status_out,
+            'attendance_status' => $attendance->status,
+            'status_in' => $attendance->status,
             'time_in' => $attendance->time_in,
             'time_out' => $attendance->time_out,
-            'message' => ucfirst(str_replace('_', ' ', $status)),
+            'message' => 'Attendance already recorded.',
             'uid' => $scannedUid,
             'user' => [
                 'id' => $user->id,
                 'name' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
             ],
-            'attendance_id' => $attendance->id
+            'attendance_id' => $attendance->id,
         ];
     }
 

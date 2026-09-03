@@ -102,8 +102,8 @@ class schedulecontroller extends Controller
             'section' => ['required', 'string', 'max:1'],
         ]);
 
-        $days = $validatedData['Day']; 
-        
+        $days = array_values(array_unique((array) $validatedData['Day']));
+
         // 1. Conflict Check Loop
         foreach ($days as $singleDay) {
             $roomConflict = Schedule::where('room_id', $validatedData['Room'])
@@ -184,27 +184,30 @@ class schedulecontroller extends Controller
             'section'    => ['required', 'string', 'max:1'],
         ]);
 
-        $dayValue = implode(', ', $validatedData['Day']);
+        $days = array_values(array_unique((array) $validatedData['Day']));
 
         // Blade submits Course and Room as IDs.
         $courseId = $validatedData['Course'];
         $roomId = $validatedData['Room'];
 
-        $schedule->update([
-            'program_id' => $validatedData['program_id'],
-            'course_id' => $courseId,
-            'room_id' => $roomId,
+        // A schedule row can only hold one day in this schema, so each checked day becomes its own record.
+        $schedule->delete();
 
-            'year_level' => $validatedData['year_level'],
-            'section' => $validatedData['section'],
-
-            'day' => $dayValue,
-            'start_time' => $validatedData['Start_time'],
-            'end_time' => $validatedData['End_time'],
-
-            'Semester' => $validatedData['Semester'],
-            'School_year' => $validatedData['School_year'],
-        ]);
+        foreach ($days as $singleDay) {
+            Schedule::create([
+                'user_id' => $schedule->user_id,
+                'program_id' => $validatedData['program_id'],
+                'course_id' => $courseId,
+                'room_id' => $roomId,
+                'year_level' => $validatedData['year_level'],
+                'section' => $validatedData['section'],
+                'day' => $singleDay,
+                'start_time' => $validatedData['Start_time'],
+                'end_time' => $validatedData['End_time'],
+                'Semester' => $validatedData['Semester'],
+                'School_year' => $validatedData['School_year'],
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Schedule updated successfully!');
     }
