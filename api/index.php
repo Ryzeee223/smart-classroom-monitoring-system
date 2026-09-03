@@ -1,5 +1,7 @@
 <?php
-
+if (!is_dir('/tmp/views')) {
+    mkdir('/tmp/views', 0755, true);
+}
 // Enable error reporting
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
