@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use App\Models\Schedule;
 use App\Models\User;
-use App\Models\report;
+use App\Models\Report;
 
 class ApiController extends Controller
 {
@@ -140,7 +140,7 @@ class ApiController extends Controller
         $start = Carbon::today()->setTimeFromTimeString($schedule->start_time);
         $end = Carbon::today()->setTimeFromTimeString($schedule->end_time);
 
-        $attendance = report::firstOrCreate(
+        $attendance = Report::firstOrCreate(
             [
                 'user_id' => $user->id,
                 'schedule_id' => $schedule->id,
