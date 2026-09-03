@@ -57,7 +57,7 @@ class RequestController extends Controller
      */
 
 
-public function show($id)
+public function show($id = null)
 {
     // 1. Resolve logged-in user ID safely
     $currentUserId = session('user_id') ?? auth()->id();
