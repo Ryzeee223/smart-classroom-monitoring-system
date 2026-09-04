@@ -13,6 +13,9 @@ if (isset($_GET['route'])) {
     $_SERVER['REQUEST_URI'] = '/' . ltrim((string) $_GET['path'], '/');
 }
 
+$_SERVER['SCRIPT_NAME'] = '/index.php';
+$_SERVER['PHP_SELF'] = '/index.php';
+
 // Define writable paths inside /tmp
 $tmpStorage = '/tmp/storage';
 $viewsPath = '/tmp/storage/framework/views';
