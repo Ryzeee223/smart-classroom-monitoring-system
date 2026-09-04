@@ -22,11 +22,11 @@
     },
     {
       "src": "/api/(.*)",
-      "dest": "/api/index.php"
+      "dest": "/api/index.php?route=$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/api/index.php"
+      "dest": "/api/index.php?path=$1"
     }
   ]
 }

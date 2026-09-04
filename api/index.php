@@ -7,6 +7,12 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+if (isset($_GET['route'])) {
+    $_SERVER['REQUEST_URI'] = '/api/' . ltrim((string) $_GET['route'], '/');
+} elseif (isset($_GET['path'])) {
+    $_SERVER['REQUEST_URI'] = '/' . ltrim((string) $_GET['path'], '/');
+}
+
 // Define writable paths inside /tmp
 $tmpStorage = '/tmp/storage';
 $viewsPath = '/tmp/storage/framework/views';
