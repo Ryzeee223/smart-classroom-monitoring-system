@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './bootstrap';
 
 
-// eMonitor Custom JavaScript
+// RFINSIDE Custom JavaScript
 
 document.addEventListener("DOMContentLoaded", function () {
     // Password Toggle Functionality
