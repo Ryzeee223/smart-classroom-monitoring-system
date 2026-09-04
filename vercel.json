@@ -21,6 +21,22 @@
       "dest": "/public/build/$1"
     },
     {
+      "src": "/api/check-latest-attendance",
+      "dest": "/api/index.php?route=check-latest-attendance"
+    },
+    {
+      "src": "/api/check-latest-assignment",
+      "dest": "/api/index.php?route=check-latest-assignment"
+    },
+    {
+      "src": "/api/attendance-scan",
+      "dest": "/api/index.php?route=attendance-scan"
+    },
+    {
+      "src": "/api/rfid-scan",
+      "dest": "/api/index.php?route=rfid-scan"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/index.php?route=$1"
     },

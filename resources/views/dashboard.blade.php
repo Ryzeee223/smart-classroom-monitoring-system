@@ -356,6 +356,9 @@ body {
     setInterval(async () => {
         try {
             const response = await fetch('/api/check-latest-attendance');
+            if (!response.ok) {
+                throw new Error(`RFID endpoint returned HTTP ${response.status}`);
+            }
             const data = await response.json();
 
             if (data.scan_data && data.uid !== lastHandledUid) {
