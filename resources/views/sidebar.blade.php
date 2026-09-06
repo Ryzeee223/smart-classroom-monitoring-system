@@ -17,6 +17,7 @@
                 <div class="app-sidebar__user">{{ session('user_name') ?? '' }}</div>
             @endif
         </div>
+        
         {{-- notification --}}
         @if ($role === 2 || $role === 3 || $role === 4 || $role === 5)
              <button type="button"

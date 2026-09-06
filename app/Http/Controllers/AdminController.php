@@ -168,7 +168,9 @@ public function assignRfid(Request $request)
         'rfid_code' => 'required|string',
     ]);
 
-$existingUser = User::where('RFID_code')
+    $rfidCode = strtoupper(trim($request->input('rfid_code')));
+
+    $existingUser = User::whereRaw('UPPER(TRIM(RFID_code)) = ?', [$rfidCode])
         ->where('id', '!=', $request->user_id)
         ->first();
 
@@ -177,7 +179,7 @@ $existingUser = User::where('RFID_code')
     }
 
     $user = User::findOrFail($request->user_id);
-    $user->update(['RFID_code' => strtoupper(trim($request->rfid_code))]);
+    $user->update(['RFID_code' => $rfidCode]);
 
     // Clear cache so it doesn't leak into subsequent polls
     Cache::forget('latest_assignment_scan');
