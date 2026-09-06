@@ -52,24 +52,14 @@ class ApiController extends Controller
 
         Log::info("RFID Hardware Scan Received: {$scannedUid}");
 
-        $unassignedPayload = [
-            'status' => 'assignment_ready',
-            'message' => 'RFID cached for assignment.',
-            'uid' => $scannedUid,
-        ];
-
-        Cache::put('latest_assignment_scan_data', $unassignedPayload, 120);
         Cache::put('latest_assignment_scan', $scannedUid, 120);
 
-        return response()->json($unassignedPayload, 200);
+        return response()->json(['uid' => $scannedUid], 200);
     }
 
     public function checkLatestAssignmentScan()
     {
-        return response()->json([
-            'uid' => Cache::get('latest_assignment_scan'),
-            'scan_data' => Cache::get('latest_assignment_scan_data'),
-        ]);
+        return response()->json(['uid' => Cache::get('latest_assignment_scan')]);
     }
 
     public function checkLatestAttendanceScan()
