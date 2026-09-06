@@ -15,7 +15,7 @@ class RequestController extends Controller
      */
     public function index()
     {
-        $currentUserId = session('user_id') ?? auth()->id();
+        $currentUserId = session('user_id');
         $currentUser = \App\Models\users::find($currentUserId);
 
         $userRole = $currentUser ? (int) $currentUser->role : (int) (session('user_role') ?? 0);

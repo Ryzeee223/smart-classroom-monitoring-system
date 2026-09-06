@@ -272,25 +272,27 @@
 
             button.addEventListener('click', async function (event) {
                 event.preventDefault();
-                let modal = document.getElementById('notificationsModal');
+                button.disabled = true;
+                button.setAttribute('aria-busy', 'true');
 
-                if (!modal) {
-                    button.disabled = true;
-                    button.setAttribute('aria-busy', 'true');
+                let modal;
+                try {
+                    const response = await fetch(button.dataset.notificationsUrl, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
 
-                    try {
-                        const response = await fetch(button.dataset.notificationsUrl, {
-                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                        });
-
-                        if (!response.ok) return;
-
-                        document.body.insertAdjacentHTML('beforeend', await response.text());
-                        modal = document.getElementById('notificationsModal');
-                    } finally {
-                        button.disabled = false;
-                        button.removeAttribute('aria-busy');
+                    if (!response.ok) {
+                        throw new Error(`Notifications endpoint returned HTTP ${response.status}`);
                     }
+
+                    document.getElementById('notificationsModal')?.remove();
+                    document.body.insertAdjacentHTML('beforeend', await response.text());
+                    modal = document.getElementById('notificationsModal');
+                } catch (error) {
+                    console.error('Error loading notifications:', error);
+                } finally {
+                    button.disabled = false;
+                    button.removeAttribute('aria-busy');
                 }
 
                 if (modal && window.bootstrap) {
