@@ -147,28 +147,14 @@ public function store(Request $request)
     }
 
 
-
-// public function assignRfid(Request $request)
-//     {
-//         $request->validate([
-//             'user_id' => 'required|exists:users,id',
-//             'rfid_code' => 'required|string|max:50|unique:users,RFID_code',
-//         ]);
-
-//         $user = User::findOrFail($request->user_id);
-//         $user->update(['RFID_code' => $request->rfid_code]);
-
-//         return back()->with('success', 'RFID assigned successfully!');
-//     }
-
 public function assignRfid(Request $request)
 {
     $request->validate([
         'user_id' => 'required|exists:users,id',
-        'rfid_code' => 'required|string',
+        'RFID_code' => 'required|string',
     ]);
 
-    $rfidCode = strtoupper(trim($request->input('rfid_code')));
+    $rfidCode = strtoupper(trim($request->input('RFID_code')));
 
     $existingUser = User::whereRaw('UPPER(TRIM(RFID_code)) = ?', [$rfidCode])
         ->where('id', '!=', $request->user_id)
@@ -199,7 +185,7 @@ public function assignRfid(Request $request)
         $recent_faculty = User::where('role', [2,3,4,5])->latest('created_at')->take(5)->get();
         $faculty_count = User::where('role', [2,3,4,5])->where('acc_status', 1)->count();
         // Pending accounts (acc_status=0) for faculty-related roles only: 2,3,4,5 (exclude admin role 1)
-        $pending_count = User::whereIn('role', [2, 3, 4, 5])->where('rfid_code', 0)->count();
+        $pending_count = User::whereIn('role', [2, 3, 4, 5])->where('RFID_code', 0)->count();
         
         // Fetch ongoing classes
         $now = Carbon::now();
