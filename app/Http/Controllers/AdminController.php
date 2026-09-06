@@ -182,8 +182,8 @@ public function assignRfid(Request $request)
     $user->update(['RFID_code' => $rfidCode]);
 
     // Clear cache so it doesn't leak into subsequent polls
-    Cache::forget('latest_assignment_scan');
-    Cache::forget('latest_assignment_scan_data');
+    Cache::store('database')->forget('latest_assignment_scan');
+    Cache::store('database')->forget('latest_assignment_scan_data');
 
     return redirect()->back()->with('success', 'RFID assigned successfully.');
 }

@@ -33,8 +33,8 @@ class ApiController extends Controller
                 'uid' => $scannedUid,
             ];
 
-        Cache::put('latest_attendance_scan_data', $attendanceData, 120);
-        Cache::put('latest_attendance_scan', $scannedUid, 120);
+        Cache::store('database')->put('latest_attendance_scan_data', $attendanceData, 120);
+        Cache::store('database')->put('latest_attendance_scan', $scannedUid, 120);
 
         return response()->json($attendanceData, 200);
     }
@@ -52,21 +52,23 @@ class ApiController extends Controller
 
         Log::info("RFID Hardware Scan Received: {$scannedUid}");
 
-        Cache::put('latest_assignment_scan', $scannedUid, 120);
+        Cache::store('database')->put('latest_assignment_scan', $scannedUid, 120);
 
         return response()->json(['uid' => $scannedUid], 200);
     }
 
     public function checkLatestAssignmentScan()
     {
-        return response()->json(['uid' => Cache::get('latest_assignment_scan')]);
+        return response()->json([
+            'uid' => Cache::store('database')->get('latest_assignment_scan'),
+        ]);
     }
 
     public function checkLatestAttendanceScan()
     {
         return response()->json([
-            'uid' => Cache::get('latest_attendance_scan'),
-            'scan_data' => Cache::get('latest_attendance_scan_data'),
+            'uid' => Cache::store('database')->get('latest_attendance_scan'),
+            'scan_data' => Cache::store('database')->get('latest_attendance_scan_data'),
         ]);
     }
 
