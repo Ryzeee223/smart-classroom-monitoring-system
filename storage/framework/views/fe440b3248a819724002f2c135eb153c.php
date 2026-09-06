@@ -223,7 +223,12 @@
     // Check the server for a new scan every 2 seconds
     setInterval(() => {
         fetch('/api/check-latest-attendance')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`RFID endpoint returned HTTP ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 // If a card is active, and it's NOT the one we just handled
                 if (data.uid && data.uid !== lastDetectedUid) {

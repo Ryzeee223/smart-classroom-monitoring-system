@@ -9,6 +9,11 @@ use Illuminate\Support\Carbon;
 
 class ReportController extends Controller
 {
+    public function reportDisplay()
+    {
+        $displayrep = Report::with('attendance_date');
+        return view('reports', compact('displayrep'));
+    }
     public function index()
     {
         $now = Carbon::now();

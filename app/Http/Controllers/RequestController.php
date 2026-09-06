@@ -59,37 +59,30 @@ class RequestController extends Controller
 
 public function show($id = null)
 {
-    // 1. Resolve logged-in user ID safely
-    $currentUserId = session('user_id') ?? auth()->id();
-    
-    // 2. Fetch user instance to check credentials
-    $dean = \App\Models\users::find($currentUserId);
-    
-    $userCollegeId = $dean ? (int)$dean->college_id : (int)session('college_id');
-    $userRole = $dean ? (int)$dean->role : (int)session('user_role');
+        $userRole = (int) session('user_role', 0);
+        $userCollegeId = (int) session('college_id', 0);
 
-    $req = collect();
-    $recent_faculty = collect();
+        $req = collect();
+        $recent_faculty = collect();
 
-    // 3. Enforce strictly positive integer for college_id
-    if (in_array($userRole, [2, 3], true) && $userCollegeId > 0) {
+        if (in_array($userRole, [2, 3], true) && $userCollegeId > 0) {
+            $req = RequestModel::with('user')
+                ->where('status', 'pending')
+                ->whereHas('user', function ($query) use ($userCollegeId) {
+                    $query->whereIn('role', [2, 3, 4, 5])
+                        ->where('college_id', $userCollegeId);
+                })
+                ->latest()
+                ->get()
+                ->groupBy('user_id');
 
-        $req = RequestModel::with('user')
-            ->whereHas('user', function ($q) use ($userCollegeId) {
-                $q->whereIn('role', [2, 3, 4, 5])
-                  ->where('college_id', '=', $userCollegeId);
-            })
-            ->where('status', 'pending')
-            ->get()
-            ->groupBy('user_id');
+            $recent_faculty = \App\Models\users::whereIn('role', [2, 3, 4, 5])
+                ->where('college_id', $userCollegeId)
+                ->latest('created_at')
+                ->get();
+        }
 
-        $recent_faculty = \App\Models\users::whereIn('role', [2, 3, 4, 5])
-            ->where('college_id', '=', $userCollegeId)
-            ->latest('created_at')
-            ->get();
-    }
-
-    return view('partials.notifications-modal', compact('req', 'recent_faculty'));
+        return view('partials.notifications-modal', compact('req', 'recent_faculty'));
 }
 
     /**
