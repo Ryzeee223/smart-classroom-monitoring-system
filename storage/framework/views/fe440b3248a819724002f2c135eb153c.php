@@ -18,6 +18,7 @@
             <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         </div>
         
+        
         <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($role === 2 || $role === 3 || $role === 4 || $role === 5): ?>
              <button type="button"
             class="notifications-trigger app-sidebar__notifications btn btn-light btn-sm rounded-circle"

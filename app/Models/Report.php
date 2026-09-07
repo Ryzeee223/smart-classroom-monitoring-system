@@ -53,7 +53,7 @@ class Report extends Model
         } elseif (!$isOnLeave
             && $attendance->status === 'waiting'
             && !$attendance->time_in
-            && $now->gte($start->copy()->addMinutes(15))) {
+            && $now->gte($start->copy()->addMinutes(30))) {
             $attendance->update(['status' => 'absent']);
         }
 

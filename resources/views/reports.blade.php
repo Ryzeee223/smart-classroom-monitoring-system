@@ -90,7 +90,37 @@
                                 {{ $currentSemester ?? 'Current Semester' }} • {{ $currentSchoolYear ?? 'Current School Year' }}
                             </small>
                         </div>
-                        <button class="btn btn-primary px-4">Generate Report</button>
+
+                 <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Gereate report
+                    </button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Generate Attendance Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label for="date" class="form-label">Attendance Date</label>
+        <select class="form-select" id="date" name="date">
+            <option value="">Select attendance date</option>
+            @foreach ($displayrep as $date)
+                <option value="{{ $date }}">{{ \Illuminate\Support\Carbon::parse($date)->format('F d, Y') }}</option>
+            @endforeach
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+                    
                     </div>
                     </form>
 

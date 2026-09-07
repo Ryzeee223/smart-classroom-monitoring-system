@@ -62,13 +62,26 @@ class ReportController extends Controller
             );
         }
 
-        // 3. Fetch all attendance records for today's matching schedules
+        // 3. Synchronize no-tap statuses before displaying today's attendance
+        foreach ($schedules as $schedule) {
+            Report::syncForSchedule($schedule, $todayDate, $now);
+        }
+
+        // 4. Fetch all attendance records for today's matching schedules
         $attendances = Report::whereDate('attendance_date', $todayDate)
             ->whereIn('schedule_id', $schedules->pluck('id'))
             ->get()
             ->keyBy('schedule_id');
 
-        // 4. Map schedules for view display
+        $displayrep = Report::whereNotNull('attendance_date')
+            ->orderByDesc('attendance_date')
+            ->pluck('attendance_date')
+            ->filter()
+            ->map(fn ($date) => Carbon::parse($date)->toDateString())
+            ->unique()
+            ->values();
+
+        // 5. Map schedules for view display
         $facultySchedules = $schedules->map(function ($schedule) use ($now, $todayDate, $attendances) {
             $attendance = $attendances->get($schedule->id);
             
@@ -119,6 +132,7 @@ class ReportController extends Controller
             'todayLabel' => $now->translatedFormat('l, F d, Y'),
             'currentSemester' => $currentSemester,
             'currentSchoolYear' => $currentSchoolYear,
+            'displayrep' => $displayrep,
         ]);
     }
    

@@ -175,7 +175,7 @@ class ApiController extends Controller
 
         if (empty($attendance->time_in) && empty($attendance->time_out)) {
             $attendance->time_in = $now->format('H:i:s');
-            $attendance->status = $now->gt($start->copy()->addMinutes(15)) ? 'late' : 'attended';
+            $attendance->status = $now->gt($start->copy()->addMinutes(30)) ? 'late' : 'attended';
             $attendance->save();
 
             $user->update(['acc_status' => ucfirst($attendance->status)]);

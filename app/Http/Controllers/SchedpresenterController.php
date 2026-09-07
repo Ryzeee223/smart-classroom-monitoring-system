@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Models\Schedule;
-use App\Models\Room; // Standard PascalCase
+use App\Models\Room; 
 
 class SchedpresenterController extends Controller
 {
@@ -55,8 +55,8 @@ class SchedpresenterController extends Controller
         if ($currentTime >= $schedule->start_time && $currentTime <= $schedule->end_time) {
             $startTime = Carbon::parse($schedule->start_time);
             
-            // Late grace period: 5 minutes after start time
-            if ($now->greaterThan($startTime->copy()->addMinutes(5))) {
+            // Late grace period: 30 minutes after start time
+            if ($now->greaterThan($startTime->copy()->addMinutes(30))) {
                 return response()->json(['message' => 'Late. Attendance logged.', 'status' => 'late']);
             }
 
