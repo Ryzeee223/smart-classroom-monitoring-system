@@ -303,15 +303,20 @@ body {
                                     @php
                                         $accountStatus = strtolower((string) ($user->acc_status ?? ''));
                                     @endphp
-                                    <span class="badge {{ $accountStatus === 'Present' ? 'bg-success' : 'bg-success' }}">
-                                        {{ $user->acc_status ?? 'N/A' }}
-                                    </span>
+                                    @if ($accountStatus === 'present')
+                                        <span class="badge bg-success">{{ $user->acc_status }}</span>
+                                    @elseif ($accountStatus === 'absent')
+                                        <span class="badge bg-danger">{{ $user->acc_status }}</span>
+                                    @else
+                                        <span class="badge bg-secondary">{{ $user->acc_status ?? 'N/A' }}</span>
+                                    @endif
+
                                 </td>
                                 <td>
                                     @if($user->RFID_code)
                                         <span class="badge bg-success">Assigned</span>
                                     @else
-                                        <span class="badge bg-danger">Not Assigned</span>
+                                        <span class="badge bg-danger">Not Assigned</span>   
                                     @endif
                                 </td>
                                 <td class="text-center">

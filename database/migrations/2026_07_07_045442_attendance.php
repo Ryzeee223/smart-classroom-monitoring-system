@@ -15,6 +15,7 @@ return new class extends Migration
         {
         $table ->id();
         $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+        $table->foreignId('college_id')->constrained('college')->onDelete('cascade');
         $table->foreignId('schedule_id')->constrained('schedule')->onDelete('cascade');
         $table->foreignId('room_id')->constrained('room')->onDelete('cascade');
         $table->time('time_in')->nullable();

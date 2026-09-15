@@ -13,9 +13,9 @@ class userscontroller extends Controller
         $user = User::findOrFail($id);
 
         // Fill dropdown from college table (hide the first-created college: id=1)
-        $courses = college::query()->select(['id','college_name','abbreviation','description'])->where('id', '!=', 1)->get();
+        $colleges = college::query()->select(['id', 'college_name', 'abbreviation'])->where('id', '!=', 1)->get();
 
-        return view('users.edit', compact('user', 'courses'));
+        return view('users.edit', compact('user', 'colleges'));
     }
 
     public function update(Request $request, $id)
@@ -23,7 +23,8 @@ class userscontroller extends Controller
         $request->validate([
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
-            'college_code' => 'nullable|string|max:255',
+            'role' => 'required|integer|in:2,3,4,5',
+            'acc_status' => 'nullable|string',
         ]);
 
         $user = User::findOrFail($id);
@@ -31,8 +32,8 @@ class userscontroller extends Controller
         $user->update([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
-            'college' => $request->college_code,
-
+            'role' => $request->role,
+            'acc_status' => $request->acc_status,
         ]);
 
         return redirect()->route('users.index')->with('success', 'User updated successfully!');

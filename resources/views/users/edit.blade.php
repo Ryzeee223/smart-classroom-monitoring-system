@@ -46,38 +46,48 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
                         <div class="row g-3">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label class="form-label form-label-sm">First Name</label>
                                 <input type="text" class="form-control form-control-sm" name="first_name" value="{{ old('first_name', $user->first_name) }}" required>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-12">
+                                <label class="form-label form-label-sm">Middle Name</label>
+                                <input type="text" class="form-control form-control-sm" name="middle_name" value="{{ old('middle_name', $user->middle_name) }}">
+                            </div>
+
+                            <div class="col-md-12">
                                 <label class="form-label form-label-sm">Last Name</label>
                                 <input type="text" class="form-control form-control-sm" name="last_name" value="{{ old('last_name', $user->last_name) }}" required>
                             </div>
 
                             <div class="col-md-12">
-                                <label class="form-label form-label-sm">College</label>
-                                <select name="college_code" class="form-select form-select-sm" required>
-                                    <option value="" {{ empty(old('college_code', $user->course)) ? 'selected' : '' }}>Select College</option>
-
-                                    @foreach($courses as $c)
-                                        @php
-                                            $collegeId = (int) ($c->id ?? 0);
-                                            // Hide the first-created college (id=1) from user editing choices.
-                                            if ($collegeId === 1) {
-                                                continue;
-                                            }
-                                            $abbr = $c->abbreviation ?? '';
-                                            $name = $c->college_name ?? '';
-                                        @endphp
-
-                                        <option value="{{ $abbr }}" {{ (string)old('college_code', $user->course) === (string)$abbr ? 'selected' : '' }}>
-                                            {{ $name }}{{ $abbr ? ' (' . $abbr . ')' : '' }}
+                                <label class="form-label form-label-sm">Role</label>
+                                <select name="role" class="form-select form-select-sm" required>
+                                    @php
+                                        $roleLabels = [
+                                            2 => 'Dean',
+                                            3 => 'Assistant Dean',
+                                            4 => 'Faculty',
+                                            5 => 'Program Head',
+                                        ];
+                                    @endphp
+                                    @foreach($roleLabels as $roleId => $roleName)
+                                        <option value="{{ $roleId }}" {{ (string)old('role', $user->role) === (string)$roleId ? 'selected' : '' }}>
+                                            {{ $roleName }}
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
+
+                           <div class="col-md-12">
+                            <label class="form-label form-label-sm">Status</label>
+                            <select name="acc_status" class="form-select form-select-sm">
+                                <option value="Present" {{ old('acc_status', $user->acc_status) === 'Present' ? 'selected' : '' }}>Present</option>
+                                <option value="Absent" {{ old('acc_status', $user->acc_status) === 'Absent' ? 'selected' : '' }}>Absent</option>
+                            </select>
+                           </div>
+
                         </div>
 
                         <div class="d-flex gap-2 mt-4">

@@ -16,9 +16,22 @@
             <div class="row">
                 <div class="col-md-3">@include('sidebar')</div>
 
-                <div class="col-md-9">
+                <div class="col-md-9 mt-5">
+                    @if(session('success'))
+                                <div class="alert alert-success">{{ session('success') }}</div>
+                            @endif
+
+                            @if($errors->any())
+                                <div class="alert alert-danger">
+                                    @foreach($errors->all() as $error)
+                                        <div>{{ $error }}</div>
+                                    @endforeach
+                                </div>
+                            @endif
                     <div class="card shadow-sm">
                         <div class="card-body">
+                            
+                                            
                             <div class="d-flex align-items-center gap-3">
                                 @php
                                   
@@ -55,11 +68,11 @@
                                     
                                 @endphp
 
-                                 <img
+                                 {{-- <img
                                     src="{{ $profileUrl ?? asset('images/default-avatar.png') }}"
                                     alt="Profile picture"
                                     style="width:140px; height:140px; object-fit:cover; border-radius:50%;"
-                                >
+                                > --}}
 
                                 <div>
                                     <h4 class="mb-1">{{ $user ? ($user->first_name . ' ' . $user->last_name) : 'Guest' }}</h4>
@@ -81,17 +94,7 @@
 
                             <hr>
 
-                            @if(session('success'))
-                                <div class="alert alert-success">{{ session('success') }}</div>
-                            @endif
 
-                            @if($errors->any())
-                                <div class="alert alert-danger">
-                                    @foreach($errors->all() as $error)
-                                        <div>{{ $error }}</div>
-                                    @endforeach
-                                </div>
-                            @endif
 
                             <div class="mt-3 text-center">
                                  <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" id="profilePicForm">
@@ -129,7 +132,7 @@
                                             <p class="text-muted mb-3">Submit a Request Letter to the Dean</p>
 
 
-                                            <form action="{{ route('profile.request.store') }}" method="POST" class="row g-3">
+                                            <form id="requestForm" action="{{ route('profile.request.store') }}" method="POST" class="row g-3">
                                                 @csrf
                                   
                                                 <div class="col-12">
@@ -150,15 +153,69 @@
                                                         <option value="" selected disabled>Select option</option>
                                                         <option value="Sick leave">Sick leave</option>
                                                         <option value="official business leave">Official Business leave</option>
-                                                        <option value="Summer class">Request a summer class</option>
-                                                        <option value="others"> others</option>
+                                                        {{-- <option value="Summer class">Request a summer class</option> --}}
+                                                        
                                                     </select>
                                                 </div>
 
                                                 <div class="col-12 text-end">
                                                     <button type="submit" class="btn btn-primary">Send Request</button>
                                                 </div>
+
+                                                <div class="modal fade" id="requestConfirmationModal" tabindex="-1" aria-labelledby="requestConfirmationModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content text-start">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="requestConfirmationModalLabel">Confirm Request</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p class="mb-3">Please double-check your request before sending.</p>
+                                                                <dl class="row mb-0">
+                                                                    <dt class="col-sm-4">Your Request</dt>
+                                                                    <dd class="col-sm-8" id="confirmRequestLetter">-</dd>
+                                                                    <dt class="col-sm-4">Reason</dt>
+                                                                    <dd class="col-sm-8" id="confirmRequestReason">-</dd>
+                                                                </dl>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
+                                                                <button type="button" class="btn btn-primary" id="confirmRequestButton">Confirm and Send</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </form>
+
+                                            <script>
+                                                document.addEventListener('DOMContentLoaded', function () {
+                                                    const requestForm = document.getElementById('requestForm');
+                                                    const requestModalElement = document.getElementById('requestConfirmationModal');
+                                                    if (!requestForm || !requestModalElement) return;
+
+                                                    const requestModal = new bootstrap.Modal(requestModalElement);
+                                                    const confirmRequestButton = document.getElementById('confirmRequestButton');
+                                                    let requestConfirmed = false;
+
+                                                    requestForm.addEventListener('submit', function (event) {
+                                                        if (requestConfirmed) {
+                                                            requestConfirmed = false;
+                                                            return;
+                                                        }
+
+                                                        event.preventDefault();
+                                                        document.getElementById('confirmRequestLetter').textContent = requestForm.querySelector('[name="letter"]').value || 'Not provided';
+                                                        document.getElementById('confirmRequestReason').textContent = requestForm.querySelector('[name="reason"]').selectedOptions[0]?.text || 'Not selected';
+                                                        requestModal.show();
+                                                    });
+
+                                                    confirmRequestButton.addEventListener('click', function () {
+                                                        requestConfirmed = true;
+                                                        requestModal.hide();
+                                                        requestForm.requestSubmit();
+                                                    });
+                                                });
+                                            </script>
 
                                             {{-- Request history --}}
                                             @if(isset($requests) && $requests->count() > 0)

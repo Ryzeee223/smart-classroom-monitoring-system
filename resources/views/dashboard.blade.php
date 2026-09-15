@@ -120,7 +120,7 @@ body {
                                         @endphp
 
                                         <button
-                                            class="nav-link building-tab {{ $bIndex === 0 ?  : '' }}"
+                                            class="nav-link building-tab {{ $bIndex === 0 ? 'active' : '' }}"
                                             type="button"
                                             data-building="{{ $abbr }}"
                                             data-building-name="{{ $name }}"

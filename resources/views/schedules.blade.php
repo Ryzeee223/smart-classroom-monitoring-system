@@ -113,7 +113,7 @@ while ($startTime <= $endTimeLimit) {
                                 <div class="row"> 
                                     {{-- Programs --}}
                                     <div class="row">
-                                    <div class="col-md-12 mb-3 shadow-sm">
+                                    <div class="col-md-12 mb-3">
                                         <label class="form-label">Program</label>
                                         <select class="form-select" name="program_id" required>
                                             <option value="">Select Program</option>
@@ -163,7 +163,7 @@ while ($startTime <= $endTimeLimit) {
                                         </select>
                                     </div>
 
-{{-- start time --}}
+                                {{-- start time --}}
                                     <div class="col-md-3 mb-3">
                                         <label class="form-label">Start Time</label>
                                         <select class="form-select" name="Start_time" required>
@@ -213,12 +213,68 @@ while ($startTime <= $endTimeLimit) {
                                 </div>
 
                                 <div class="mt-4">
-                                    <button type="submit" class="btn btn-primary w-100" onclick="return confirm('Save this schedule?')">
+                                    <button type="submit" class="btn btn-primary w-100">
                                         Add Schedule
                                     </button>
                                 </div>
 
-                                
+                                {{-- Conflict modal --}}
+                                <div class="modal fade" id="scheduleConflictModal" tabindex="-1" aria-labelledby="scheduleConflictModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="scheduleConflictModalLabel">Schedule Conflict</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                A schedule conflict has been detected. Please choose another time or room.
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Schedule confirmation modal --}}
+                                <div class="modal fade" id="scheduleConfirmationModal" tabindex="-1" aria-labelledby="scheduleConfirmationModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="scheduleConfirmationModalLabel">Confirm Schedule</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p class="mb-3">Please double-check the schedule details before saving.</p>
+                                                <dl class="row mb-0">
+                                                    <dt class="col-sm-4">Semester</dt>
+                                                    <dd class="col-sm-8" id="confirmSemester">-</dd>
+                                                    <dt class="col-sm-4">School Year</dt>
+                                                    <dd class="col-sm-8" id="confirmSchoolYear">-</dd>
+                                                    <dt class="col-sm-4">Faculty</dt>
+                                                    <dd class="col-sm-8" id="confirmFaculty">-</dd>
+                                                    <dt class="col-sm-4">Program</dt>
+                                                    <dd class="col-sm-8" id="confirmProgram">-</dd>
+                                                    <dt class="col-sm-4">Course</dt>
+                                                    <dd class="col-sm-8" id="confirmCourse">-</dd>
+                                                    <dt class="col-sm-4">Year / Section</dt>
+                                                    <dd class="col-sm-8" id="confirmYearSection">-</dd>
+                                                    <dt class="col-sm-4">Room</dt>
+                                                    <dd class="col-sm-8" id="confirmRoom">-</dd>
+                                                    <dt class="col-sm-4">Day</dt>
+                                                    <dd class="col-sm-8" id="confirmDays">-</dd>
+                                                    <dt class="col-sm-4">Time</dt>
+                                                    <dd class="col-sm-8" id="confirmTime">-</dd>
+                                                </dl>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
+                                                <button type="button" class="btn btn-primary" id="confirmScheduleButton">Confirm and Save</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
 
                                 {{-- Conflict checker script --}}
                                 <script>
@@ -228,6 +284,26 @@ while ($startTime <= $endTimeLimit) {
 
                                         const alertEl = document.getElementById('scheduleConflictAlert');
                                         const apiUrl = '{{ route('schedules.bookingsystem') }}';
+                                        const confirmationModal = new bootstrap.Modal(document.getElementById('scheduleConfirmationModal'));
+                                        const confirmButton = document.getElementById('confirmScheduleButton');
+                                        let confirmationAccepted = false;
+
+                                        function selectedText(selector, fallback = 'Not selected') {
+                                            const select = form.querySelector(selector);
+                                            return select?.selectedOptions[0]?.text.trim() || fallback;
+                                        }
+
+                                        function populateConfirmation() {
+                                            document.getElementById('confirmSemester').textContent = selectedText('select[name="Semester"]');
+                                            document.getElementById('confirmSchoolYear').textContent = selectedText('select[name="School_year"]');
+                                            document.getElementById('confirmFaculty').textContent = selectedText('select[name="user_id"]');
+                                            document.getElementById('confirmProgram').textContent = selectedText('select[name="program_id"]');
+                                            document.getElementById('confirmCourse').textContent = selectedText('select[name="Course"]');
+                                            document.getElementById('confirmYearSection').textContent = `${selectedText('select[name="year_level"]')} / ${selectedText('select[name="section"]')}`;
+                                            document.getElementById('confirmRoom').textContent = selectedText('select[name="Room"]');
+                                            document.getElementById('confirmDays').textContent = getSelectedDays().join(', ') || 'Not selected';
+                                            document.getElementById('confirmTime').textContent = `${selectedText('select[name="Start_time"]')} - ${selectedText('select[name="End_time"]')}`;
+                                        }
 
                                         function getSelectedDays() {
                                             return Array.from(form.querySelectorAll('input[name="Day[]"]:checked')).map(el => el.value);
@@ -262,6 +338,15 @@ while ($startTime <= $endTimeLimit) {
                                         form.addEventListener('submit', async function (e) {
                                             alertEl.classList.add('d-none');
 
+                                            if (!confirmationAccepted) {
+                                                e.preventDefault();
+                                                populateConfirmation();
+                                                confirmationModal.show();
+                                                return;
+                                            }
+
+                                            confirmationAccepted = false;
+
                                             const selectedDays = getSelectedDays();
                                             const roomId = form.querySelector('select[name="Room"]').value;
                                             const startTime = form.querySelector('select[name="Start_time"]').value;
@@ -282,6 +367,12 @@ while ($startTime <= $endTimeLimit) {
 
                                             // No conflicts: submit
                                             form.submit();
+                                        });
+
+                                        confirmButton.addEventListener('click', function () {
+                                            confirmationAccepted = true;
+                                            confirmationModal.hide();
+                                            form.requestSubmit();
                                         });
                                     });
                                 </script>
@@ -333,13 +424,13 @@ while ($startTime <= $endTimeLimit) {
                                                 <div class="p-2 border rounded bg-light">
                                                     <div class="d-flex justify-content-between align-items-start">
                                                         <div>
-                                                            {{-- Schedule fields (match schedule table columns) --}}
+                                                            {{-- Schedule fields --}}
                                                             <strong>{{ $schedule->Program?->program_abbr ?? $schedule->programs?->program_abbr ?? 'N/A' }} {{ $schedule->year_level ?? '' }} {{$schedule->section }}</strong><br>
                                                             <strong>{{ $schedule->course->course_code ?? 'N/A' }}</strong><br>
                                                             <small class="text-muted">
                                                                 {{ $schedule->day ?? ($schedule->Day ?? 'N/A') }} |
                                                                 {{ $schedule->start_time }} - {{ $schedule->end_time }} |
-                                                                {{ $schedule->room_id ?? ($schedule->Room ?? 'N/A') }}
+                                                                {{ $schedule->room?->room_name ?? ($schedule->room_id ?? ($schedule->Room ?? 'N/A')) }}
                                                             </small><br>
 
                                                             <small class="text-muted">

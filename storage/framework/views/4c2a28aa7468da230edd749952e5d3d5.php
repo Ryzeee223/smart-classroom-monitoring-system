@@ -45,8 +45,6 @@
                 <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('college') ? 'active fw-bold' : ''); ?>" href= "<?php echo e(route('college')); ?>">Colleges</a></li>
                 <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('rooms.index') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('rooms.index')); ?>">Rooms and Buildings</a></li>
                 <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('settings') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('settings')); ?>">Settings</a></li>
-
-                <li class="nav-item"><span class="nav-link text-muted">Reports</span></li>
                 
             <?php elseif($role === 2): ?>
             
@@ -304,4 +302,4 @@
         });
     });
 </script>
-<?php /**PATH /Volumes/shared/capstone project/backups/emonitor 3rd phase copy/resources/views/sidebar.blade.php ENDPATH**/ ?>
+<?php /**PATH D:\capstone project\backups\emonitor 3rd phase copy\resources\views/sidebar.blade.php ENDPATH**/ ?>

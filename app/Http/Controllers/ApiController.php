@@ -140,6 +140,7 @@ class ApiController extends Controller
             ],
             [
                 'room_id' => $schedule->room_id,
+                'college_id' => $schedule->User?->college_id,
                 'day' => $schedule->day,
                 'time_in' => null,
                 'time_out' => null,
@@ -150,6 +151,7 @@ class ApiController extends Controller
         $accountStatus = strtolower(str_replace(['-', '_'], ' ', trim((string) $user->acc_status)));
         $isOnLeave = in_array($accountStatus, ['sick leave', 'on leave', 'leave', 'sick'], true);
 
+        // checking for user status before turning the attendance to all on leave
         if ($isOnLeave) {
             $attendance->time_in = $attendance->time_in ?? $now->format('H:i:s');
             $attendance->status = 'on_leave';

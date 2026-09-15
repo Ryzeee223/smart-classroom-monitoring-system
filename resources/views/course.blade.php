@@ -28,7 +28,7 @@
                     <div class="card shadow">
                         <div class="card-body">
                             <h5 class="card-title">Add Course</h5>
-                            <form action="{{ route('course.store') }}" method="POST">
+                            <form id="courseCreateForm" action="{{ route('course.store') }}" method="POST">
                                 @csrf
 
                                 <div class="mb-3">
@@ -69,7 +69,66 @@
                                 </div>
 
                                 <button type="submit" class="btn btn-primary">Add Course</button>
+
+                                <div class="modal fade" id="courseConfirmationModal" tabindex="-1" aria-labelledby="courseConfirmationModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="courseConfirmationModalLabel">Confirm Course</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p class="mb-3">Please double-check the course details before saving.</p>
+                                                <dl class="row mb-0">
+                                                    <dt class="col-sm-4">College</dt>
+                                                    <dd class="col-sm-8" id="confirmCourseCollege">-</dd>
+                                                    <dt class="col-sm-4">Course Code</dt>
+                                                    <dd class="col-sm-8" id="confirmCourseCode">-</dd>
+                                                    <dt class="col-sm-4">Course Name</dt>
+                                                    <dd class="col-sm-8" id="confirmCourseName">-</dd>
+                                                    <dt class="col-sm-4">Description</dt>
+                                                    <dd class="col-sm-8" id="confirmCourseDescription">-</dd>
+                                                </dl>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
+                                                <button type="button" class="btn btn-primary" id="confirmCourseButton">Confirm and Save</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </form>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const form = document.getElementById('courseCreateForm');
+                                    const modalElement = document.getElementById('courseConfirmationModal');
+                                    if (!form || !modalElement) return;
+
+                                    const confirmationModal = new bootstrap.Modal(modalElement);
+                                    const confirmButton = document.getElementById('confirmCourseButton');
+                                    let confirmationAccepted = false;
+
+                                    form.addEventListener('submit', function (event) {
+                                        if (confirmationAccepted) {
+                                            confirmationAccepted = false;
+                                            return;
+                                        }
+
+                                        event.preventDefault();
+                                        document.getElementById('confirmCourseCollege').textContent = form.querySelector('#college_id')?.selectedOptions[0]?.text.trim() || 'Not selected';
+                                        document.getElementById('confirmCourseCode').textContent = form.querySelector('[name="course_code"]').value || 'Not provided';
+                                        document.getElementById('confirmCourseName').textContent = form.querySelector('[name="course_name"]').value || 'Not provided';
+                                        document.getElementById('confirmCourseDescription').textContent = form.querySelector('[name="description"]').value || 'None';
+                                        confirmationModal.show();
+                                    });
+
+                                    confirmButton.addEventListener('click', function () {
+                                        confirmationAccepted = true;
+                                        confirmationModal.hide();
+                                        form.requestSubmit();
+                                    });
+                                });
+                            </script>
                         </div>
                     </div>
                 </div>

@@ -5,8 +5,8 @@
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecure.h>
 
-const char* ssid = "RZE-0020(2.4)";
-const char* password = "RiZe212004";
+const char* ssid = "Our2.4";
+const char* password = "RZE-202004";
 
 enum ScanMode { SETTINGS_MODE, ATTENDANCE_MODE };
 const ScanMode scanMode = SETTINGS_MODE;

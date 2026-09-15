@@ -5,7 +5,7 @@
 
 #define SS_PIN 10
 #define RST_PIN 9
-#define BUZZER_PIN 4  // Buzzer positive pin connected to Pin 4
+#define BUZZER_PIN 4
 
 LiquidCrystal_I2C lcd(0x27, 20, 2);
 MFRC522 mfrc522(SS_PIN, RST_PIN);

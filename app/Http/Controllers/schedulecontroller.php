@@ -56,12 +56,16 @@ class schedulecontroller extends Controller
         // Dean / Assistant Dean see schedules of users in their college;
         // Admin sees all.
         if ($sessionRole === 5) {
-            $schedules = Schedule::where('user_id', session('user_id'))->get();
+            $schedules = Schedule::with('room')
+                ->where('user_id', session('user_id'))
+                ->get();
         } elseif ($sessionRole !== 1 && $collegeId) {
             $collegeUserIds = User::where('college_id', $collegeId)->pluck('id');
-            $schedules = Schedule::whereIn('user_id', $collegeUserIds)->get();
+            $schedules = Schedule::with('room')
+                ->whereIn('user_id', $collegeUserIds)
+                ->get();
         } else {
-            $schedules = Schedule::all();
+            $schedules = Schedule::with('room')->get();
         }
 
         $programs = Programs::all();

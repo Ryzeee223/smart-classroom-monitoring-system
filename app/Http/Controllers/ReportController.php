@@ -46,14 +46,18 @@ class ReportController extends Controller
 
         // 2. AUTO-CREATE missing attendance rows so new schedules show up immediately
         foreach ($schedules as $schedule) {
+            $collegeIdForSchedule = $schedule->user?->college_id ?? $collegeId;
+
             Report::firstOrCreate(
                 [
                     'user_id' => $schedule->user_id,
+                    'college_id' => $collegeIdForSchedule,
                     'schedule_id' => $schedule->id,
                     'attendance_date' => $todayDate,
                 ],
                 [
                     'room_id' => $schedule->room_id,
+                    'college_id' => $collegeIdForSchedule,
                     'day' => $schedule->day,
                     'time_in' => null,
                     'time_out' => null,
@@ -70,10 +74,12 @@ class ReportController extends Controller
         // 4. Fetch all attendance records for today's matching schedules
         $attendances = Report::whereDate('attendance_date', $todayDate)
             ->whereIn('schedule_id', $schedules->pluck('id'))
+            ->where('college_id', $collegeId)
             ->get()
             ->keyBy('schedule_id');
 
         $displayrep = Report::whereNotNull('attendance_date')
+            ->where('college_id', $collegeId)
             ->orderByDesc('attendance_date')
             ->pluck('attendance_date')
             ->filter()
@@ -163,6 +169,48 @@ class ReportController extends Controller
 
     public function generate(Request $request)
     {
-        return $this->index();
+        $validated = $request->validate([
+            'date' => 'required|date',
+        ]);
+
+        $currentUser = \App\Models\users::find(session('user_id'));
+        $collegeId = (int) ($currentUser?->college_id ?? session('college_id') ?? 0);
+        $reportDate = Carbon::parse($validated['date']);
+
+        $attendanceRecords = Report::with(['schedule.user', 'schedule.course'])
+            ->whereDate('attendance_date', $reportDate->toDateString())
+            ->when($collegeId > 0, fn ($query) => $query->where('college_id', $collegeId))
+            ->get()
+            ->sortBy(fn ($record) => $record->schedule?->start_time ?? '23:59:59');
+
+        $escape = static fn ($value) => htmlspecialchars((string) ($value ?? 'N/A'), ENT_QUOTES, 'UTF-8');
+
+        return response()->streamDownload(function () use ($attendanceRecords, $escape, $reportDate) {
+            echo '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>';
+            echo '<h2>Attendance Report - ' . $escape($reportDate->format('F d, Y')) . '</h2>';
+            echo '<table border="1">';
+            echo '<thead><tr><th>Time</th><th>Time In</th><th>Time Out</th><th>Faculty Name</th><th>Course Code</th><th>Status</th></tr></thead><tbody>';
+
+            foreach ($attendanceRecords as $record) {
+                $schedule = $record->schedule;
+                $faculty = trim(($schedule?->user?->first_name ?? '') . ' ' . ($schedule?->user?->last_name ?? '')) ?: 'N/A';
+                echo '<tr>';
+                echo '<td>' . $escape($schedule?->start_time) . ' - ' . $escape($schedule?->end_time) . '</td>';
+                echo '<td>' . $escape($record->time_in) . '</td>';
+                echo '<td>' . $escape($record->time_out) . '</td>';
+                echo '<td>' . $escape($faculty) . '</td>';
+                echo '<td>' . $escape($schedule?->course?->course_code) . '</td>';
+                echo '<td>' . $escape(ucfirst(str_replace('_', ' ', $record->status ?? 'waiting'))) . '</td>';
+                echo '</tr>';
+            }
+
+            if ($attendanceRecords->isEmpty()) {
+                echo '<tr><td colspan="6">No attendance records found.</td></tr>';
+            }
+
+            echo '</tbody></table></body></html>';
+        }, 'attendance-report-' . $reportDate->format('Y-m-d') . '.xls', [
+            'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
+        ]);
     }
 }

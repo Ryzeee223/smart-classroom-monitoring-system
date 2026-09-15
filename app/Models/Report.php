@@ -10,6 +10,7 @@ class Report extends Model
 
     protected $fillable = [
         'user_id',
+        'college_id',
         'schedule_id',
         'room_id',
         'day',
@@ -29,16 +30,23 @@ class Report extends Model
         return $this->belongsTo(users::class, 'user_id');
     }
 
+    public function college()
+    {
+        return $this->belongsTo(college::class, 'college_id');
+    }
+
     public static function syncForSchedule(Schedule $schedule, string $attendanceDate, Carbon $now): self
     {
         $attendance = self::firstOrCreate(
             [
                 'user_id' => $schedule->user_id,
+                'college_id' => $schedule->User?->college_id,
                 'schedule_id' => $schedule->id,
                 'attendance_date' => $attendanceDate,
             ],
             [
                 'room_id' => $schedule->room_id,
+                'college_id' => $schedule->User?->college_id,
                 'day' => $schedule->day,
                 'status' => 'waiting',
             ]
@@ -71,6 +79,7 @@ class Report extends Model
         return self::updateOrCreate(
             [
                 'user_id' => $userId,
+            'college_id' => $schedule->User?->college_id,
                 'schedule_id' => $scheduleId,
                 'attendance_date' => $attendanceDate,
             ],

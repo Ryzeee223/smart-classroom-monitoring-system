@@ -28,6 +28,13 @@ class SchedpresenterController extends Controller
         // 3. Return view ONCE with all data
         return view('dashboard', compact('schedules', 'ongoingClass'));
     }
+
+    public function reportToXls (Request $request)
+    {
+// logic for generating excel
+
+
+    }
     
     public function RtSchedchecker(Request $request)
     {

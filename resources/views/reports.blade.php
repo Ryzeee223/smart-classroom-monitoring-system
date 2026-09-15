@@ -12,6 +12,8 @@
     <style>
         body {
             background: #f5f7fb;
+            overflow-x: hidden;
+            overflow-y:hidden;
         }
 
         .schedule-card {
@@ -77,132 +79,77 @@
 <body>
     @include('sidebar')
 
-    <div class="container-fluid p-4 mt-3">
+    <div class="container-fluid p-5 mt-3">
         <div class="row justify-content-end">
-            <div class="col-xl-10 col-lg-11 col-md-11">
+            <div class="col-xl-10 col-lg-11 col-md-12">
+
                 <div class="card schedule-card shadow-sm border-1">
                     <div class="schedule-header d-flex justify-content-between align-items-center flex-wrap gap-3">
-                       <form action="">
                         <div>
                             <h5 class="mb-1 fw-bold text-dark">Faculty Schedule Overview</h5>
                             <small class="text-muted d-block">{{ $todayLabel ?? now()->translatedFormat('l, F d, Y') }}</small>
                             <small class="text-muted d-block">
                                 {{ $currentSemester ?? 'Current Semester' }} • {{ $currentSchoolYear ?? 'Current School Year' }}
                             </small>
+
                         </div>
-
-                 <!-- Button trigger modal -->
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            Gereate report
-                    </button>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Generate Attendance Report</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <label for="date" class="form-label">Attendance Date</label>
-        <select class="form-select" id="date" name="date">
-            <option value="">Select attendance date</option>
-            @foreach ($displayrep as $date)
-                <option value="{{ $date }}">{{ \Illuminate\Support\Carbon::parse($date)->format('F d, Y') }}</option>
-            @endforeach
-        </select>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
-                    
-                    </div>
-                    </form>
-
-                    <div class="card-body p-4">
-                        <div class="row g-4">
-                            <div class="col-lg-8">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="mb-0 fw-bold text-dark">Today's Faculty Classes</h6>
-                                    <span class="badge bg-light text-dark border">{{ count($facultySchedules) }} scheduled</span>
+                            <form method="POST" action="{{ route('reports.generate') }}" class="d-flex align-items-end gap-2">
+                                @csrf
+                                <div>
+                                    <label for="date" class="form-label">Attendance Date</label>
+                                    <select class="form-select" id="date" name="date" required>
+                                        <option value="">Select attendance date</option>
+                                        @foreach ($displayrep as $date)
+                                            <option value="{{ $date }}">{{ \Illuminate\Support\Carbon::parse($date)->format('F d, Y') }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
+                                <button type="submit" class="btn btn-primary">Generate Excel</button>
+                            </form>
+                        </div>
+                    </div>
 
-                                @forelse ($facultySchedules as $class)
-                                    <div class="schedule-item {{ $class['is_live'] ? 'live' : '' }}">
-                                        <div class="row align-items-center g-3">
-                                            <div class="col-md-3">
-                                                <div class="subject-code">{{ $class['course_code'] }}</div>
-                                                <div class="fw-bold text-dark mt-1">{{ $class['subject'] }}</div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="text-muted small">Faculty</div>
-                                                <div class="fw-semibold">{{ $class['faculty'] }}</div>
-                                                <div class="text-muted small">{{ $class['role'] }}</div>
-                                            </div>
-                                            <div class="col-md-2">
-                                                <div class="text-muted small">Classroom</div>
-                                                <div class="fw-semibold">{{ $class['room'] }}</div>
-                                            </div>
-                                            <div class="col-md-2">
-                                                <div class="text-muted small">Date</div>
-                                                <div class="fw-semibold">{{ $class['date_display'] }}</div>
-                                            </div>
-                                            <div class="col-md-2 text-md-end">
-                                                <div class="text-muted small">Start</div>
-                                                <div class="schedule-time">{{ $class['start_display'] }}</div>
-                                                <div class="text-muted small mt-2">End</div>
-                                                <div class="fw-semibold">{{ $class['end_display'] }}</div>
-                                                <div class="text-muted small mt-2">Attendance</div>
-                                                <div class="fw-semibold text-capitalize">{{ str_replace('_', ' ', $class['attendance_status']) }}</div>
-                                                @if ($class['time_in'])
-                                                    <div class="text-muted small">In: {{ $class['time_in'] }}</div>
-                                                @endif
-                                                @if ($class['time_out'])
-                                                    <div class="text-muted small">Out: {{ $class['time_out'] }}</div>
-                                                @endif
-                                                <span class="status-badge mt-2 d-inline-block {{ $class['is_live'] ? 'bg-success text-white' : 'bg-light text-dark border' }}">
-                                                    {{ $class['label'] }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
+
+                 <div class="card-body p-3 p-md-4">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">Time In</th>
+                                    <th scope="col">Time Out</th>
+                                    <th scope="col">Faculty Name</th>
+                                    <th scope="col">Course Code</th>
+                                    <th scope="col">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($facultySchedules as $schedule)
+                                    <tr>
+                                        <td>{{ $schedule['start_display'] }} - {{ $schedule['end_display'] }}</td>
+                                        <td>{{ $schedule['time_in'] ?? 'N/A' }}</td>
+                                        <td>{{ $schedule['time_out'] ?? 'N/A' }}</td>
+                                        <td>{{ $schedule['faculty'] }}</td>
+                                        <td>{{ $schedule['course_code'] }}</td>
+                                        <td>
+                                            <span class="badge text-bg-secondary">
+                                                {{ ucfirst(str_replace('_', ' ', $schedule['attendance_status'])) }}
+                                            </span>
+                                        </td>
+                                    </tr>
                                 @empty
-                                    <div class="alert alert-light border mb-0">No faculty schedules available.</div>
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">No attendance records found.</td>
+                                    </tr>
                                 @endforelse
-                            </div>
-
-                            @if ($nextClass)
-                                <div class="col-lg-4">
-                                    <div class="upcoming-box h-100">
-                                        <div class="text-muted small text-uppercase fw-bold mb-2">Next Class</div>
-                                        <h6 class="fw-bold mb-2">{{ $nextClass['faculty'] }}</h6>
-                                        <div class="fw-bold text-dark">{{ $nextClass['course_code'] }} • {{ $nextClass['subject'] }}</div>
-                                        <div class="mt-2 text-muted">{{ $nextClass['day'] }} • {{ $nextClass['date_display'] }}</div>
-
-                                        <div class="mt-3 border rounded p-3 bg-light">
-                                            <div class="small text-muted">Time Slot</div>
-                                            <div class="fw-bold text-primary">
-                                                {{ $nextClass['start_display'] }} - {{ $nextClass['end_display'] }}
-                                            </div>
-                                        </div>
-
-                                        <div class="mt-3 border rounded p-3 bg-light">
-                                            <div class="small text-muted">Classroom</div>
-                                            <div class="fw-bold">{{ $nextClass['room'] }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
+                            </tbody>
+                        </table>
+                        <br>
                     </div>
+                  </div>
                 </div>
             </div>
-        </div>
+        </div>  
+            </div>
     </div>
     @include('partials.notifications-modal')
 </body>

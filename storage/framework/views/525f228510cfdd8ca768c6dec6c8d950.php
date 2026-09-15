@@ -124,4 +124,4 @@
     </div>
 </div>
 
-<?php /**PATH /Volumes/shared/capstone project/backups/emonitor 3rd phase copy/resources/views/partials/notifications-modal.blade.php ENDPATH**/ ?>
+<?php /**PATH D:\capstone project\backups\emonitor 3rd phase copy\resources\views/partials/notifications-modal.blade.php ENDPATH**/ ?>
