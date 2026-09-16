@@ -172,7 +172,9 @@ class ReportController extends Controller
         $validated = $request->validate([
             'date' => 'required|date',
         ]);
-
+        $semesterYear = semyr::latest('id')->first();
+        $Semester = $semesterYear?->semester ?? 'Current Semester';
+        $SchoolYear = $semesterYear?->school_year ?? 'Current School Year';
         $currentUser = \App\Models\users::find(session('user_id'));
         $collegeId = (int) ($currentUser?->college_id ?? session('college_id') ?? 0);
         $reportDate = Carbon::parse($validated['date']);
@@ -185,9 +187,10 @@ class ReportController extends Controller
 
         $escape = static fn ($value) => htmlspecialchars((string) ($value ?? 'N/A'), ENT_QUOTES, 'UTF-8');
 
-        return response()->streamDownload(function () use ($attendanceRecords, $escape, $reportDate) {
+        return response()->streamDownload(function () use ($attendanceRecords, $escape, $reportDate, $Semester, $SchoolYear) {
             echo '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>';
             echo '<h2>Attendance Report - ' . $escape($reportDate->format('F d, Y')) . '</h2>';
+            echo '<h2>School year: ' . $escape($SchoolYear) . ' | ' . $escape($Semester) . '</h2>';
             echo '<table border="1">';
             echo '<thead><tr><th>Time</th><th>Time In</th><th>Time Out</th><th>Faculty Name</th><th>Course Code</th><th>Status</th></tr></thead><tbody>';
 

@@ -115,6 +115,7 @@
                         <table class="table table-bordered table-hover align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
+                                    <th scope="col">Schedule</th>
                                     <th scope="col">Time In</th>
                                     <th scope="col">Time Out</th>
                                     <th scope="col">Faculty Name</th>
