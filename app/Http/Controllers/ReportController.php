@@ -178,6 +178,40 @@ class ReportController extends Controller
         $currentUser = \App\Models\users::find(session('user_id'));
         $collegeId = (int) ($currentUser?->college_id ?? session('college_id') ?? 0);
         $reportDate = Carbon::parse($validated['date']);
+        $reportDay = strtolower($reportDate->translatedFormat('l'));
+
+        $matchingSchedules = Schedule::with(['user', 'course', 'room'])
+            ->where(function ($query) use ($reportDay) {
+                $query->whereRaw('LOWER(day) LIKE ?', ['%' . $reportDay . '%'])
+                    ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower(substr($reportDay, 0, 3)) . '%']);
+            })
+            ->whereHas('user', function ($query) {
+                $query->where('role', '!=', 1);
+            })
+            ->when($collegeId > 0, function ($query) use ($collegeId) {
+                $query->whereHas('user', fn ($uQ) => $uQ->where('college_id', $collegeId));
+            }, fn ($query) => $query->whereRaw('1 = 0'))
+            ->get();
+
+        foreach ($matchingSchedules as $schedule) {
+            $scheduleCollegeId = $schedule->user?->college_id ?? $collegeId;
+
+            Report::firstOrCreate(
+                [
+                    'user_id' => $schedule->user_id,
+                    'college_id' => $scheduleCollegeId,
+                    'schedule_id' => $schedule->id,
+                    'attendance_date' => $reportDate->toDateString(),
+                ],
+                [
+                    'room_id' => $schedule->room_id,
+                    'day' => $schedule->day,
+                    'time_in' => null,
+                    'time_out' => null,
+                    'status' => 'waiting',
+                ]
+            );
+        }
 
         $attendanceRecords = Report::with(['schedule.user', 'schedule.course'])
             ->whereDate('attendance_date', $reportDate->toDateString())
