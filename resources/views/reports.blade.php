@@ -93,19 +93,28 @@
                             </small>
 
                         </div>
-                            <form method="POST" action="{{ route('reports.generate') }}" class="d-flex align-items-end gap-2">
-                                @csrf
-                                <div>
-                                    <label for="date" class="form-label">Attendance Date</label>
-                                    <select class="form-select" id="date" name="date" required>
-                                        <option value="">Select attendance date</option>
-                                        @foreach ($displayrep as $date)
-                                            <option value="{{ $date }}">{{ \Illuminate\Support\Carbon::parse($date)->format('F d, Y') }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Generate Excel</button>
-                            </form>
+                            <div class="d-flex align-items-end gap-2 flex-wrap">
+                                <form method="GET" action="{{ route('reports') }}" class="d-flex align-items-end gap-2">
+                                    <div>
+                                        <label for="date" class="form-label">Attendance Date</label>
+                                        <select class="form-select" id="date" name="date" required>
+                                            <option value="">Select attendance date</option>
+                                            @foreach ($displayrep as $date)
+                                                <option value="{{ $date }}" @selected(request('date') == $date)>
+                                                    {{ \Illuminate\Support\Carbon::parse($date)->format('F d, Y') }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">View Attendance</button>
+                                </form>
+
+                                <form method="POST" action="{{ route('reports.generate') }}" class="d-flex align-items-end">
+                                    @csrf
+                                    <input type="hidden" name="date" value="{{ request('date') }}">
+                                    <button type="submit" class="btn btn-success" {{ !request('date') ? 'disabled' : '' }}>Generate Excel</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
 

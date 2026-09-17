@@ -14,9 +14,10 @@ class ReportController extends Controller
         $displayrep = Report::with('attendance_date');
         return view('reports', compact('displayrep'));
     }
-    public function index()
+    public function index(Request $request)
     {
-        $now = Carbon::now();
+        $selectedDate = $request->query('date');
+        $now = $selectedDate ? Carbon::parse($selectedDate) : Carbon::now();
         $todayDate = $now->toDateString();
         $todayFullDay = $now->format('l'); // e.g. "Monday"
         $todayShortDay = $now->format('D'); // e.g. "Mon"
@@ -29,7 +30,7 @@ class ReportController extends Controller
         $currentUser = \App\Models\users::find($currentUserId);
         $collegeId = (int) ($currentUser?->college_id ?? session('college_id') ?? 0);
 
-        // 1. Fetch relevant schedules for today
+        // 1. Fetch relevant schedules for the selected date
         $schedules = Schedule::with(['user', 'course', 'room', 'Program'])
             ->where(function ($query) use ($todayFullDay, $todayShortDay) {
                 $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayFullDay) . '%'])
@@ -44,7 +45,7 @@ class ReportController extends Controller
             ->orderBy('start_time', 'asc')
             ->get();
 
-        // 2. AUTO-CREATE missing attendance rows so new schedules show up immediately
+        // 2. Auto-create missing attendance rows for the selected date
         foreach ($schedules as $schedule) {
             $collegeIdForSchedule = $schedule->user?->college_id ?? $collegeId;
 
@@ -66,12 +67,12 @@ class ReportController extends Controller
             );
         }
 
-        // 3. Synchronize no-tap statuses before displaying today's attendance
+        // 3. Synchronize no-tap statuses before displaying attendance
         foreach ($schedules as $schedule) {
             Report::syncForSchedule($schedule, $todayDate, $now);
         }
 
-        // 4. Fetch all attendance records for today's matching schedules
+        // 4. Fetch all attendance records for the selected date
         $attendances = Report::whereDate('attendance_date', $todayDate)
             ->whereIn('schedule_id', $schedules->pluck('id'))
             ->where('college_id', $collegeId)
@@ -105,7 +106,7 @@ class ReportController extends Controller
                 $endDateTime->addDay();
             }
 
-            $isLive = $now->between($startDateTime, $endDateTime, true);
+            $isLive = $now->toDateString() === $todayDate && $now->between($startDateTime, $endDateTime, true);
 
             return [
                 'faculty' => trim(($schedule->user?->first_name ?? '') . ' ' . ($schedule->user?->last_name ?? '')) ?: 'Faculty',
@@ -126,7 +127,7 @@ class ReportController extends Controller
                 'start_datetime' => $startDateTime,
                 'end_datetime' => $endDateTime,
                 'is_live' => $isLive,
-                'label' => $isLive ? 'In progress' : 'Upcoming',
+                'label' => $isLive ? 'In progress' : ($now->isPast() ? 'Past attendance' : 'Upcoming'),
             ];
         })->sortBy(fn ($item) => $item['start_datetime']->timestamp)->values();
 
@@ -139,6 +140,7 @@ class ReportController extends Controller
             'currentSemester' => $currentSemester,
             'currentSchoolYear' => $currentSchoolYear,
             'displayrep' => $displayrep,
+            'selectedDate' => $todayDate,
         ]);
     }
    
