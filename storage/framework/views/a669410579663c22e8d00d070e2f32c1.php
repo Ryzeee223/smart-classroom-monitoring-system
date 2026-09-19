@@ -446,4 +446,4 @@ body {
 
 
 
-<?php /**PATH D:\capstone project\backups\emonitor 3rd phase copy\resources\views\dashboard.blade.php ENDPATH**/ ?>
+<?php /**PATH D:\capstone project\backups\emonitor 3rd phase copy\resources\views/dashboard.blade.php ENDPATH**/ ?>

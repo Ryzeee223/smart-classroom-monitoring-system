@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Schedule;
 use App\Models\User;
 use App\Models\Report;
+use Illuminate\Http\JsonResponse;
 
 class ApiController extends Controller
 {
@@ -26,7 +27,10 @@ class ApiController extends Controller
 
         $user = User::whereRaw('UPPER(TRIM(RFID_code)) = ?', [$scannedUid])->first();
         $attendanceData = $user
-            ? $this->processAttendanceForUser($user, $scannedUid)
+            ? Cache::lock(
+                'attendance-scan:' . $user->id . ':' . Carbon::today()->toDateString(),
+                10
+            )->block(5, fn () => $this->processAttendanceForUser($user, $scannedUid))
             : [
                 'status' => 'denied',
                 'message' => 'RFID card is not assigned to a user.',
@@ -83,6 +87,20 @@ class ApiController extends Controller
             ->whereTime('end_time', '>=', $now->format('H:i:s'))
             ->first();
 
+        $attendance = null;
+
+        // A checkout scan happens after the schedule is no longer active.
+        if (!$schedule) {
+            $attendance = Report::with('schedule')
+                ->where('user_id', $user->id)
+                ->whereDate('attendance_date', $now->toDateString())
+                ->whereNotNull('time_in')
+                ->whereNull('time_out')
+                ->latest('id')
+                ->first();
+            $schedule = $attendance?->schedule;
+        }
+
         if (!$schedule) {
             return [
                 'status' => 'denied',
@@ -132,7 +150,7 @@ class ApiController extends Controller
         $start = Carbon::today()->setTimeFromTimeString($schedule->start_time);
         $end = Carbon::today()->setTimeFromTimeString($schedule->end_time);
 
-        $attendance = Report::firstOrCreate(
+        $attendance ??= Report::firstOrCreate(
             [
                 'user_id' => $user->id,
                 'schedule_id' => $schedule->id,
@@ -156,6 +174,7 @@ class ApiController extends Controller
             $attendance->time_in = $attendance->time_in ?? $now->format('H:i:s');
             $attendance->status = 'on_leave';
             $attendance->save();
+            $schedule->room()->update(['status' => 'occupied']);
 
             $user->update(['acc_status' => 'On Leave']);
 
@@ -179,6 +198,7 @@ class ApiController extends Controller
             $attendance->time_in = $now->format('H:i:s');
             $attendance->status = $now->gt($start->copy()->addMinutes(30)) ? 'late' : 'attended';
             $attendance->save();
+            $schedule->room()->update(['status' => 'occupied']);
 
             $user->update(['acc_status' => ucfirst($attendance->status)]);
 
@@ -218,6 +238,17 @@ class ApiController extends Controller
 
             $attendance->time_out = $now->format('H:i:s');
             $attendance->save();
+
+            $roomStillInUse = Report::where('room_id', $schedule->room_id)
+                ->whereDate('attendance_date', $now->toDateString())
+                ->whereNotNull('time_in')
+                ->whereNull('time_out')
+                ->where('id', '!=', $attendance->id)
+                ->exists();
+
+            if (!$roomStillInUse) {
+                $schedule->room()->update(['status' => 'vacant']);
+            }
 
             $user->update(['acc_status' => 'Checked Out']);
 
@@ -269,5 +300,60 @@ class ApiController extends Controller
         }
 
         return strtoupper(trim((string) $uid));
+    }
+    public function DisplaytoLcd()
+    {
+        $now = Carbon::now();
+        $today = $now->format('l');
+
+        $rooms = \App\Models\room::with('building')->get();
+        $schedules = Schedule::with(['User', 'course', 'room'])
+            ->where(function ($query) use ($today) {
+                $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($today) . '%'])
+                    ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower(substr($today, 0, 3)) . '%']);
+            })
+            ->whereTime('start_time', '<=', $now->format('H:i:s'))
+            ->whereTime('end_time', '>=', $now->format('H:i:s'))
+            ->get();
+
+        $attendanceBySchedule = Report::whereDate('attendance_date', $now->toDateString())
+            ->whereIn('schedule_id', $schedules->pluck('id'))
+            ->get()
+            ->keyBy('schedule_id');
+
+        $liveByRoom = $schedules->mapWithKeys(function ($schedule) use ($attendanceBySchedule) {
+            $attendance = $attendanceBySchedule->get($schedule->id);
+            $faculty = trim(($schedule->User?->first_name ?? '') . ' ' . ($schedule->User?->last_name ?? ''));
+
+            return [$schedule->room_id => [
+                'schedule_id' => $schedule->id,
+                'faculty' => $faculty ?: 'Faculty',
+                'course_code' => $schedule->course?->course_code ?? 'N/A',
+                'course' => $schedule->course?->course_name ?? 'N/A',
+                'start' => $schedule->start_time,
+                'end' => $schedule->end_time,
+                'time_in' => $attendance?->time_in,
+                'time_out' => $attendance?->time_out,
+                'attendance_status' => $attendance?->status ?? 'waiting',
+                'occupied' => (bool) ($attendance?->time_in && !$attendance?->time_out),
+            ]];
+        });
+
+        return response()->json([
+            'rooms' => $rooms->map(function ($room) use ($liveByRoom) {
+                $live = $liveByRoom->get($room->id);
+
+                return [
+                    'id' => $room->id,
+                    'name' => $room->room_name,
+                    'type' => $room->room_type,
+                    'bldg_abbr' => $room->building?->bldg_abbr ?? '',
+                    'bldg_name' => $room->building?->bldg_name ?? '',
+                    'status' => $live && $live['occupied'] ? 'occupied' : 'vacant',
+                    'live' => $live,
+                ];
+            })->values(),
+            'updated_at' => $now->toIso8601String(),
+        ]);
     }
 }

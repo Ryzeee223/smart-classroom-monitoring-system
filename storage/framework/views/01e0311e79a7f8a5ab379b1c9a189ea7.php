@@ -81,7 +81,7 @@
 
     <div class="container-fluid p-5 mt-3">
         <div class="row justify-content-end">
-            <div class="col-xl-10 col-lg-11 col-md-12">
+            <div class="col-xl-10 col-lg-12 col-md-12">
 
                 <div class="card schedule-card shadow-sm border-1">
                     <div class="schedule-header d-flex justify-content-between align-items-center flex-wrap gap-3">
@@ -94,19 +94,29 @@
                             </small>
 
                         </div>
-                            <form method="POST" action="<?php echo e(route('reports.generate')); ?>" class="d-flex align-items-end gap-2">
-                                <?php echo csrf_field(); ?>
-                                <div>
-                                    <label for="date" class="form-label">Attendance Date</label>
-                                    <select class="form-select" id="date" name="date" required>
-                                        <option value="">Select attendance date</option>
-                                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $displayrep; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $date): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
-                                            <option value="<?php echo e($date); ?>"><?php echo e(\Illuminate\Support\Carbon::parse($date)->format('F d, Y')); ?></option>
-                                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
-                                    </select>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Generate Excel</button>
-                            </form>
+                            <div class="d-flex align-items-end gap-2 flex-wrap">
+                                <form method="GET" action="<?php echo e(route('reports')); ?>" class="d-flex align-items-end gap-2">
+                                    <div>
+                                        <label for="date" class="form-label">Attendance Date</label>
+                                        <select class="form-select" id="date" name="date" required>
+                                            <option value="">Select attendance date</option>
+                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $displayrep; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $date): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                                <option value="<?php echo e($date); ?>" <?php if(request('date') == $date): echo 'selected'; endif; ?>>
+                                                    <?php echo e(\Illuminate\Support\Carbon::parse($date)->format('F d, Y')); ?>
+
+                                                </option>
+                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">View Attendance</button>
+                                </form>
+
+                                <form method="POST" action="<?php echo e(route('reports.generate')); ?>" class="d-flex align-items-end">
+                                    <?php echo csrf_field(); ?>
+                                    <input type="hidden" name="date" value="<?php echo e(request('date')); ?>">
+                                    <button type="submit" class="btn btn-success" <?php echo e(!request('date') ? 'disabled' : ''); ?>>Generate Excel</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
 
@@ -116,6 +126,7 @@
                         <table class="table table-bordered table-hover align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
+                                    <th scope="col">Schedule</th>
                                     <th scope="col">Time In</th>
                                     <th scope="col">Time Out</th>
                                     <th scope="col">Faculty Name</th>

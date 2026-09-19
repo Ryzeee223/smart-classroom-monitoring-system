@@ -30,57 +30,17 @@ class ReportController extends Controller
         $currentUser = \App\Models\users::find($currentUserId);
         $collegeId = (int) ($currentUser?->college_id ?? session('college_id') ?? 0);
 
-        // 1. Fetch relevant schedules for the selected date
-        $schedules = Schedule::with(['user', 'course', 'room', 'Program'])
-            ->where(function ($query) use ($todayFullDay, $todayShortDay) {
-                $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayFullDay) . '%'])
-                      ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayShortDay) . '%']);
-            })
-            ->whereHas('user', function ($query) {
-                $query->where('role', '!=', 1);
-            })
-            ->when($collegeId > 0, function ($query) use ($collegeId) {
-                $query->whereHas('user', fn ($uQ) => $uQ->where('college_id', $collegeId));
-            }, fn ($query) => $query->whereRaw('1 = 0'))
-            ->orderBy('start_time', 'asc')
+        // Attendance is the source of report rows. Schedule only supplies
+        // the planned class time and course code for each attendance record.
+        $attendances = Report::with(['user', 'schedule.course'])
+            ->whereDate('attendance_date', $todayDate)
+            ->where('status', '!=', 'waiting')
+            ->when($collegeId > 0, fn ($query) => $query->where('college_id', $collegeId))
             ->get();
 
-        // 2. Auto-create missing attendance rows for the selected date
-        foreach ($schedules as $schedule) {
-            $collegeIdForSchedule = $schedule->user?->college_id ?? $collegeId;
-
-            Report::firstOrCreate(
-                [
-                    'user_id' => $schedule->user_id,
-                    'college_id' => $collegeIdForSchedule,
-                    'schedule_id' => $schedule->id,
-                    'attendance_date' => $todayDate,
-                ],
-                [
-                    'room_id' => $schedule->room_id,
-                    'college_id' => $collegeIdForSchedule,
-                    'day' => $schedule->day,
-                    'time_in' => null,
-                    'time_out' => null,
-                    'status' => 'waiting',
-                ]
-            );
-        }
-
-        // 3. Synchronize no-tap statuses before displaying attendance
-        foreach ($schedules as $schedule) {
-            Report::syncForSchedule($schedule, $todayDate, $now);
-        }
-
-        // 4. Fetch all attendance records for the selected date
-        $attendances = Report::whereDate('attendance_date', $todayDate)
-            ->whereIn('schedule_id', $schedules->pluck('id'))
-            ->where('college_id', $collegeId)
-            ->get()
-            ->keyBy('schedule_id');
-
         $displayrep = Report::whereNotNull('attendance_date')
-            ->where('college_id', $collegeId)
+            ->where('status', '!=', 'waiting')
+            ->when($collegeId > 0, fn ($query) => $query->where('college_id', $collegeId))
             ->orderByDesc('attendance_date')
             ->pluck('attendance_date')
             ->filter()
@@ -88,10 +48,8 @@ class ReportController extends Controller
             ->unique()
             ->values();
 
-        // 5. Map schedules for view display
-        $facultySchedules = $schedules->map(function ($schedule) use ($now, $todayDate, $attendances) {
-            $attendance = $attendances->get($schedule->id);
-            
+        $facultySchedules = $attendances->map(function ($attendance) use ($now, $todayDate) {
+            $schedule = $attendance->schedule;
             $roleLabels = [
                 2 => 'Dean',
                 3 => 'Assistant Dean',
@@ -99,37 +57,44 @@ class ReportController extends Controller
                 5 => 'Program Head',
             ];
 
-            $startDateTime = Carbon::parse("{$todayDate} {$schedule->start_time}");
-            $endDateTime = Carbon::parse("{$todayDate} {$schedule->end_time}");
+            $startDateTime = $schedule?->start_time
+                ? Carbon::parse("{$todayDate} {$schedule->start_time}")
+                : null;
+            $endDateTime = $schedule?->end_time
+                ? Carbon::parse("{$todayDate} {$schedule->end_time}")
+                : null;
 
-            if ($endDateTime->lt($startDateTime)) {
+            if ($startDateTime && $endDateTime && $endDateTime->lt($startDateTime)) {
                 $endDateTime->addDay();
             }
 
-            $isLive = $now->toDateString() === $todayDate && $now->between($startDateTime, $endDateTime, true);
+            $isLive = $startDateTime && $endDateTime
+                && $now->toDateString() === $todayDate
+                && $now->between($startDateTime, $endDateTime, true);
+            $faculty = $attendance->user;
 
             return [
-                'faculty' => trim(($schedule->user?->first_name ?? '') . ' ' . ($schedule->user?->last_name ?? '')) ?: 'Faculty',
-                'role' => $roleLabels[(int) ($schedule->user?->role ?? 0)] ?? 'Role ' . (int) ($schedule->user?->role ?? 0),
-                'course_code' => $schedule->course?->course_code ?? 'N/A',
-                'subject' => $schedule->course?->course_name ?? 'N/A',
-                'room' => $schedule->room?->room_name ?? 'N/A',
-                'attendance_status' => $attendance?->status ?? 'waiting',
-                'time_in' => $attendance?->time_in,
-                'time_out' => $attendance?->time_out,
-                'day' => $schedule->day,
-                'date' => $startDateTime->toDateString(),
-                'date_display' => $startDateTime->translatedFormat('D, M d, Y'),
-                'start' => $startDateTime->format('H:i:s'),
-                'end' => $endDateTime->format('H:i:s'),
-                'start_display' => $startDateTime->format('g:i A'),
-                'end_display' => $endDateTime->format('g:i A'),
+                'faculty' => trim(($faculty?->first_name ?? '') . ' ' . ($faculty?->last_name ?? '')) ?: 'Faculty',
+                'role' => $roleLabels[(int) ($faculty?->role ?? 0)] ?? 'Role ' . (int) ($faculty?->role ?? 0),
+                'course_code' => $schedule?->course?->course_code ?? 'N/A',
+                'subject' => $schedule?->course?->course_name ?? 'N/A',
+                'room' => $attendance->room_id ?? 'N/A',
+                'attendance_status' => $attendance->status ?? 'waiting',
+                'time_in' => $attendance->time_in,
+                'time_out' => $attendance->time_out,
+                'day' => $attendance->day,
+                'date' => $todayDate,
+                'date_display' => $startDateTime?->translatedFormat('D, M d, Y') ?? $todayDate,
+                'start' => $startDateTime?->format('H:i:s'),
+                'end' => $endDateTime?->format('H:i:s'),
+                'start_display' => $startDateTime?->format('g:i A') ?? 'N/A',
+                'end_display' => $endDateTime?->format('g:i A') ?? 'N/A',
                 'start_datetime' => $startDateTime,
                 'end_datetime' => $endDateTime,
                 'is_live' => $isLive,
-                'label' => $isLive ? 'In progress' : ($now->isPast() ? 'Past attendance' : 'Upcoming'),
+                'label' => $isLive ? 'In progress' : 'Attendance recorded',
             ];
-        })->sortBy(fn ($item) => $item['start_datetime']->timestamp)->values();
+        })->sortBy(fn ($item) => $item['start_datetime']?->timestamp ?? PHP_INT_MAX)->values();
 
         $nextClass = $facultySchedules->first();
 
@@ -180,43 +145,9 @@ class ReportController extends Controller
         $currentUser = \App\Models\users::find(session('user_id'));
         $collegeId = (int) ($currentUser?->college_id ?? session('college_id') ?? 0);
         $reportDate = Carbon::parse($validated['date']);
-        $reportDay = strtolower($reportDate->translatedFormat('l'));
-
-        $matchingSchedules = Schedule::with(['user', 'course', 'room'])
-            ->where(function ($query) use ($reportDay) {
-                $query->whereRaw('LOWER(day) LIKE ?', ['%' . $reportDay . '%'])
-                    ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower(substr($reportDay, 0, 3)) . '%']);
-            })
-            ->whereHas('user', function ($query) {
-                $query->where('role', '!=', 1);
-            })
-            ->when($collegeId > 0, function ($query) use ($collegeId) {
-                $query->whereHas('user', fn ($uQ) => $uQ->where('college_id', $collegeId));
-            }, fn ($query) => $query->whereRaw('1 = 0'))
-            ->get();
-
-        foreach ($matchingSchedules as $schedule) {
-            $scheduleCollegeId = $schedule->user?->college_id ?? $collegeId;
-
-            Report::firstOrCreate(
-                [
-                    'user_id' => $schedule->user_id,
-                    'college_id' => $scheduleCollegeId,
-                    'schedule_id' => $schedule->id,
-                    'attendance_date' => $reportDate->toDateString(),
-                ],
-                [
-                    'room_id' => $schedule->room_id,
-                    'day' => $schedule->day,
-                    'time_in' => null,
-                    'time_out' => null,
-                    'status' => 'waiting',
-                ]
-            );
-        }
-
-        $attendanceRecords = Report::with(['schedule.user', 'schedule.course'])
+        $attendanceRecords = Report::with(['user', 'schedule.course'])
             ->whereDate('attendance_date', $reportDate->toDateString())
+            ->where('status', '!=', 'waiting')
             ->when($collegeId > 0, fn ($query) => $query->where('college_id', $collegeId))
             ->get()
             ->sortBy(fn ($record) => $record->schedule?->start_time ?? '23:59:59');
@@ -232,7 +163,7 @@ class ReportController extends Controller
 
             foreach ($attendanceRecords as $record) {
                 $schedule = $record->schedule;
-                $faculty = trim(($schedule?->user?->first_name ?? '') . ' ' . ($schedule?->user?->last_name ?? '')) ?: 'N/A';
+                $faculty = trim(($record->user?->first_name ?? '') . ' ' . ($record->user?->last_name ?? '')) ?: 'N/A';
                 echo '<tr>';
                 echo '<td>' . $escape($schedule?->start_time) . ' - ' . $escape($schedule?->end_time) . '</td>';
                 echo '<td>' . $escape($record->time_in) . '</td>';

@@ -124,39 +124,20 @@ if (in_array($userRole, [2, 3], true)) {
 
 $todaySchedules = $schedulesQuery->get();
 
-// 4. Batch Auto-Create Missing Attendance (Reports) for Today
-if (in_array($userRole, [2, 3, 4, 5], true) && $todaySchedules->isNotEmpty()) {
-    $nowTimestamp = now();
+// 4. Transform schedules for the live grid without creating attendance rows.
+$attendanceBySchedule = Report::whereDate('attendance_date', $todayDate)
+    ->whereIn('schedule_id', $todaySchedules->pluck('id'))
+    ->get()
+    ->keyBy('schedule_id');
 
-    $attendanceData = $todaySchedules->map(function ($schedule) use ($todayDate, $nowTimestamp) {
-        return [
-            'user_id'         => $schedule->user_id,
-            'schedule_id'     => $schedule->id,
-            'attendance_date' => $todayDate,
-            'room_id'         => $schedule->room_id,
-            'day'             => $schedule->day,
-            'status'          => 'waiting',
-            'created_at'      => $nowTimestamp,
-            'updated_at'      => $nowTimestamp,
-        ];
-    })->toArray();
-
-    Report::upsert(
-        $attendanceData,
-        ['user_id', 'schedule_id', 'attendance_date'],[] 
-        // Empty array ensures existing records (e.g. marked attendance) are untouched
-    );
-}
-
-// 5. Transform Schedules for Live Grid & Auto-Mark Late Absences
 $attendanceClasses = $todaySchedules
     ->whereBetween('start_time', ['07:00:00', '18:00:00'])
-    ->map(function ($schedule) use ($now, $todayDate) {
+    ->map(function ($schedule) use ($now, $todayDate, $attendanceBySchedule) {
         $start = \Illuminate\Support\Carbon::parse("{$todayDate} {$schedule->start_time}");
         $end = \Illuminate\Support\Carbon::parse("{$todayDate} {$schedule->end_time}");
         if ($end->lt($start)) $end->addDay();
 
-        $attendance = Report::syncForSchedule($schedule, $todayDate, $now);
+        $attendance = $attendanceBySchedule->get($schedule->id);
 
         // Ended classes are synchronized above but are not shown in the live grid.
         if ($end->lt($now)) return null;
@@ -207,10 +188,6 @@ Route::get('/dashboard/attendance', function () {
                 ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower(substr($todayDay, 0, 3)) . '%']);
         })
         ->get();
-
-    foreach ($schedules as $schedule) {
-        Report::syncForSchedule($schedule, $today->toDateString(), $today);
-    }
 
     $attendance = Report::with(['schedule.user', 'schedule.course', 'schedule.room'])
         ->whereDate('attendance_date', now()->toDateString())

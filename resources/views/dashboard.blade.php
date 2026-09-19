@@ -177,6 +177,13 @@ body {
                     const buildingTitle = document.querySelector('.building-title');
                     const rooms = window.__roomsGrid || [];
 
+                    function formatLiveTime(value) {
+                        if (!value) return '-';
+                        const [hours, minutes] = value.split(':');
+                        const date = new Date(2000, 0, 1, Number(hours), Number(minutes));
+                        return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+                    }
+
                     function renderForBuilding(abbr, name) {
                         if (!grid) return;
 
@@ -198,6 +205,12 @@ body {
 
                         grid.innerHTML = filtered.map(r => {
                             const subtitle = [r.type].filter(Boolean).join(' ');
+                            const live = r.live;
+                            const liveDetails = live
+                                ? `<p class="mb-0 text-muted fs-6"><small class="fw-bold text-uppercase">Faculty:</small> ${live.faculty}</p>
+                                   <p class="mb-0 text-muted fs-6"><small class="fw-bold text-uppercase">Attendance:</small> ${formatLiveTime(live.time_in)} - ${formatLiveTime(live.time_out)}</p>
+                                   <p class="mb-0 text-muted fs-6"><small class="fw-bold text-uppercase">Class:</small> ${live.course_code} | ${live.start} - ${live.end}</p>`
+                                : '<p class="mb-0 text-muted fs-6"><small class="fw-bold text-uppercase">Faculty:</small> None</p>';
                             return `
                                 <div class="col">
                                     <div class="card shadow-sm h-100 border-1">
@@ -212,7 +225,7 @@ body {
                                             </div>
                                         </div>
                                         <div class="card-footer p-2 pt-1 bg-transparent border-0">
-                                            <p class="mb-0 text-muted fs-6"><small class="fw-bold text-uppercase">Faculty:</small> None</p>
+                                            ${liveDetails}
                                         </div>
                                     </div>
                                 </div>
@@ -220,6 +233,19 @@ body {
                         }).join('');
 
                         if (buildingTitle) buildingTitle.textContent = title;
+                    }
+
+                    async function refreshLiveRooms() {
+                        const response = await fetch('/api/live-classrooms', { headers: { Accept: 'application/json' } });
+                        if (!response.ok) throw new Error(`Live classroom endpoint returned HTTP ${response.status}`);
+
+                        const data = await response.json();
+                        rooms.splice(0, rooms.length, ...(data.rooms || []));
+                        const activeBtn = document.querySelector('.building-tab.active');
+                        renderForBuilding(
+                            activeBtn ? activeBtn.getAttribute('data-building') : '',
+                            activeBtn ? activeBtn.getAttribute('data-building-name') : ''
+                        );
                     }
 
                     document.addEventListener('DOMContentLoaded', function () {
@@ -236,6 +262,9 @@ body {
                                 renderForBuilding(abbr, name);
                             });
                         });
+
+                        refreshLiveRooms().catch(error => console.error('Live classroom refresh error:', error));
+                        setInterval(() => refreshLiveRooms().catch(error => console.error('Live classroom refresh error:', error)), 2000);
                     });
                 })();
             </script>

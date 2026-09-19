@@ -20,6 +20,24 @@ class Report extends Model
         'status',
     ];
 
+    protected static function booted(): void
+    {
+        static::saved(function (self $attendance): void {
+            if (!$attendance->room_id) {
+                return;
+            }
+
+            $roomIsOccupied = self::where('room_id', $attendance->room_id)
+                ->whereNotNull('time_in')
+                ->whereNull('time_out')
+                ->exists();
+
+            room::whereKey($attendance->room_id)->update([
+                'status' => $roomIsOccupied ? 'occupied' : 'vacant',
+            ]);
+        });
+    }
+
     public function schedule()
     {
         return $this->belongsTo(Schedule::class, 'schedule_id');

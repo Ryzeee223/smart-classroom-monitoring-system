@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link href="{{ asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="<?php echo e(asset('bootstrap-5.3.8-dist/css/bootstrap.min.css')); ?>" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="<?php echo e(asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js')); ?>"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <title>Faculty Schedule Reports</title>
     <style>
@@ -77,7 +77,7 @@
     </style>
 </head>
 <body>
-    @include('sidebar')
+    <?php echo $__env->make('sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <div class="container-fluid p-5 mt-3">
         <div class="row justify-content-end">
@@ -87,32 +87,34 @@
                     <div class="schedule-header d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div>
                             <h5 class="mb-1 fw-bold text-dark">Faculty Schedule Overview</h5>
-                            <small class="text-muted d-block">{{ $todayLabel ?? now()->translatedFormat('l, F d, Y') }}</small>
+                            <small class="text-muted d-block"><?php echo e($todayLabel ?? now()->translatedFormat('l, F d, Y')); ?></small>
                             <small class="text-muted d-block">
-                                {{ $currentSemester ?? 'Current Semester' }} • {{ $currentSchoolYear ?? 'Current School Year' }}
+                                <?php echo e($currentSemester ?? 'Current Semester'); ?> • <?php echo e($currentSchoolYear ?? 'Current School Year'); ?>
+
                             </small>
 
                         </div>
                             <div class="d-flex align-items-end gap-2 flex-wrap">
-                                <form method="GET" action="{{ route('reports') }}" class="d-flex align-items-end gap-2">
+                                <form method="GET" action="<?php echo e(route('reports')); ?>" class="d-flex align-items-end gap-2">
                                     <div>
                                         <label for="date" class="form-label">Attendance Date</label>
                                         <select class="form-select" id="date" name="date" required>
                                             <option value="">Select attendance date</option>
-                                            @foreach ($displayrep as $date)
-                                                <option value="{{ $date }}" @selected(request('date') == $date)>
-                                                    {{ \Illuminate\Support\Carbon::parse($date)->format('F d, Y') }}
+                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $displayrep; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $date): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                                <option value="<?php echo e($date); ?>" <?php if(request('date') == $date): echo 'selected'; endif; ?>>
+                                                    <?php echo e(\Illuminate\Support\Carbon::parse($date)->format('F d, Y')); ?>
+
                                                 </option>
-                                            @endforeach
+                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                                         </select>
                                     </div>
                                     <button type="submit" class="btn btn-primary">View Attendance</button>
                                 </form>
 
-                                <form method="POST" action="{{ route('reports.generate') }}" class="d-flex align-items-end">
-                                    @csrf
-                                    <input type="hidden" name="date" value="{{ request('date') }}">
-                                    <button type="submit" class="btn btn-success" {{ !request('date') ? 'disabled' : '' }}>Generate Excel</button>
+                                <form method="POST" action="<?php echo e(route('reports.generate')); ?>" class="d-flex align-items-end">
+                                    <?php echo csrf_field(); ?>
+                                    <input type="hidden" name="date" value="<?php echo e(request('date')); ?>">
+                                    <button type="submit" class="btn btn-success" <?php echo e(!request('date') ? 'disabled' : ''); ?>>Generate Excel</button>
                                 </form>
                             </div>
                         </div>
@@ -133,24 +135,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($facultySchedules as $schedule)
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $facultySchedules; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $schedule): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                                     <tr>
-                                        <td>{{ $schedule['start_display'] }} - {{ $schedule['end_display'] }}</td>
-                                        <td>{{ $schedule['time_in'] ?? 'N/A' }}</td>
-                                        <td>{{ $schedule['time_out'] ?? 'N/A' }}</td>
-                                        <td>{{ $schedule['faculty'] }}</td>
-                                        <td>{{ $schedule['course_code'] }}</td>
+                                        <td><?php echo e($schedule['start_display']); ?> - <?php echo e($schedule['end_display']); ?></td>
+                                        <td><?php echo e($schedule['time_in'] ?? 'N/A'); ?></td>
+                                        <td><?php echo e($schedule['time_out'] ?? 'N/A'); ?></td>
+                                        <td><?php echo e($schedule['faculty']); ?></td>
+                                        <td><?php echo e($schedule['course_code']); ?></td>
                                         <td>
                                             <span class="badge text-bg-secondary">
-                                                {{ ucfirst(str_replace('_', ' ', $schedule['attendance_status'])) }}
+                                                <?php echo e(ucfirst(str_replace('_', ' ', $schedule['attendance_status']))); ?>
+
                                             </span>
                                         </td>
                                     </tr>
-                                @empty
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                                     <tr>
                                         <td colspan="6" class="text-center text-muted">No attendance records found.</td>
                                     </tr>
-                                @endforelse
+                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                             </tbody>
                         </table>
                         <br>
@@ -161,7 +164,7 @@
         </div>  
             </div>
     </div>
-    @include('partials.notifications-modal')
+    <?php echo $__env->make('partials.notifications-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
 
-</html>
+</html><?php /**PATH D:\capstone project\backups\emonitor 3rd phase copy\resources\views/reports.blade.php ENDPATH**/ ?>
