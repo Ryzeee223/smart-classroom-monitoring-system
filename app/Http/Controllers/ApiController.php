@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Schedule;
 use App\Models\User;
 use App\Models\Report;
+use App\Models\room;
 use Illuminate\Http\JsonResponse;
 
 class ApiController extends Controller
@@ -17,6 +18,7 @@ class ApiController extends Controller
     public function handleAttendanceScan(Request $request)
     {
         $scannedUid = $this->resolveUid($request);
+        $roomName = $this->resolveRoom($request);
 
         if ($scannedUid === '') {
             return response()->json([
@@ -30,7 +32,7 @@ class ApiController extends Controller
             ? Cache::lock(
                 'attendance-scan:' . $user->id . ':' . Carbon::today()->toDateString(),
                 10
-            )->block(5, fn () => $this->processAttendanceForUser($user, $scannedUid))
+            )->block(5, fn () => $this->processAttendanceForUser($user, $scannedUid, $roomName))
             : [
                 'status' => 'denied',
                 'message' => 'RFID card is not assigned to a user.',
@@ -76,16 +78,57 @@ class ApiController extends Controller
         ]);
     }
 
-    private function processAttendanceForUser(User $user, string $scannedUid): array
+    private function processAttendanceForUser(User $user, string $scannedUid, ?string $roomName = null): array
     {
         $now = Carbon::now();
         $today = $now->format('l');
+        $normalizedRoom = trim((string) ($roomName ?? ''));
 
-        $schedule = Schedule::where('user_id', $user->id)
-            ->where('day', $today)
+        $allowedRoomIds = [];
+        if ($normalizedRoom !== '') {
+            $roomValue = strtoupper(trim($normalizedRoom));
+            $allowedRoomIds = room::whereRaw('UPPER(TRIM(room_name)) = ?', [$roomValue])
+                ->pluck('id')
+                ->all();
+
+            if (empty($allowedRoomIds)) {
+                return [
+                    'status' => 'denied',
+                    'message' => 'This room does not exist in the system.',
+                    'uid' => $scannedUid,
+                    'room' => $normalizedRoom,
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
+                    ],
+                ];
+            }
+        }
+
+        $scheduleQuery = Schedule::where('user_id', $user->id)
+            ->where('day', $today);
+
+        if ($normalizedRoom !== '') {
+            $scheduleQuery->whereIn('room_id', $allowedRoomIds);
+        }
+
+        $schedule = $scheduleQuery
             ->whereTime('start_time', '<=', $now->format('H:i:s'))
             ->whereTime('end_time', '>=', $now->format('H:i:s'))
             ->first();
+
+        if (!$schedule && $normalizedRoom !== '') {
+            return [
+                'status' => 'denied',
+                'message' => 'This RFID card is not assigned to the scheduled room.',
+                'uid' => $scannedUid,
+                'room' => $normalizedRoom,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
+                ],
+            ];
+        }
 
         $attendance = null;
 
@@ -300,6 +343,24 @@ class ApiController extends Controller
         }
 
         return strtoupper(trim((string) $uid));
+    }
+
+    private function resolveRoom(Request $request): string
+    {
+        $room = $request->input('room')
+            ?? $request->input('room_name')
+            ?? $request->input('location')
+            ?? $request->input('roomId');
+
+        if ($room === null) {
+            $rawBody = trim($request->getContent());
+            $decodedBody = json_decode($rawBody, true);
+            $room = is_array($decodedBody)
+                ? ($decodedBody['room'] ?? $decodedBody['room_name'] ?? $decodedBody['location'] ?? $decodedBody['roomId'] ?? '')
+                : '';
+        }
+
+        return strtoupper(trim((string) $room));
     }
     public function DisplaytoLcd()
     {
