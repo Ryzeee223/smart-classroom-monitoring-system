@@ -149,6 +149,14 @@ public function store(Request $request)
 
 public function assignRfid(Request $request)
 {
+    if (!session('logged_in')) {
+        return redirect('/');
+    }
+
+    if ((int) (session('user_role') ?? 0) !== 1) {
+        return redirect('/dashboard')->withErrors(['unauthorized' => 'Only admin can assign RFID cards.']);
+    }
+
     $request->validate([
         'user_id' => 'required|exists:users,id',
         'RFID_code' => 'required|string',

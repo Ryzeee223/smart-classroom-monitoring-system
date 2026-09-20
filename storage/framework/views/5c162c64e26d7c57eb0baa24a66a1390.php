@@ -73,7 +73,7 @@
 
 <div class="mb-3">
     <label class="form-label">RFID Code <small class="text-muted">(Tap card)</small></label>
-    <input type="hidden" name="rfid_code" id="rfid_input">
+    <input type="hidden" name="RFID_code" id="rfid_input">
     <span id="rfid_label" class="form-control bg-light" style="font-family:monospace">Waiting for card...</span>
 </div>
 

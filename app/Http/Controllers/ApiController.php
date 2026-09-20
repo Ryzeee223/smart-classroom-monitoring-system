@@ -66,7 +66,7 @@ class ApiController extends Controller
     public function checkLatestAssignmentScan()
     {
         return response()->json([
-            'uid' => Cache::store('database')->get('latest_assignment_scan'),
+            'uid' => Cache::store('database')->pull('latest_assignment_scan'),
         ]);
     }
 

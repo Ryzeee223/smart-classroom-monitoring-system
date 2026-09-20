@@ -1,12 +1,13 @@
 // DIP SWITCHES FOR RUNTIME (Normal Operation):
-// 1-2 ON | 3-4 OFF | 5-6-7 OFF | 8 OFF
+// 1-2 ON to go live
+// ESP8366 5-6-7
 
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 
-const char* ssid = "Our2.4";
+const char* ssid = "Our2.4G";
 const char* password = "RZE-202004";
 
 enum ScanMode { SETTINGS_MODE, ATTENDANCE_MODE };
@@ -57,9 +58,10 @@ void loop() {
         int httpResponseCode = http.POST(jsonPayload);
 
         if (httpResponseCode > 0) {
-          String response = http.getString();
-          // Echo server response back across Serial to ATmega
-          Serial.println(response); 
+          // Do not send the JSON response back to the ATmega as scanner data.
+          http.getString();
+          Serial.print("HTTP:");
+          Serial.println(httpResponseCode);
         } else {
           Serial.print("ERROR:");
           Serial.println(httpResponseCode);
