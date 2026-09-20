@@ -44,7 +44,7 @@ class SchedpresenterController extends Controller
 
         // Search schedule matched with user's RFID code for today
         $schedule = Schedule::whereHas('user', function ($query) use ($rfid) {
-                $query->whereRaw('UPPER(TRIM(RFID_code)) = ?', [$rfid]);
+                $query->whereRaw('UPPER(TRIM("RFID_code")) = ?', [$rfid]);
             })
             ->where('day', $today)
             ->first();

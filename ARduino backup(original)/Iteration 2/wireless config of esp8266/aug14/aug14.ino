@@ -8,7 +8,7 @@
 #include <ArduinoJson.h>
 
 const char* ssid = "Our2.4G";
-const char* password = "RZE-202004";
+const char* password = "RZE-2004";
 
 enum ScanMode { SETTINGS_MODE, ATTENDANCE_MODE };
 const ScanMode scanMode = SETTINGS_MODE;
@@ -37,9 +37,16 @@ void setup() {
 
 void loop() {
   if (Serial.available() > 0) {
-    String rfidData = Serial.readStringUntil('\n');
-    rfidData.replace("\r", ""); // Remove hidden carriage returns
-    rfidData.trim();            
+    String packet = Serial.readStringUntil('\n');
+    packet.replace("\r", "");
+    packet.trim();
+
+    if (!packet.startsWith("RFID:")) {
+      return;
+    }
+
+    String rfidData = packet.substring(5);
+    rfidData.trim();
 
     if (rfidData.length() > 0 && WiFi.status() == WL_CONNECTED) {
       WiFiClientSecure client;
@@ -58,13 +65,7 @@ void loop() {
         int httpResponseCode = http.POST(jsonPayload);
 
         if (httpResponseCode > 0) {
-          // Do not send the JSON response back to the ATmega as scanner data.
           http.getString();
-          Serial.print("HTTP:");
-          Serial.println(httpResponseCode);
-        } else {
-          Serial.print("ERROR:");
-          Serial.println(httpResponseCode);
         }
 
         http.end();

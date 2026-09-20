@@ -164,7 +164,7 @@ public function assignRfid(Request $request)
 
     $rfidCode = strtoupper(trim($request->input('RFID_code')));
 
-    $existingUser = User::whereRaw('UPPER(TRIM(RFID_code)) = ?', [$rfidCode])
+    $existingUser = User::whereRaw('UPPER(TRIM("RFID_code")) = ?', [$rfidCode])
         ->where('id', '!=', $request->user_id)
         ->first();
 

@@ -27,7 +27,7 @@ class ApiController extends Controller
             ], 422);
         }
 
-        $user = User::whereRaw('UPPER(TRIM(RFID_code)) = ?', [$scannedUid])->first();
+        $user = User::whereRaw('UPPER(TRIM("RFID_code")) = ?', [$scannedUid])->first();
         $attendanceData = $user
             ? Cache::lock(
                 'attendance-scan:' . $user->id . ':' . Carbon::today()->toDateString(),

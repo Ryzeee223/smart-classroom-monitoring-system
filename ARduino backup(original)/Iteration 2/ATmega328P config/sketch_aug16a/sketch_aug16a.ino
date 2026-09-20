@@ -49,7 +49,8 @@ void loop() {
   lcd.setCursor(0, 1);
   lcd.print("UID: " + cardUID);
 
-  // Send UID over Serial to ESP8266
+  // Send a framed RFID packet over Serial to the ESP8266.
+  Serial.print("RFID:");
   Serial.println(cardUID);
   
   mfrc522.PICC_HaltA();
