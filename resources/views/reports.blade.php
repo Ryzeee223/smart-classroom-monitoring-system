@@ -12,7 +12,7 @@
     <style>
         body {
             background: #f5f7fb;
-            overflow-x: hidden;
+            overflow-x: auto;
             overflow-y:hidden;
         }
 

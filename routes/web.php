@@ -124,7 +124,10 @@ if (in_array($userRole, [2, 3], true)) {
 
 $todaySchedules = $schedulesQuery->get();
 
-// 4. Transform schedules for the live grid without creating attendance rows.
+foreach ($todaySchedules as $schedule) {
+    Report::syncForSchedule($schedule, $todayDate, $now);
+}
+
 $attendanceBySchedule = Report::whereDate('attendance_date', $todayDate)
     ->whereIn('schedule_id', $todaySchedules->pluck('id'))
     ->get()

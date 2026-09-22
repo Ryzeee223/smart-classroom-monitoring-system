@@ -77,14 +77,14 @@ body {
             </div>
 
             
-                <div class="col">
+                {{-- <div class="col">
                 <div class="card stats-card h-100 shadow-sm">
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
                         <h6 class="text-muted mb-2">Pending RFID</h6>
                         <div class="display-4 fw-bold text-warning mb-0">{{ $pending_count ?? 0 }}</div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
             
            
 

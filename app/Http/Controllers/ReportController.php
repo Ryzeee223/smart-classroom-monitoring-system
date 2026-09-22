@@ -30,6 +30,15 @@ class ReportController extends Controller
         $currentUser = \App\Models\users::find($currentUserId);
         $collegeId = (int) ($currentUser?->college_id ?? session('college_id') ?? 0);
 
+        Schedule::with('User')
+            ->where(function ($query) use ($todayFullDay, $todayShortDay) {
+                $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayFullDay) . '%'])
+                    ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayShortDay) . '%']);
+            })
+            ->when($collegeId > 0, fn ($query) => $query->whereHas('User', fn ($userQuery) => $userQuery->where('college_id', $collegeId)))
+            ->get()
+            ->each(fn ($schedule) => Report::syncForSchedule($schedule, $todayDate, $now));
+
         // Attendance is the source of report rows. Schedule only supplies
         // the planned class time and course code for each attendance record.
         $attendances = Report::with(['user', 'schedule.course'])
@@ -145,6 +154,18 @@ class ReportController extends Controller
         $currentUser = \App\Models\users::find(session('user_id'));
         $collegeId = (int) ($currentUser?->college_id ?? session('college_id') ?? 0);
         $reportDate = Carbon::parse($validated['date']);
+        $reportDay = $reportDate->format('l');
+        $reportShortDay = $reportDate->format('D');
+
+        Schedule::with('User')
+            ->where(function ($query) use ($reportDay, $reportShortDay) {
+                $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($reportDay) . '%'])
+                    ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower($reportShortDay) . '%']);
+            })
+            ->when($collegeId > 0, fn ($query) => $query->whereHas('User', fn ($userQuery) => $userQuery->where('college_id', $collegeId)))
+            ->get()
+            ->each(fn ($schedule) => Report::syncForSchedule($schedule, $reportDate->toDateString(), $reportDate->copy()->endOfDay()));
+
         $attendanceRecords = Report::with(['user', 'schedule.course'])
             ->whereDate('attendance_date', $reportDate->toDateString())
             ->where('status', '!=', 'waiting')
