@@ -5,7 +5,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecure.h>
-#include <ArduinoJson.h>
+#include <ESPmDNS.h>
 
 const char* ssid = "Our2.4G";
 const char* password = "RZE-2004";
@@ -13,14 +13,50 @@ const char* password = "RZE-2004";
 enum ScanMode { SETTINGS_MODE, ATTENDANCE_MODE };
 const ScanMode scanMode = SETTINGS_MODE;
 
+// always check me before sketching
+//offline
+// const char* settingsUrl = "192.168.100.2:8000/api/rfid-scan"
+// const char* attendanceUrl = "192.168.100.2:8000/api/attendance-scan"
+
+// online
 const char* settingsUrl = "https://rfinside.vercel.app/api/rfid-scan";
 const char* attendanceUrl = "https://rfinside.vercel.app/api/attendance-scan";
+const char* lcdUrl = "https://rfinside.vercel.app/api/live-classrooms?room=";
 
 // Room definition
 const char* room = "CC101";
 
 const char* getScanUrl() {
   return (scanMode == SETTINGS_MODE) ? settingsUrl : attendanceUrl;
+}
+
+unsigned long lastLcdPoll = 0;
+
+void pollLcdDisplay() {
+  if (WiFi.status() != WL_CONNECTED || millis() - lastLcdPoll < 5000) {
+    return;
+  }
+  lastLcdPoll = millis();
+
+  WiFiClientSecure client;
+  client.setInsecure();
+
+  HTTPClient http;
+  String lcdRequestUrl = String(lcdUrl) + room;
+  if (http.begin(client, lcdRequestUrl)) {
+    int responseCode = http.GET();
+    if (responseCode > 0) {
+      String payload = http.getString();
+      payload.replace("\r", "");
+      payload.trim();
+
+      if (payload.length() > 0) {
+        Serial.print("LCD:");
+        Serial.println(payload);
+      }
+    }
+    http.end();
+  }
 }
 
 void setup() {
@@ -36,6 +72,8 @@ void setup() {
 }
 
 void loop() {
+  pollLcdDisplay();
+
   if (Serial.available() > 0) {
     String packet = Serial.readStringUntil('\n');
     packet.replace("\r", "");

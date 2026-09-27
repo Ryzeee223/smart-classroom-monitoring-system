@@ -53,12 +53,22 @@ class Report extends Model
         return $this->belongsTo(college::class, 'college_id');
     }
 
-    public static function syncForSchedule(Schedule $schedule, string $attendanceDate, Carbon $now): self
+    public static function syncForSchedule(Schedule $schedule, string $attendanceDate, Carbon $now): ?self
     {
+        $attendanceDate = Carbon::parse($attendanceDate)->toDateString();
+        $scheduledDays = preg_split('/[\s,\/|&-]+/', strtolower(trim((string) $schedule->day)), -1, PREG_SPLIT_NO_EMPTY);
+        $attendanceDays = [
+            strtolower(Carbon::parse($attendanceDate)->format('l')),
+            strtolower(Carbon::parse($attendanceDate)->format('D')),
+        ];
+
+        if (!array_intersect($scheduledDays, $attendanceDays)) {
+            return null;
+        }
+
         $attendance = self::firstOrCreate(
             [
                 'user_id' => $schedule->user_id,
-                'college_id' => $schedule->User?->college_id,
                 'schedule_id' => $schedule->id,
                 'attendance_date' => $attendanceDate,
             ],

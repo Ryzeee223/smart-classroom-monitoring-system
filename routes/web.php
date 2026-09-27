@@ -124,10 +124,6 @@ if (in_array($userRole, [2, 3], true)) {
 
 $todaySchedules = $schedulesQuery->get();
 
-foreach ($todaySchedules as $schedule) {
-    Report::syncForSchedule($schedule, $todayDate, $now);
-}
-
 $attendanceBySchedule = Report::whereDate('attendance_date', $todayDate)
     ->whereIn('schedule_id', $todaySchedules->pluck('id'))
     ->get()

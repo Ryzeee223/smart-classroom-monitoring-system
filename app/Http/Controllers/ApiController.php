@@ -367,6 +367,45 @@ class ApiController extends Controller
         $now = Carbon::now();
         $today = $now->format('l');
 
+        if (request()->filled('room')) {
+            $roomName = strtoupper(trim((string) request()->query('room')));
+            $scannerRoom = room::whereRaw('UPPER(TRIM(room_name)) = ?', [$roomName])->first();
+
+            if (!$scannerRoom) {
+                return response('Room not found|Check room setup', 404)
+                    ->header('Content-Type', 'text/plain');
+            }
+
+            $schedule = Schedule::with(['User', 'course'])
+                ->where('room_id', $scannerRoom->id)
+                ->where(function ($query) use ($today) {
+                    $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($today) . '%'])
+                        ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower(substr($today, 0, 3)) . '%']);
+                })
+                ->whereTime('start_time', '<=', $now->format('H:i:s'))
+                ->whereTime('end_time', '>=', $now->format('H:i:s'))
+                ->orderBy('start_time')
+                ->first();
+
+            if (!$schedule) {
+                $lcdLines = ['No ongoing class', 'Room: ' . $scannerRoom->room_name];
+            } else {
+                $faculty = trim(($schedule->User?->first_name ?? '') . ' ' . ($schedule->User?->last_name ?? ''));
+                $lcdLines = [
+                    $schedule->course?->course_code ?? $schedule->course?->course_name ?? 'Class in session',
+                    $faculty ?: 'Faculty',
+                ];
+            }
+
+            $lcdLines = array_map(
+                fn ($line) => substr(str_replace('|', ' ', $line), 0, 20),
+                $lcdLines
+            );
+
+            return response(implode('|', $lcdLines))
+                ->header('Content-Type', 'text/plain');
+        }
+
         $rooms = \App\Models\room::with('building')->get();
         $schedules = Schedule::with(['User', 'course', 'room'])
             ->where(function ($query) use ($today) {

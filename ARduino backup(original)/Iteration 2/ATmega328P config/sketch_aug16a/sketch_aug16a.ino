@@ -9,6 +9,31 @@
 
 LiquidCrystal_I2C lcd(0x27, 20, 2);
 MFRC522 mfrc522(SS_PIN, RST_PIN);
+String espMessageBuffer = "";
+
+void updateLcdFromEsp() {
+  while (Serial.available() > 0) {
+    char incoming = Serial.read();
+
+    if (incoming == '\n') {
+      if (espMessageBuffer.startsWith("LCD:")) {
+        String displayText = espMessageBuffer.substring(4);
+        int separator = displayText.indexOf('|');
+
+        if (separator >= 0) {
+          lcd.clear();
+          lcd.setCursor(0, 0);
+          lcd.print(displayText.substring(0, separator));
+          lcd.setCursor(0, 1);
+          lcd.print(displayText.substring(separator + 1));
+        }
+      }
+      espMessageBuffer = "";
+    } else if (incoming != '\r' && espMessageBuffer.length() < 80) {
+      espMessageBuffer += incoming;
+    }
+  }
+}
 
 void setup() {
   Serial.begin(115200); 
@@ -25,6 +50,8 @@ void setup() {
 }
 
 void loop() {
+  updateLcdFromEsp();
+
   // Look for new cards
   if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial()) {
     delay(50);

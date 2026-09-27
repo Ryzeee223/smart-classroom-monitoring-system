@@ -19,8 +19,6 @@ class ReportController extends Controller
         $selectedDate = $request->query('date');
         $now = $selectedDate ? Carbon::parse($selectedDate) : Carbon::now();
         $todayDate = $now->toDateString();
-        $todayFullDay = $now->format('l'); // e.g. "Monday"
-        $todayShortDay = $now->format('D'); // e.g. "Mon"
 
         $semesterRecord = semyr::latest('id')->first();
         $currentSemester = $semesterRecord?->semester ?? 'Current Semester';
@@ -29,15 +27,6 @@ class ReportController extends Controller
         $currentUserId = session('user_id');
         $currentUser = \App\Models\users::find($currentUserId);
         $collegeId = (int) ($currentUser?->college_id ?? session('college_id') ?? 0);
-
-        Schedule::with('User')
-            ->where(function ($query) use ($todayFullDay, $todayShortDay) {
-                $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayFullDay) . '%'])
-                    ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayShortDay) . '%']);
-            })
-            ->when($collegeId > 0, fn ($query) => $query->whereHas('User', fn ($userQuery) => $userQuery->where('college_id', $collegeId)))
-            ->get()
-            ->each(fn ($schedule) => Report::syncForSchedule($schedule, $todayDate, $now));
 
         // Attendance is the source of report rows. Schedule only supplies
         // the planned class time and course code for each attendance record.

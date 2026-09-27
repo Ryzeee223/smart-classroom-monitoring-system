@@ -8,8 +8,6 @@ use App\Models\users;
 use App\Models\room;
 use App\Models\bldg;
 use App\Models\college;
-use App\Models\Schedule;
-use App\Models\Report;
 
 class room_bldg_controller extends Controller
 {
@@ -128,20 +126,6 @@ class room_bldg_controller extends Controller
         $user = users::find(session('user_id'));
         $userColId = $user ? $user->college_id : null;
     }
-
-        $now = now();
-        $todayDate = $now->toDateString();
-        $todayDay = $now->format('l');
-        $todayShortDay = $now->format('D');
-
-        Schedule::with('User')
-            ->where(function ($query) use ($todayDay, $todayShortDay) {
-                $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayDay) . '%'])
-                    ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayShortDay) . '%']);
-            })
-            ->when($userColId, fn ($query) => $query->whereHas('User', fn ($userQuery) => $userQuery->where('college_id', $userColId)))
-            ->get()
-            ->each(fn ($schedule) => Report::syncForSchedule($schedule, $todayDate, $now));
 
         $facultyCount = users::where('college_id', $userColId)->count();
         return view('dashboard', compact('buildings', 'rooms', 'countRoom', 'occupiedRooms', 'facultyCount'));
