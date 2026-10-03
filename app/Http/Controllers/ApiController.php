@@ -15,15 +15,22 @@ use Illuminate\Http\JsonResponse;
 
 class ApiController extends Controller
 {
+    public function syncAttendanceForSchedules(iterable $schedules, string $attendanceDate, Carbon $now): void
+    {
+        foreach ($schedules as $schedule) {
+            Report::syncForSchedule($schedule, $attendanceDate, $now);
+        }
+    }
+
     public function handleAttendanceScan(Request $request)
     {
         $scannedUid = $this->resolveUid($request);
         $roomName = $this->resolveRoom($request);
 
-        if ($scannedUid === '') {
+        if ($scannedUid === '' || $roomName === '') {
             return response()->json([
                 'status' => 'error',
-                'message' => 'RFID UID is required.',
+                'message' => 'RFID UID and scanner room are required.',
             ], 422);
         }
 
@@ -41,6 +48,26 @@ class ApiController extends Controller
 
         Cache::store('database')->put('latest_attendance_scan_data', $attendanceData, 120);
         Cache::store('database')->put('latest_attendance_scan', $scannedUid, 120);
+
+        if ($request->query('format') === 'lcd') {
+            $attendanceStatus = $attendanceData['attendance_status'] ?? null;
+            $lineOne = $attendanceStatus
+                ? 'Status: ' . ucfirst(str_replace('_', ' ', $attendanceStatus))
+                : 'Scan: ' . ucfirst((string) ($attendanceData['status'] ?? 'error'));
+
+            if (!empty($attendanceData['time_out'])) {
+                $lineTwo = 'Out: ' . $attendanceData['time_out'];
+            } elseif (!empty($attendanceData['time_in'])) {
+                $lineTwo = 'In: ' . $attendanceData['time_in'];
+            } else {
+                $lineTwo = $attendanceData['message'] ?? 'No attendance update';
+            }
+
+            return response(implode('|', array_map(
+                fn ($line) => substr(str_replace('|', ' ', $line), 0, 20),
+                [$lineOne, $lineTwo]
+            )))->header('Content-Type', 'text/plain');
+        }
 
         return response()->json($attendanceData, 200);
     }
@@ -82,45 +109,18 @@ class ApiController extends Controller
     {
         $now = Carbon::now();
         $today = $now->format('l');
+        $shortToday = $now->format('D');
         $normalizedRoom = trim((string) ($roomName ?? ''));
 
-        $allowedRoomIds = [];
-        if ($normalizedRoom !== '') {
-            $roomValue = strtoupper(trim($normalizedRoom));
-            $allowedRoomIds = room::whereRaw('UPPER(TRIM(room_name)) = ?', [$roomValue])
-                ->pluck('id')
-                ->all();
+        $roomValue = strtoupper(trim($normalizedRoom));
+        $allowedRoomIds = room::whereRaw('UPPER(TRIM(room_name)) = ?', [$roomValue])
+            ->pluck('id')
+            ->all();
 
-            if (empty($allowedRoomIds)) {
-                return [
-                    'status' => 'denied',
-                    'message' => 'This room does not exist in the system.',
-                    'uid' => $scannedUid,
-                    'room' => $normalizedRoom,
-                    'user' => [
-                        'id' => $user->id,
-                        'name' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
-                    ],
-                ];
-            }
-        }
-
-        $scheduleQuery = Schedule::where('user_id', $user->id)
-            ->where('day', $today);
-
-        if ($normalizedRoom !== '') {
-            $scheduleQuery->whereIn('room_id', $allowedRoomIds);
-        }
-
-        $schedule = $scheduleQuery
-            ->whereTime('start_time', '<=', $now->format('H:i:s'))
-            ->whereTime('end_time', '>=', $now->format('H:i:s'))
-            ->first();
-
-        if (!$schedule && $normalizedRoom !== '') {
+        if (empty($allowedRoomIds)) {
             return [
                 'status' => 'denied',
-                'message' => 'This RFID card is not assigned to the scheduled room.',
+                'message' => 'This room does not exist in the system.',
                 'uid' => $scannedUid,
                 'room' => $normalizedRoom,
                 'user' => [
@@ -130,13 +130,26 @@ class ApiController extends Controller
             ];
         }
 
+        $scheduleQuery = Schedule::where('user_id', $user->id)
+            ->whereIn('room_id', $allowedRoomIds)
+            ->where(function ($query) use ($today, $shortToday) {
+                $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($today) . '%'])
+                    ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower($shortToday) . '%']);
+            });
+
+        $schedule = $scheduleQuery
+            ->whereTime('start_time', '<=', $now->format('H:i:s'))
+            ->whereTime('end_time', '>=', $now->format('H:i:s'))
+            ->first();
+
         $attendance = null;
 
-        // A checkout scan happens after the schedule is no longer active.
+        // A checkout scan can happen after the scheduled class has ended.
         if (!$schedule) {
             $attendance = Report::with('schedule')
                 ->where('user_id', $user->id)
                 ->whereDate('attendance_date', $now->toDateString())
+                ->whereIn('room_id', $allowedRoomIds)
                 ->whereNotNull('time_in')
                 ->whereNull('time_out')
                 ->latest('id')
@@ -147,8 +160,9 @@ class ApiController extends Controller
         if (!$schedule) {
             return [
                 'status' => 'denied',
-                'message' => 'User found, but no active schedule for this room and time.',
+                'message' => 'No active schedule or open attendance for this faculty in this room.',
                 'uid' => $scannedUid,
+                'room' => $normalizedRoom,
                 'user' => [
                     'id' => $user->id,
                     'name' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),

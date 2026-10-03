@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::table('attendance', function (Blueprint $table) {
             $table->unique(
                 ['user_id', 'schedule_id', 'attendance_date'],
-                'attendance_user_schedule_date_unique'
+                'attendance_creator'
             );
         });
     }
@@ -19,7 +19,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('attendance', function (Blueprint $table) {
-            $table->dropUnique('attendance_user_schedule_date_unique');
+            $table->dropUnique('attendance_creator');
         });
     }
 };

@@ -10,13 +10,17 @@
 LiquidCrystal_I2C lcd(0x27, 20, 2);
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 String espMessageBuffer = "";
+unsigned long attendanceDisplayUntil = 0;
 
 void updateLcdFromEsp() {
   while (Serial.available() > 0) {
     char incoming = Serial.read();
 
     if (incoming == '\n') {
-      if (espMessageBuffer.startsWith("LCD:")) {
+      bool isAttendanceUpdate = espMessageBuffer.startsWith("ATT:");
+      bool isClassUpdate = espMessageBuffer.startsWith("LCD:");
+
+      if (isAttendanceUpdate || (isClassUpdate && (long)(millis() - attendanceDisplayUntil) >= 0)) {
         String displayText = espMessageBuffer.substring(4);
         int separator = displayText.indexOf('|');
 
@@ -26,6 +30,10 @@ void updateLcdFromEsp() {
           lcd.print(displayText.substring(0, separator));
           lcd.setCursor(0, 1);
           lcd.print(displayText.substring(separator + 1));
+        }
+
+        if (isAttendanceUpdate) {
+          attendanceDisplayUntil = millis() + 8000UL;
         }
       }
       espMessageBuffer = "";
@@ -72,9 +80,9 @@ void loop() {
   // Visual feedback on LCD
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("Tag Scanned!");
+  lcd.print("Card received");
   lcd.setCursor(0, 1);
-  lcd.print("UID: " + cardUID);
+  lcd.print("Checking attendance");
 
   // Send a framed RFID packet over Serial to the ESP8266.
   Serial.print("RFID:");
