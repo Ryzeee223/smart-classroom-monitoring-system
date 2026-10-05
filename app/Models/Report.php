@@ -96,6 +96,26 @@ class Report extends Model
         return $attendance->fresh();
     }
 
+    public static function syncForToday(?Carbon $now = null): int
+    {
+        $now ??= Carbon::now();
+        $attendanceDate = $now->toDateString();
+        $today = strtolower($now->format('l'));
+        $shortToday = strtolower($now->format('D'));
+        $schedules = Schedule::with('User')
+            ->where(function ($query) use ($today, $shortToday) {
+                $query->whereRaw('LOWER(day) LIKE ?', ['%' . $today . '%'])
+                    ->orWhereRaw('LOWER(day) LIKE ?', ['%' . $shortToday . '%']);
+            })
+            ->get();
+
+        foreach ($schedules as $schedule) {
+            self::syncForSchedule($schedule, $attendanceDate, $now);
+        }
+
+        return $schedules->count();
+    }
+
     public static function CreateAttendance($userId, $scheduleId, $timeIn, $timeOut, $attendanceDate, $status, $statusOut = null)
     {
         $schedule = Schedule::findOrFail($scheduleId);
