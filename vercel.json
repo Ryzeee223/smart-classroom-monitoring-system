@@ -2,6 +2,12 @@
   "version": 2,
   "outputDirectory": "public",
   "regions": ["sin1"],
+  "crons": [
+    {
+      "path": "/api/attendance-sync",
+      "schedule": "* * * * *"
+    }
+  ],
   "functions": {
     "api/index.php": {
       "runtime": "vercel-php@0.7.3"

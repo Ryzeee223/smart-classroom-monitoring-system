@@ -22,6 +22,27 @@ class ApiController extends Controller
         }
     }
 
+    public function syncScheduledAttendance(Request $request): JsonResponse
+    {
+        $now = Carbon::now();
+        $attendanceDate = $now->toDateString();
+        $today = strtolower($now->format('l'));
+        $shortToday = strtolower($now->format('D'));
+        $schedules = Schedule::with('User')
+            ->where(function ($query) use ($today, $shortToday) {
+                $query->whereRaw('LOWER(day) LIKE ?', ['%' . $today . '%'])
+                    ->orWhereRaw('LOWER(day) LIKE ?', ['%' . $shortToday . '%']);
+            })
+            ->get();
+
+        $this->syncAttendanceForSchedules($schedules, $attendanceDate, $now);
+
+        return response()->json([
+            'date' => $attendanceDate,
+            'schedules_checked' => $schedules->count(),
+        ]);
+    }
+
     public function handleAttendanceScan(Request $request)
     {
         $scannedUid = $this->resolveUid($request);

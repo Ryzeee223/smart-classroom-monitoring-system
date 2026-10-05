@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\RequestController;
-use App\Http\Controllers\ApiController;
 use Faker\Guesser\Name;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -22,7 +21,7 @@ Route::post('/', [App\Http\Controllers\Auth\LoginController::class, 'login'])->n
 Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 
 // {{-- 1=admin 2=dean 3=asst. dean 4=faculty 5=Programhead --}}
-Route::get('/dashboard', function (ApiController $apiController) {
+Route::get('/dashboard', function () {
     if (!session('logged_in') || !in_array((int) session('user_role'), [1, 2, 3, 4, 5], true)) {
         return redirect('/');
     }
@@ -124,8 +123,6 @@ if (in_array($userRole, [2, 3], true)) {
 }
 
 $todaySchedules = $schedulesQuery->get();
-
-$apiController->syncAttendanceForSchedules($todaySchedules, $todayDate, $now);
 
 $attendanceBySchedule = Report::whereDate('attendance_date', $todayDate)
     ->whereIn('schedule_id', $todaySchedules->pluck('id'))

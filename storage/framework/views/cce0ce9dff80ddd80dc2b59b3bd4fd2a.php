@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="<?php echo e(asset('bootstrap-5.3.8-dist/css/bootstrap.min.css')); ?>" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="<?php echo e(asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js')); ?>"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <title>RFInsiDe - Courses</title>
 </head>
@@ -18,7 +20,7 @@
     </style>
 
     <div class="app-shell">
-        @include('sidebar')
+        <?php echo $__env->make('sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
         <main class="app-shell__content container mt-4 mb-5 p-4">
             <div class="row g-4">
@@ -26,30 +28,31 @@
                     <div class="card shadow">
                         <div class="card-body">
                             <h5 class="card-title">Add Course</h5>
-                            <form id="courseCreateForm" action="{{ route('course.store') }}" method="POST">
-                                @csrf
+                            <form id="courseCreateForm" action="<?php echo e(route('course.store')); ?>" method="POST">
+                                <?php echo csrf_field(); ?>
 
                                 <div class="mb-3">
-                                    @php
+                                    <?php
                                         $sessionRole = (int) (session('user_role') ?? 0);
                                         $currentUser = \App\Models\User::find(session('user_id'));
                                         $currentCollegeId = (int) ($currentUser?->college_id ?? 0);
                                         $currentCollegeName = $currentCollegeId
                                             ? (\App\Models\college::query()->where('id', $currentCollegeId)->value('college_name'))
                                             : null;
-                                    @endphp
+                                    ?>
 
-                                    <input type="hidden" name="college_id" value="{{ $currentCollegeId }}">
+                                    <input type="hidden" name="college_id" value="<?php echo e($currentCollegeId); ?>">
 
                                     <label for="college_id" class="form-label">College</label>
                                     <select id="college_id" class="form-select" disabled>
-                                        @if($currentCollegeId)
-                                            <option value="{{ $currentCollegeId }}" selected>
-                                                {{ $currentCollegeName ?? ('Assigned to your college (ID: ' . $currentCollegeId . ')') }}
+                                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($currentCollegeId): ?>
+                                            <option value="<?php echo e($currentCollegeId); ?>" selected>
+                                                <?php echo e($currentCollegeName ?? ('Assigned to your college (ID: ' . $currentCollegeId . ')')); ?>
+
                                             </option>
-                                        @else
+                                        <?php else: ?>
                                             <option selected>No assigned college. Please contact Admin.</option>
-                                        @endif
+                                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                     </select>
                                 </div>
 
@@ -148,26 +151,26 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse($course as $course)
+                                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $course; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                                             <tr>
-                                                <td>{{ $course->course_name ?? 'N/A' }}</td>
-                                                <td>{{ $course->course_code }}</td>
-                                                <td>{{ $course->course_name }}</td>
-                                                <td>{{ Str::limit($course->description, 30) }}</td>
+                                                <td><?php echo e($course->course_name ?? 'N/A'); ?></td>
+                                                <td><?php echo e($course->course_code); ?></td>
+                                                <td><?php echo e($course->course_name); ?></td>
+                                                <td><?php echo e(Str::limit($course->description, 30)); ?></td>
                                                 <td class="text-nowrap">
-                                                    <a href="{{ route('course.edit', $course->id) }}" class="btn btn-sm btn-outline-primary fw-semibold">Edit</a>
-                                                    <form method="POST" action="{{ route('course.destroy', $course->id) }}" class="d-inline" onsubmit="return confirm('Are you sure?')">
-                                                        @csrf
-                                                        @method('DELETE')
+                                                    <a href="<?php echo e(route('course.edit', $course->id)); ?>" class="btn btn-sm btn-outline-primary fw-semibold">Edit</a>
+                                                    <form method="POST" action="<?php echo e(route('course.destroy', $course->id)); ?>" class="d-inline" onsubmit="return confirm('Are you sure?')">
+                                                        <?php echo csrf_field(); ?>
+                                                        <?php echo method_field('DELETE'); ?>
                                                         <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                                                     </form>
                                                 </td>
                                             </tr>
-                                        @empty
+                                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                                             <tr>
                                                 <td colspan="5" class="text-center">No course yet</td>
                                             </tr>
-                                        @endforelse
+                                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -176,8 +179,9 @@
                 </div>
             </div>
         </main>
-        @include('partials.notifications-modal')
+        <?php echo $__env->make('partials.notifications-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     </div>
 </body>
 </html>
 
+<?php /**PATH /Volumes/shared/capstone project/backups/emonitor 3rd phase copy/resources/views/course.blade.php ENDPATH**/ ?>

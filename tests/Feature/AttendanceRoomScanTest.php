@@ -18,7 +18,7 @@ class AttendanceRoomScanTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_dashboard_generates_waiting_attendance_for_todays_schedule(): void
+    public function test_cron_sync_generates_waiting_attendance_without_a_login_session(): void
     {
         $now = Carbon::parse('2026-10-03 10:00:00');
         Carbon::setTestNow($now);
@@ -87,11 +87,8 @@ class AttendanceRoomScanTest extends TestCase
             'School_year' => '2026-2027',
         ]);
 
-        $this->withSession([
-            'logged_in' => true,
-            'user_role' => 4,
-            'user_id' => $userId,
-        ])->get('/dashboard')->assertOk();
+        $this->getJson('/api/attendance-sync')->assertOk();
+        $this->getJson('/api/attendance-sync')->assertOk();
 
         $this->assertDatabaseHas('attendance', [
             'user_id' => $userId,
@@ -99,6 +96,7 @@ class AttendanceRoomScanTest extends TestCase
             'attendance_date' => $now->toDateString(),
             'status' => 'waiting',
         ]);
+        $this->assertDatabaseCount('attendance', 1);
 
         Carbon::setTestNow();
     }
