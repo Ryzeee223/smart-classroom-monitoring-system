@@ -403,6 +403,30 @@ class ApiController extends Controller
      * form input, and direct query parameters. This keeps the scanner and the app compatible
      * with multiple hardware and frontend implementations.
      */
+    private function isScheduleActive(Schedule $schedule, Carbon $now): bool
+    {
+        $scheduleDays = preg_split('/[\s,\/|&-]+/', strtolower(trim((string) $schedule->day)), -1, PREG_SPLIT_NO_EMPTY);
+        $today = strtolower($now->format('l'));
+        $shortToday = strtolower($now->format('D'));
+
+        $matchesDay = in_array($today, $scheduleDays, true)
+            || in_array($shortToday, $scheduleDays, true);
+
+        if (!$matchesDay) {
+            return false;
+        }
+
+        if (!$schedule->start_time || !$schedule->end_time) {
+            return false;
+        }
+
+        $start = Carbon::createFromFormat('H:i:s', $schedule->start_time);
+        $end = Carbon::createFromFormat('H:i:s', $schedule->end_time);
+        $current = Carbon::createFromFormat('H:i:s', $now->format('H:i:s'));
+
+        return $current->greaterThanOrEqualTo($start) && $current->lessThanOrEqualTo($end);
+    }
+
     private function resolveUid(Request $request): string
     {
         $uid = $request->input('uid')
@@ -501,24 +525,27 @@ class ApiController extends Controller
         $payload = Cache::remember($cacheKey, 5, function () use ($today, $now) {
             // For the general dashboard view, the system lists all rooms and their live class status.
             $rooms = \App\Models\room::with('building')->select(['id', 'room_name', 'room_type', 'building_id'])->get();
-            $schedules = Schedule::with(['User:id,first_name,last_name', 'course:id,course_code,course_name', 'room:id,room_name'])
+
+            $allSchedules = Schedule::with(['User:id,first_name,last_name', 'course:id,course_code,course_name', 'room:id,room_name'])
                 ->where(function ($query) use ($today) {
                     $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($today) . '%'])
                         ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower(substr($today, 0, 3)) . '%']);
                 })
-                ->whereTime('start_time', '<=', $now->format('H:i:s'))
-                ->whereTime('end_time', '>=', $now->format('H:i:s'))
                 ->select(['id', 'room_id', 'user_id', 'course_id', 'start_time', 'end_time', 'day'])
                 ->get();
 
+            $activeSchedules = $allSchedules->filter(function ($schedule) use ($now) {
+                return $this->isScheduleActive($schedule, $now);
+            });
+
             // Pull attendance records for the active schedules so each room can show if it is occupied.
             $attendanceBySchedule = Report::whereDate('attendance_date', $now->toDateString())
-                ->whereIn('schedule_id', $schedules->pluck('id'))
+                ->whereIn('schedule_id', $activeSchedules->pluck('id'))
                 ->select(['id', 'schedule_id', 'time_in', 'time_out', 'status'])
                 ->get()
                 ->keyBy('schedule_id');
 
-            $liveByRoom = $schedules->mapWithKeys(function ($schedule) use ($attendanceBySchedule) {
+            $liveByRoom = $activeSchedules->mapWithKeys(function ($schedule) use ($attendanceBySchedule) {
                 $attendance = $attendanceBySchedule->get($schedule->id);
                 $faculty = trim(($schedule->User?->first_name ?? '') . ' ' . ($schedule->User?->last_name ?? ''));
 
@@ -532,7 +559,7 @@ class ApiController extends Controller
                     'time_in' => $attendance?->time_in,
                     'time_out' => $attendance?->time_out,
                     'attendance_status' => $attendance?->status ?? 'waiting',
-                    'occupied' => (bool) ($attendance?->time_in && !$attendance?->time_out),
+                    'occupied' => true,
                 ]];
             });
 
