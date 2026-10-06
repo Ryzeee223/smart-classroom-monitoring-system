@@ -524,7 +524,7 @@ class ApiController extends Controller
 
         $payload = Cache::remember($cacheKey, 5, function () use ($today, $now) {
             // For the general dashboard view, the system lists all rooms and their live class status.
-            $rooms = \App\Models\room::with('building')->select(['id', 'room_name', 'room_type', 'building_id'])->get();
+            $rooms = \App\Models\room::with('building')->select(['id', 'room_name', 'room_type', 'bldg_id'])->get();
 
             $allSchedules = Schedule::with(['User:id,first_name,last_name', 'course:id,course_code,course_name', 'room:id,room_name'])
                 ->where(function ($query) use ($today) {
