@@ -183,4 +183,102 @@ class AttendanceRoomScanTest extends TestCase
             'user_id' => $userId,
         ]);
     }
+
+    public function test_attendance_scan_checks_out_after_the_local_schedule_end_time(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-03 16:00:00', 'Asia/Manila'));
+        $now = Carbon::now('Asia/Manila');
+
+        $collegeId = DB::table('college')->insertGetId([
+            'college_name' => 'College of Engineering',
+            'abbreviation' => 'COE',
+            'description' => 'Engineering',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        $userId = DB::table('users')->insertGetId([
+            'first_name' => 'Checkout',
+            'last_name' => 'Faculty',
+            'middle_name' => '',
+            'employee_ID' => 'CO-101',
+            'email' => 'checkoutfaculty@example.com',
+            'password' => bcrypt('secret'),
+            'role' => 4,
+            'college_id' => $collegeId,
+            'RFID_code' => 'EF56GH78',
+            'acc_status' => 'Attended',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        $programId = DB::table('programs')->insertGetId([
+            'college_id' => $collegeId,
+            'program_abbr' => 'BSCS',
+            'program_name' => 'Bachelor of Science in Computer Science',
+            'description' => 'Core program',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        $roomId = DB::table('room')->insertGetId([
+            'room_name' => 'CC103',
+            'room_type' => 'Lecture',
+            'status' => 'occupied',
+            'bldg_id' => 1,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        $courseId = DB::table('courses')->insertGetId([
+            'college_id' => $collegeId,
+            'course_code' => 'CS102',
+            'course_name' => 'Data Structures',
+            'description' => 'Data structures',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        $schedule = Schedule::create([
+            'user_id' => $userId,
+            'program_id' => $programId,
+            'course_id' => $courseId,
+            'room_id' => $roomId,
+            'year_level' => '2',
+            'section' => 'A',
+            'day' => $now->format('l'),
+            'start_time' => '14:00:00',
+            'end_time' => '15:00:00',
+            'Semester' => '1st Semester',
+            'School_year' => '2026-2027',
+        ]);
+
+        DB::table('attendance')->insert([
+            'user_id' => $userId,
+            'college_id' => $collegeId,
+            'schedule_id' => $schedule->id,
+            'room_id' => $roomId,
+            'time_in' => '14:00:00',
+            'time_out' => null,
+            'day' => $now->format('l'),
+            'attendance_date' => $now->toDateString(),
+            'status' => 'attended',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        $this->postJson('/api/attendance-scan', [
+            'uid' => 'EF56GH78',
+            'room' => 'CC103',
+        ])->assertOk()
+            ->assertJsonPath('status', 'accepted')
+            ->assertJsonPath('time_out', '16:00:00')
+            ->assertJsonPath('message', 'Checked out');
+
+        $this->assertDatabaseHas('attendance', [
+            'user_id' => $userId,
+            'schedule_id' => $schedule->id,
+            'time_out' => '16:00:00',
+        ]);
+    }
 }
