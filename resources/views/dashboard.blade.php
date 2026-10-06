@@ -306,7 +306,7 @@ body {
             </td>
             <td>{{ $schedule?->course?->course_name ?? 'N/A' }}</td>
             <td>
-                <span class="badge {{ in_array($attendance->status, ['attended', 'present']) ? 'bg-success' : ($attendance->status === 'absent' ? 'bg-danger' : ($attendance->status === 'ongoing' ? 'bg-primary' : 'bg-warning')) }}">
+                <span class="badge {{ in_array($attendance->status, ['attended', 'present']) ? 'bg-success' : ($attendance->status === 'absent' ? 'bg-danger' : 'bg-warning') }}">
                     {{ ucfirst(str_replace('_', ' ', $attendance->status ?? 'N/A')) }}
                 </span>
             </td>
@@ -344,7 +344,7 @@ body {
             const status = record.status || 'waiting';
             const badgeClass = ['attended', 'present'].includes(status)
                 ? 'bg-success'
-                : status === 'absent' ? 'bg-danger' : status === 'ongoing' ? 'bg-primary' : 'bg-warning';
+                : status === 'absent' ? 'bg-danger' : 'bg-warning';
 
             return `<tr>
                 <td>${record.class}</td>
@@ -399,7 +399,6 @@ body {
                         let badgeClass = 'badge ';
                         switch(scan.status_in) {
                             case 'attended': badgeClass += 'bg-success'; break;
-                            case 'ongoing': badgeClass += 'bg-primary'; break;
                             case 'late': badgeClass += 'bg-warning text-dark'; break;
                             case 'on_leave': badgeClass += 'bg-info text-dark'; break;
                             case 'absent': badgeClass += 'bg-danger'; break;
@@ -427,6 +426,7 @@ body {
     @include('partials.notifications-modal')
 </body>
 </html>
+
 
 
 

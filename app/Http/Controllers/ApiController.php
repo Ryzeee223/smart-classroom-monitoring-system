@@ -250,9 +250,9 @@ class ApiController extends Controller
             ];
         }
 
-        // Allow checkout during the grace period immediately after class ends.
+        // Start and end times are used to classify early, late, or duplicate scans.
+        $start = Carbon::today()->setTimeFromTimeString($schedule->start_time);
         $end = Carbon::today()->setTimeFromTimeString($schedule->end_time);
-        $checkoutDeadline = $end->copy()->addMinutes(Report::CHECKOUT_GRACE_MINUTES);
 
         // Create a report entry if this is the first attendance action for the class period.
         $attendance ??= Report::firstOrCreate(
@@ -301,14 +301,15 @@ class ApiController extends Controller
             ];
         }
 
-        // A check-in remains ongoing until a checkout scan completes the attendance record.
+        // This is the normal check-in branch: the system writes the time_in value and classifies
+        // the user as attended or late based on whether they arrived more than 30 minutes after start time.
         if (empty($attendance->time_in) && empty($attendance->time_out)) {
             $attendance->time_in = $now->format('H:i:s');
-            $attendance->status = 'ongoing';
+            $attendance->status = $now->gt($start->copy()->addMinutes(30)) ? 'late' : 'attended';
             $attendance->save();
             $schedule->room()->update(['status' => 'occupied']);
 
-            $user->update(['acc_status' => 'Ongoing']);
+            $user->update(['acc_status' => ucfirst($attendance->status)]);
 
             return [
                 'status' => 'accepted',
@@ -346,30 +347,8 @@ class ApiController extends Controller
                 ];
             }
 
-            if ($now->greaterThanOrEqualTo($checkoutDeadline)) {
-                $attendance->status = 'absent';
-                $attendance->save();
-                $user->update(['acc_status' => 'Absent']);
-
-                return [
-                    'status' => 'ignored',
-                    'attendance_status' => $attendance->status,
-                    'status_in' => $attendance->status,
-                    'time_in' => $attendance->time_in,
-                    'time_out' => $attendance->time_out,
-                    'message' => 'Checkout grace period expired.',
-                    'uid' => $scannedUid,
-                    'user' => [
-                        'id' => $user->id,
-                        'name' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
-                    ],
-                    'attendance_id' => $attendance->id,
-                ];
-            }
-
-            // A scan during the grace period records the checkout and completes attendance.
+            // After class end time, the same user can check out and complete the attendance record.
             $attendance->time_out = $now->format('H:i:s');
-            $attendance->status = 'attended';
             $attendance->save();
 
             // If nobody else is still inside the room, this room returns to vacant status.
@@ -377,7 +356,6 @@ class ApiController extends Controller
                 ->whereDate('attendance_date', $now->toDateString())
                 ->whereNotNull('time_in')
                 ->whereNull('time_out')
-                ->whereIn('status', ['ongoing', 'on_leave'])
                 ->where('id', '!=', $attendance->id)
                 ->exists();
 
@@ -385,7 +363,7 @@ class ApiController extends Controller
                 $schedule->room()->update(['status' => 'vacant']);
             }
 
-            $user->update(['acc_status' => 'Attended']);
+            $user->update(['acc_status' => 'Checked Out']);
 
             return [
                 'status' => 'accepted',
