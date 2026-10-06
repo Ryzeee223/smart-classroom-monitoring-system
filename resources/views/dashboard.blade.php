@@ -291,7 +291,7 @@ body {
                                                 <th>Status</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="my-attendance-body">
+                                        <tbody id="my-attendance-body" >
     @forelse(($myAttendance ?? collect()) as $attendance)
         @php $schedule = $attendance->schedule; @endphp
         <tr>

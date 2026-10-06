@@ -17,7 +17,7 @@ class scheduleTester extends Seeder
         //
         $now = Carbon::now();
         $timenow = $now->toTimeString();
-        $endtime = $now->copy()->addMinutes(3)->toTimeString();
+        $endtime = $now->copy()->addMinutes(2)->toTimeString();
         Schedule::create([
             'user_id' => 3,
             'room_id' => 1,

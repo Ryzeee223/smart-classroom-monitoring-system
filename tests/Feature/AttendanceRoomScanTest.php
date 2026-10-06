@@ -82,7 +82,7 @@ class AttendanceRoomScanTest extends TestCase
             'year_level' => '2',
             'section' => 'A',
             'day' => $now->format('l'),
-            'start_time' => '10:30:00',
+            'start_time' => '09:40:00',
             'end_time' => '12:00:00',
             'Semester' => '1st Semester',
             'School_year' => '2026-2027',
@@ -98,12 +98,21 @@ class AttendanceRoomScanTest extends TestCase
             'status' => 'waiting',
         ]);
         $this->assertDatabaseCount('attendance', 1);
+        $this->assertDatabaseHas('room', [
+            'id' => $roomId,
+            'status' => 'vacant',
+        ]);
+        $this->getJson('/api/live-classrooms')
+            ->assertOk()
+            ->assertJsonPath('rooms.0.status', 'vacant');
 
         Carbon::setTestNow();
     }
 
     public function test_room_in_scan_request_is_used_to_validate_the_schedule(): void
     {
+        Carbon::setTestNow(Carbon::parse('2026-10-03 10:00:00', 'Asia/Manila'));
+
         $collegeId = DB::table('college')->insertGetId([
             'college_name' => 'College of Engineering',
             'abbreviation' => 'COE',
@@ -144,6 +153,14 @@ class AttendanceRoomScanTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+        DB::table('room')->insert([
+            'room_name' => 'CC101',
+            'room_type' => 'Lecture',
+            'status' => 'vacant',
+            'bldg_id' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         $courseId = DB::table('courses')->insertGetId([
             'college_id' => $collegeId,
@@ -156,8 +173,9 @@ class AttendanceRoomScanTest extends TestCase
 
         $today = Carbon::today();
         $day = $today->format('l');
+        $end = $today->copy()->setTime(12, 0);
 
-        Schedule::create([
+        $schedule = Schedule::create([
             'user_id' => $userId,
             'program_id' => $programId,
             'course_id' => $courseId,
@@ -165,8 +183,8 @@ class AttendanceRoomScanTest extends TestCase
             'year_level' => '2',
             'section' => 'A',
             'day' => $day,
-            'start_time' => $today->copy()->subMinutes(30)->format('H:i:s'),
-            'end_time' => $today->copy()->addMinutes(120)->format('H:i:s'),
+            'start_time' => $today->copy()->setTime(9, 40)->format('H:i:s'),
+            'end_time' => $end->format('H:i:s'),
             'Semester' => '1st Semester',
             'School_year' => '2026-2027',
         ]);
@@ -180,8 +198,34 @@ class AttendanceRoomScanTest extends TestCase
             ->assertJsonPath('status', 'denied')
             ->assertJsonPath('message', 'This RFID card is not assigned to the scheduled room.');
 
-        $this->assertDatabaseMissing('attendance', [
+        $this->assertDatabaseHas('attendance', [
             'user_id' => $userId,
+            'schedule_id' => $schedule->id,
+            'time_in' => null,
+            'time_out' => null,
+        ]);
+        $this->assertDatabaseHas('room', [
+            'id' => $roomId,
+            'status' => 'vacant',
+        ]);
+
+        $this->postJson('/api/attendance-scan', [
+            'uid' => 'AB12CD34',
+            'room' => 'CC102',
+        ])->assertOk()
+            ->assertJsonPath('status', 'accepted')
+            ->assertJsonPath('time_in', '10:00:00')
+            ->assertJsonPath('attendance_status', 'ongoing');
+
+        $this->assertDatabaseHas('attendance', [
+            'user_id' => $userId,
+            'time_in' => '10:00:00',
+            'time_out' => null,
+            'status' => 'ongoing',
+        ]);
+        $this->assertDatabaseHas('room', [
+            'id' => $roomId,
+            'status' => 'occupied',
         ]);
     }
 

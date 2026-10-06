@@ -29,15 +29,15 @@ class Report extends Model
                 return;
             }
 
-            $roomIsOccupied = self::where('room_id', $attendance->room_id)
+            $roomHasOpenAttendance = self::where('room_id', $attendance->room_id)
                 ->whereNotNull('time_in')
                 ->whereNull('time_out')
                 ->whereIn('status', ['ongoing', 'on_leave'])
                 ->exists();
 
-            room::whereKey($attendance->room_id)->update([
-                'status' => $roomIsOccupied ? 'occupied' : 'vacant',
-            ]);
+            if (!$roomHasOpenAttendance) {
+                room::whereKey($attendance->room_id)->update(['status' => 'vacant']);
+            }
         });
     }
 

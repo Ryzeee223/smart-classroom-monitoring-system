@@ -43,8 +43,18 @@ class ApiController extends Controller
         $scannedUid = $this->resolveUid($request);
         $roomName = $this->resolveRoom($request);
 
+        Log::info('Attendance RFID packet received', [
+            'room' => $roomName,
+            'has_uid' => $scannedUid !== '',
+        ]);
+
         // If either value is missing, the scan is invalid and should be rejected early.
         if ($scannedUid === '' || $roomName === '') {
+            Log::warning('Attendance RFID packet rejected because UID or room is missing.', [
+                'has_uid' => $scannedUid !== '',
+                'has_room' => $roomName !== '',
+            ]);
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'RFID UID and scanner room are required.',
@@ -52,7 +62,11 @@ class ApiController extends Controller
         }
 
         // Find the registered user assigned to the scanned RFID card.
-        $user = User::whereRaw('UPPER(TRIM("RFID_code")) = ?', [$scannedUid])->first();
+        $userQuery = User::query();
+        $rfidColumn = $userQuery->getQuery()->getGrammar()->wrap('RFID_code');
+        $user = $userQuery
+            ->whereRaw("UPPER(TRIM({$rfidColumn})) = ?", [$scannedUid])
+            ->first();
 
         // A valid user goes through the attendance workflow; an unassigned card is denied.
         $attendanceData = $user
@@ -65,6 +79,13 @@ class ApiController extends Controller
                 'message' => 'card is not assigned',
                 'uid' => $scannedUid,
             ];
+
+        Log::info('Attendance RFID packet processed', [
+            'room' => $roomName,
+            'status' => $attendanceData['status'] ?? 'unknown',
+            'attendance_status' => $attendanceData['attendance_status'] ?? null,
+            'message' => $attendanceData['message'] ?? null,
+        ]);
 
         // Store the latest scan result so the admin dashboard can show the most recent update.
         Cache::store('database')->put('latest_attendance_scan_data', $attendanceData, 120);
@@ -171,9 +192,8 @@ class ApiController extends Controller
             ];
         }
 
-        // Search for an active schedule for the user in this room on the current day.
+        // Find the user's active schedule first, then validate its room against the scanner.
         $scheduleQuery = Schedule::where('user_id', $user->id)
-            ->whereIn('room_id', $allowedRoomIds)
             ->where(function ($query) use ($today, $shortToday) {
                 $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($today) . '%'])
                     ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower($shortToday) . '%']);
@@ -192,7 +212,6 @@ class ApiController extends Controller
             $attendance = Report::with('schedule')
                 ->where('user_id', $user->id)
                 ->whereDate('attendance_date', $now->toDateString())
-                ->whereIn('room_id', $allowedRoomIds)
                 ->whereNotNull('time_in')
                 ->whereNull('time_out')
                 ->latest('id')
@@ -214,6 +233,21 @@ class ApiController extends Controller
             ];
         }
 
+        if (!$schedule->room_id || !in_array((int) $schedule->room_id, array_map('intval', $allowedRoomIds), true)) {
+            Log::warning('Attendance scan rejected because the schedule room does not match the scanner room.', [
+                'schedule_id' => $schedule->id,
+                'schedule_room_id' => $schedule->room_id,
+                'scanned_room' => $normalizedRoom,
+            ]);
+
+            return [
+                'status' => 'denied',
+                'message' => 'This RFID card is not assigned to the scheduled room.',
+                'uid' => $scannedUid,
+                'room' => $normalizedRoom,
+            ];
+        }
+
         // This confirms that the scanned card belongs to the faculty assigned to the schedule.
         $scheduledUser = $schedule->User;
         $scheduledUid = strtoupper(trim((string) ($scheduledUser?->RFID_code ?? '')));
@@ -232,20 +266,6 @@ class ApiController extends Controller
             return [
                 'status' => 'denied',
                 'message' => 'not assigned to faculty.',
-                'uid' => $scannedUid,
-            ];
-        }
-
-        // A schedule without a room cannot be processed safely.
-        if (!$schedule->room_id) {
-            Log::error('skipped, no room.', [
-                'schedule_id' => $schedule->id,
-                'user_id' => $user->id,
-            ]);
-
-            return [
-                'status' => 'denied',
-                'message' => 'schedule is missing a room.',
                 'uid' => $scannedUid,
             ];
         }
@@ -539,7 +559,7 @@ class ApiController extends Controller
 
         $payload = Cache::remember($cacheKey, 5, function () use ($today, $now) {
             // For the general dashboard view, the system lists all rooms and their live class status.
-            $rooms = \App\Models\room::with('building')->select(['id', 'room_name', 'room_type', 'bldg_id'])->get();
+            $rooms = \App\Models\room::with('building')->select(['id', 'room_name', 'room_type', 'bldg_id', 'status'])->get();
 
             $allSchedules = Schedule::with(['User:id,first_name,last_name', 'course:id,course_code,course_name', 'room:id,room_name'])
                 ->where(function ($query) use ($today) {
@@ -553,7 +573,7 @@ class ApiController extends Controller
                 return $this->isScheduleActive($schedule, $now);
             });
 
-            // Pull attendance records for the active schedules so each room can show if it is occupied.
+            // Include current attendance times alongside the scheduled live-class details.
             $attendanceBySchedule = Report::whereDate('attendance_date', $now->toDateString())
                 ->whereIn('schedule_id', $activeSchedules->pluck('id'))
                 ->select(['id', 'schedule_id', 'time_in', 'time_out', 'status'])
@@ -574,7 +594,6 @@ class ApiController extends Controller
                     'time_in' => $attendance?->time_in,
                     'time_out' => $attendance?->time_out,
                     'attendance_status' => $attendance?->status ?? 'waiting',
-                    'occupied' => true,
                 ]];
             });
 
@@ -588,7 +607,7 @@ class ApiController extends Controller
                         'type' => $room->room_type,
                         'bldg_abbr' => $room->building?->bldg_abbr ?? '',
                         'bldg_name' => $room->building?->bldg_name ?? '',
-                        'status' => $live && $live['occupied'] ? 'occupied' : 'vacant',
+                        'status' => $room->status,
                         'live' => $live,
                     ];
                 })->values(),
