@@ -6,6 +6,8 @@ use Illuminate\Support\Carbon;
 
 class Report extends Model
 {
+    public const CHECKOUT_GRACE_MINUTES = 10;
+
     protected $table = 'attendance';
 
     protected $fillable = [
@@ -30,6 +32,7 @@ class Report extends Model
             $roomIsOccupied = self::where('room_id', $attendance->room_id)
                 ->whereNotNull('time_in')
                 ->whereNull('time_out')
+                ->whereIn('status', ['ongoing', 'on_leave'])
                 ->exists();
 
             room::whereKey($attendance->room_id)->update([
@@ -86,6 +89,22 @@ class Report extends Model
 
         if ($isOnLeave && $attendance->status !== 'on_leave') {
             $attendance->update(['status' => 'on_leave', 'time_in' => null]);
+        } elseif (!$isOnLeave && $attendance->time_out && $attendance->status !== 'attended') {
+            $attendance->update(['status' => 'attended']);
+        } elseif (!$isOnLeave && $attendance->time_in) {
+            $end = Carbon::parse("{$attendanceDate} {$schedule->end_time}");
+
+            if ($end->lt($start)) {
+                $end->addDay();
+            }
+
+            $checkoutDeadline = $end->copy()->addMinutes(self::CHECKOUT_GRACE_MINUTES);
+
+            if ($now->greaterThanOrEqualTo($checkoutDeadline) && $attendance->status !== 'absent') {
+                $attendance->update(['status' => 'absent']);
+            } elseif ($now->lessThanOrEqualTo($checkoutDeadline) && $attendance->status !== 'ongoing') {
+                $attendance->update(['status' => 'ongoing']);
+            }
         } elseif (!$isOnLeave
             && $attendance->status === 'waiting'
             && !$attendance->time_in
@@ -141,4 +160,3 @@ class Report extends Model
         );
     }
 }
-
