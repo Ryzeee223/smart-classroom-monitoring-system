@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Schedule;
+use App\Models\Report;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -186,7 +187,7 @@ class AttendanceRoomScanTest extends TestCase
 
     public function test_attendance_scan_checks_out_after_the_local_schedule_end_time(): void
     {
-        Carbon::setTestNow(Carbon::parse('2026-10-03 16:00:00', 'Asia/Manila'));
+        Carbon::setTestNow(Carbon::parse('2026-10-03 14:20:00', 'Asia/Manila'));
         $now = Carbon::now('Asia/Manila');
 
         $collegeId = DB::table('college')->insertGetId([
@@ -224,7 +225,7 @@ class AttendanceRoomScanTest extends TestCase
         $roomId = DB::table('room')->insertGetId([
             'room_name' => 'CC103',
             'room_type' => 'Lecture',
-            'status' => 'occupied',
+            'status' => 'vacant',
             'bldg_id' => 1,
             'created_at' => $now,
             'updated_at' => $now,
@@ -253,32 +254,68 @@ class AttendanceRoomScanTest extends TestCase
             'School_year' => '2026-2027',
         ]);
 
-        DB::table('attendance')->insert([
-            'user_id' => $userId,
-            'college_id' => $collegeId,
-            'schedule_id' => $schedule->id,
-            'room_id' => $roomId,
-            'time_in' => '14:00:00',
-            'time_out' => null,
-            'day' => $now->format('l'),
-            'attendance_date' => $now->toDateString(),
-            'status' => 'attended',
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]);
-
         $this->postJson('/api/attendance-scan', [
             'uid' => 'EF56GH78',
             'room' => 'CC103',
         ])->assertOk()
             ->assertJsonPath('status', 'accepted')
-            ->assertJsonPath('time_out', '16:00:00')
-            ->assertJsonPath('message', 'Checked out');
+            ->assertJsonPath('time_in', '14:20:00')
+            ->assertJsonPath('attendance_status', 'ongoing');
 
         $this->assertDatabaseHas('attendance', [
             'user_id' => $userId,
             'schedule_id' => $schedule->id,
-            'time_out' => '16:00:00',
+            'time_in' => '14:20:00',
+            'time_out' => null,
+            'status' => 'ongoing',
+        ]);
+        $this->assertDatabaseHas('users', [
+            'id' => $userId,
+            'acc_status' => 'Attended',
+        ]);
+
+        $noShowSchedule = $schedule->replicate();
+        $noShowSchedule->section = 'B';
+        $noShowSchedule->save();
+
+        Report::syncForSchedule(
+            $noShowSchedule,
+            $now->toDateString(),
+            Carbon::parse('2026-10-03 14:30:00', 'Asia/Manila')
+        );
+
+        $this->assertDatabaseHas('attendance', [
+            'user_id' => $userId,
+            'schedule_id' => $noShowSchedule->id,
+            'time_in' => null,
+            'time_out' => null,
+            'status' => 'absent',
+        ]);
+        $this->assertDatabaseHas('users', [
+            'id' => $userId,
+            'acc_status' => 'Attended',
+        ]);
+
+        Carbon::setTestNow(Carbon::parse('2026-10-03 15:09:59', 'Asia/Manila'));
+        $this->postJson('/api/attendance-scan', [
+            'uid' => 'EF56GH78',
+            'room' => 'CC103',
+        ])->assertOk()
+            ->assertJsonPath('status', 'accepted')
+            ->assertJsonPath('time_in', '14:20:00')
+            ->assertJsonPath('time_out', '15:09:59')
+            ->assertJsonPath('attendance_status', 'attended');
+
+        $this->assertDatabaseHas('attendance', [
+            'user_id' => $userId,
+            'schedule_id' => $schedule->id,
+            'time_in' => '14:20:00',
+            'time_out' => '15:09:59',
+            'status' => 'attended',
+        ]);
+        $this->assertDatabaseHas('users', [
+            'id' => $userId,
+            'acc_status' => 'Attended',
         ]);
     }
 }
