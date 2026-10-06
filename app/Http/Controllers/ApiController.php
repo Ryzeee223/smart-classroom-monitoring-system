@@ -46,7 +46,7 @@ class ApiController extends Controller
             )->block(5, fn () => $this->processAttendanceForUser($user, $scannedUid, $roomName))
             : [
                 'status' => 'denied',
-                'message' => 'RFID card is not assigned to a user.',
+                'message' => 'card is not assigned',
                 'uid' => $scannedUid,
             ];
 
@@ -124,7 +124,7 @@ class ApiController extends Controller
         if (empty($allowedRoomIds)) {
             return [
                 'status' => 'denied',
-                'message' => 'This room does not exist in the system.',
+                'message' => 'This room not exist .',
                 'uid' => $scannedUid,
                 'room' => $normalizedRoom,
                 'user' => [
@@ -164,7 +164,7 @@ class ApiController extends Controller
         if (!$schedule) {
             return [
                 'status' => 'denied',
-                'message' => 'No active schedule or open attendance for this faculty in this room.',
+                'message' => 'No active schedule',
                 'uid' => $scannedUid,
                 'room' => $normalizedRoom,
                 'user' => [
@@ -182,7 +182,7 @@ class ApiController extends Controller
             || $scheduledUid === ''
             || $scheduledUid !== $scannedUid
         ) {
-            Log::warning('Attendance scan rejected because the card does not belong to the scheduled faculty.', [
+            Log::warning('rejected.', [
                 'schedule_id' => $schedule->id,
                 'scheduled_user_id' => $schedule->user_id,
                 'scanned_user_id' => $user->id,
@@ -190,20 +190,20 @@ class ApiController extends Controller
 
             return [
                 'status' => 'denied',
-                'message' => 'This RFID card is not assigned to the scheduled faculty.',
+                'message' => 'not assigned to faculty.',
                 'uid' => $scannedUid,
             ];
         }
 
         if (!$schedule->room_id) {
-            Log::error('Attendance scan skipped because the schedule has no room.', [
+            Log::error('skipped, no room.', [
                 'schedule_id' => $schedule->id,
                 'user_id' => $user->id,
             ]);
 
             return [
                 'status' => 'denied',
-                'message' => 'This schedule is missing a room assignment.',
+                'message' => 'schedule is missing a room.',
                 'uid' => $scannedUid,
             ];
         }

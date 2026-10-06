@@ -18,8 +18,8 @@ class scheduleTester extends Seeder
         $now = Carbon::now();
         $timenow = $now->toTimeString();
         $endtime = $now->copy()->addMinutes(3)->toTimeString();
-        $schedule = Schedule::create([
-            'user_id' => 5,
+        Schedule::create([
+            'user_id' => 3,
             'room_id' => 1,
             'program_id' => 1,
             'course_id' => 1,
@@ -29,8 +29,8 @@ class scheduleTester extends Seeder
             'Semester' => '1st Semester',
             'School_year' => '2025-2026',
             'day' => $now->format('l'),
-            'start_time' => $timenow, //replace me if gusto
-            'end_time' => $endtime,   //replace me if gusto
+            'start_time' => $timenow, 
+            'end_time' => $endtime,   
         ]);
 
     }
