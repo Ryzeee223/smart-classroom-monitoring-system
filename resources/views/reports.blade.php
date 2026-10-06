@@ -133,13 +133,13 @@
                             <tbody>
                                 @forelse ($facultySchedules as $schedule)
                                     <tr>
-                                        <td>{{ $schedule['start_display'] }} - {{ $schedule['end_display'] }}</td>
+                                        <td >{{ $schedule['start_display'] }} - {{ $schedule['end_display'] }}</td>
                                         <td>{{ $schedule['time_in'] ?? 'N/A' }}</td>
                                         <td>{{ $schedule['time_out'] ?? 'N/A' }}</td>
                                         <td>{{ $schedule['faculty'] }}</td>
                                         <td>{{ $schedule['course_code'] }}</td>
                                         <td>
-                                            <span class="badge text-bg-secondary">
+                                            <span class="d-flex align-items-center justify-content-center">
                                                 {{ ucfirst(str_replace('_', ' ', $schedule['attendance_status'])) }}
                                             </span>
                                         </td>

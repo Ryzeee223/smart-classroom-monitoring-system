@@ -135,13 +135,13 @@
                             <tbody>
                                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $facultySchedules; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $schedule): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                                     <tr>
-                                        <td><?php echo e($schedule['start_display']); ?> - <?php echo e($schedule['end_display']); ?></td>
+                                        <td ><?php echo e($schedule['start_display']); ?> - <?php echo e($schedule['end_display']); ?></td>
                                         <td><?php echo e($schedule['time_in'] ?? 'N/A'); ?></td>
                                         <td><?php echo e($schedule['time_out'] ?? 'N/A'); ?></td>
                                         <td><?php echo e($schedule['faculty']); ?></td>
                                         <td><?php echo e($schedule['course_code']); ?></td>
                                         <td>
-                                            <span class="badge text-bg-secondary">
+                                            <span class="d-flex align-items-center justify-content-center">
                                                 <?php echo e(ucfirst(str_replace('_', ' ', $schedule['attendance_status']))); ?>
 
                                             </span>
