@@ -534,12 +534,13 @@ class ApiController extends Controller
                 ->first();
 
             if (!$schedule) {
-                $lcdLines = ['No ongoing class', 'Room: ' . $scannerRoom->room_name];
+                $lcdLines = ['Room: ' . $scannerRoom->room_name,'No ongoing class' ];
             } else {
                 $faculty = trim(($schedule->User?->first_name ?? '') . ' ' . ($schedule->User?->last_name ?? ''));
                 $lcdLines = [
+                     $faculty ?: 'Faculty',
                     $schedule->course?->course_code ?? $schedule->course?->course_name ?? 'Class in session',
-                    $faculty ?: 'Faculty',
+                   
                 ];
             }
 

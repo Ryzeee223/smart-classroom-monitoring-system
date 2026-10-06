@@ -325,7 +325,21 @@ class AttendanceRoomScanTest extends TestCase
         Report::syncForSchedule(
             $noShowSchedule,
             $now->toDateString(),
-            Carbon::parse('2026-10-03 14:30:00', 'Asia/Manila')
+            Carbon::parse('2026-10-03 15:09:59', 'Asia/Manila')
+        );
+
+        $this->assertDatabaseHas('attendance', [
+            'user_id' => $userId,
+            'schedule_id' => $noShowSchedule->id,
+            'time_in' => null,
+            'time_out' => null,
+            'status' => 'waiting',
+        ]);
+
+        Report::syncForSchedule(
+            $noShowSchedule,
+            $now->toDateString(),
+            Carbon::parse('2026-10-03 15:10:00', 'Asia/Manila')
         );
 
         $this->assertDatabaseHas('attendance', [

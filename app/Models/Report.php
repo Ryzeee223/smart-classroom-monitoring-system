@@ -93,7 +93,7 @@ class Report extends Model
             if ($attendance->status !== 'attended') {
                 $attendance->update(['status' => 'attended']);
             }
-        } elseif (!$isOnLeave && $attendance->time_in) {
+        } elseif (!$isOnLeave && (!$attendance->time_in || !$attendance->time_out)) {
             $end = Carbon::parse("{$attendanceDate} {$schedule->end_time}");
 
             if ($end->lt($start)) {
@@ -104,15 +104,11 @@ class Report extends Model
 
             if ($now->greaterThanOrEqualTo($checkoutDeadline) && $attendance->status !== 'absent') {
                 $attendance->update(['status' => 'absent']);
-            } elseif ($now->lessThan($checkoutDeadline) && $attendance->status !== 'ongoing') {
+            } elseif ($attendance->time_in && $now->lessThan($checkoutDeadline) && $attendance->status !== 'ongoing') {
                 $attendance->update(['status' => 'ongoing']);
+            } elseif (!$attendance->time_in && !$attendance->time_out && $attendance->status !== 'waiting') {
+                $attendance->update(['status' => 'waiting']);
             }
-        } elseif (!$isOnLeave && $now->gte($start->copy()->addMinutes(30))) {
-            if ($attendance->status !== 'absent') {
-                $attendance->update(['status' => 'absent']);
-            }
-        } elseif (!$isOnLeave && $attendance->status !== 'waiting') {
-            $attendance->update(['status' => 'waiting']);
         }
 
         return $attendance->fresh();
