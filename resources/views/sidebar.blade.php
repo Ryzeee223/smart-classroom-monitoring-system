@@ -245,7 +245,7 @@
                 // A single failed poll must never break the whole page.
                 console.error('Error checking RFID:', error);
             });
-    }, 1000); 
+    }, 2000); 
 
 
 </script>
