@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rooms - RFINSIDE</title>
-    <link href="{{ asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}" rel="stylesheet">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
@@ -116,18 +116,7 @@
                             <div class="alert alert-success alert-sm mb-3">{{ session('success') }}</div>
                         @endif
 
-                        {{-- College filter --}}
-                            <div class="mb-3">
-                            <label class="form-label form-label-sm mb-1">Filter by present College ID</label>
-                            <select class="form-select form-select-sm" id="college-filter" onchange="filterBuildingsByCollege()">
-                            <option value="">All colleges</option>
-                            @forelse($colleges ?? [] as $c)
-                                <option value="{{ $c->id }}">{{ $c->college_name ?? $c->abbreviation }}</option>
-                            @empty
-                                <option value="" disabled>No colleges available</option>
-                            @endforelse
-                             </select>
-                            </div>
+                        
 
                     <div class="table-responsive mb-0">
                         {{-- slot container --}}

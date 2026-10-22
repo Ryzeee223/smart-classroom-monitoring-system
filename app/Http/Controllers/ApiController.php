@@ -504,8 +504,8 @@ class ApiController extends Controller
 
     /**
      * This endpoint serves the LCD display by showing either the currently active class in a room
-     * or a message indicating that the room is idle. It is designed for hardware screens that need
-     * a minimal two-line text format.
+     * or a message indicating that the room is idle. It returns four pipe-delimited lines for
+     * hardware displays.
      */
     public function DisplaytoLcd()
     {
@@ -518,7 +518,7 @@ class ApiController extends Controller
             $scannerRoom = room::whereRaw('UPPER(TRIM(room_name)) = ?', [$roomName])->first();
 
             if (!$scannerRoom) {
-                return response('Room not found|Check room setup', 404)
+                return response('Room not found|Check room setup||', 404)
                     ->header('Content-Type', 'text/plain');
             }
 
@@ -534,13 +534,14 @@ class ApiController extends Controller
                 ->first();
 
             if (!$schedule) {
-                $lcdLines = ['Room: ' . $scannerRoom->room_name,'No ongoing class' ];
+                $lcdLines = ['Room: ' . $scannerRoom->room_name, 'No ongoing class', '', ''];
             } else {
                 $faculty = trim(($schedule->User?->first_name ?? '') . ' ' . ($schedule->User?->last_name ?? ''));
                 $lcdLines = [
-                     $faculty ?: 'Faculty',
+                    $faculty ?: 'Faculty',
                     $schedule->course?->course_code ?? $schedule->course?->course_name ?? 'Class in session',
-                   
+                    'Start: ' . Carbon::parse($schedule->start_time)->format('g:i A'),
+                    'End: ' . Carbon::parse($schedule->end_time)->format('g:i A'),
                 ];
             }
 

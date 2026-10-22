@@ -19,7 +19,7 @@ class scheduleTester extends Seeder
         $timenow = $now->toTimeString();
         $endtime = $now->copy()->addMinutes(2)->toTimeString();
         Schedule::create([
-            'user_id' => 3,
+            'user_id' => 2, //change me depending on the user
             'room_id' => 1,
             'program_id' => 1,
             'course_id' => 1,

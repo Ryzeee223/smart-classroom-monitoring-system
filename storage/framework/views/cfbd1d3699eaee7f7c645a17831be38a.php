@@ -90,12 +90,6 @@
 
                             <hr>
 
-
-
-                            
-
-                                     
-
                             <script>
                                 const changeBtn = document.getElementById('changePhotoBtn');
                                 const saveBtn = document.getElementById('savePhotoBtn');

@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Profile</title>
-    <link href="{{ asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}" rel="stylesheet">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
@@ -93,19 +93,6 @@
                             </div>
 
                             <hr>
-
-
-
-                            {{-- <div class="mt-3 text-center">
-                                 <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" id="profilePicForm">
-                                    @csrf
-                                    <input type="file" name="profile_picture" id="profilePictureInput" accept="image/*" style="display:none;" required>
-                                    {{-- display account status --}}
-
-                                    {{-- <button type="button" class="btn btn-outline-primary" id="changePhotoBtn">Add / Replace Image</button>
-                                    <button type="submit" class="btn btn-primary" id="savePhotoBtn" style="display:none;">Save</button>
-                                </form> 
-                            </div> --}} 
 
                             <script>
                                 const changeBtn = document.getElementById('changePhotoBtn');

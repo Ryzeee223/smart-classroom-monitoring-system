@@ -71,29 +71,29 @@ while ($startTime <= $endTimeLimit) {
                                 <div class="row">
 
 
-                                <div class="row text-start">
-                                    {{-- Semester / School Year--}}
-                                    <div class="col-md-6 mb-3">
-                                        @php
-                                            $latestSemyr = \App\Models\semyr::query()->latest('id')->first();
-                                        @endphp
-                                        <label class="form-label">Semester</label>
-                                        <select class="form-select" name="Semester" required disabled>
-                                            <option value="{{ $latestSemyr->semester ?? '' }}">{{ $latestSemyr->semester ?? 'Current Semester' }}</option>
-                                        </select>
-                                        <input type="hidden" name="Semester" value="{{ $latestSemyr->semester ?? '' }}">
-                                    </div>
+<div class="row text-center mt-1 mb-5 p-2 mx-auto border rounded">
+    {{-- Semester / School Year--}}
+    <div class="col-md-6 mb-3">
+        @php
+            $latestSemyr = \App\Models\semyr::query()->latest('id')->first();
+        @endphp
+        <label class="form-label">Semester</label>
+        <div class="form-label" name="Semester" required disabled>
+            <div value="{{ $latestSemyr->semester ?? '' }}">{{ $latestSemyr->semester ?? 'Current Semester' }}</div>
+        </div>
+        <input type="hidden" name="Semester" value="{{ $latestSemyr->semester ?? '' }}">
+    </div>
 
+    {{-- school year --}}
+    <div class="col-md-6 mb-3">
+        <label class="form-label">School Year</label>
+        <div class="form-label" name="School_year" required disabled>
+            <div value="{{ $latestSemyr->school_year ?? '' }}">{{ $latestSemyr->school_year ?? 'Current School Year' }}</div>
+        </div>
+        <input type="hidden" name="School_year" value="{{ $latestSemyr->school_year ?? '' }}">
+    </div>
+</div>
 
-                                    {{-- school year --}}
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">School Year</label>
-                                        <select class="form-select" name="School_year" required disabled>
-                                            <option value="{{ $latestSemyr->school_year ?? '' }}">{{ $latestSemyr->school_year ?? 'Current School Year' }}</option>
-                                        </select>
-                                        <input type="hidden" name="School_year" value="{{ $latestSemyr->school_year ?? '' }}">
-                                    </div>
-                                </div>
 
                                 {{-- selec faculty --}}
                                     <div class="col-md-12 mb-3">
