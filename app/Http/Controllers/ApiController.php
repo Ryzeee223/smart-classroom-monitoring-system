@@ -504,7 +504,7 @@ class ApiController extends Controller
 
     /**
      * This endpoint serves the LCD display by showing either the currently active class in a room
-     * or a message indicating that the room is idle. It returns four pipe-delimited lines for
+     * or a message indicating that the room is idle. It returns five pipe-delimited lines for
      * hardware displays.
      */
     public function DisplaytoLcd()
@@ -534,14 +534,26 @@ class ApiController extends Controller
                 ->first();
 
             if (!$schedule) {
-                $lcdLines = ['Room: ' . $scannerRoom->room_name, 'No ongoing class', '', ''];
+                $lcdLines = [
+                    'Room: ' . $scannerRoom->room_name,
+                    'No ongoing class',
+                    '',
+                    '',
+                    'Room: ' . $scannerRoom->status,
+                ];
             } else {
                 $faculty = trim(($schedule->User?->first_name ?? '') . ' ' . ($schedule->User?->last_name ?? ''));
+                $attendance = Report::whereDate('attendance_date', $now->toDateString())
+                    ->where('schedule_id', $schedule->id)
+                    ->first();
                 $lcdLines = [
                     $faculty ?: 'Faculty',
                     $schedule->course?->course_code ?? $schedule->course?->course_name ?? 'Class in session',
-                    'Start: ' . Carbon::parse($schedule->start_time)->format('g:i A'),
-                    'End: ' . Carbon::parse($schedule->end_time)->format('g:i A'),
+                    Carbon::parse($schedule->start_time)->format('g:i A')
+                        . ' - '
+                        . Carbon::parse($schedule->end_time)->format('g:i A'),
+                    'Attendance: ' . ($attendance?->status ?? 'waiting'),
+                    'Room: ' . $scannerRoom->status,
                 ];
             }
 
