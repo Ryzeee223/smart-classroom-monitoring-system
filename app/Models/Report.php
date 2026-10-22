@@ -6,7 +6,7 @@ use Illuminate\Support\Carbon;
 
 class Report extends Model
 {
-    public const CHECKOUT_GRACE_MINUTES = 10;
+    public const CHECKOUT_GRACE_MINUTES = 3;
 
     protected $table = 'attendance';
 
@@ -30,14 +30,15 @@ class Report extends Model
             }
 
             $roomHasOpenAttendance = self::where('room_id', $attendance->room_id)
+                ->whereDate('attendance_date', Carbon::today()->toDateString())
                 ->whereNotNull('time_in')
                 ->whereNull('time_out')
                 ->whereIn('status', ['ongoing', 'on_leave'])
                 ->exists();
 
-            if (!$roomHasOpenAttendance) {
-                room::whereKey($attendance->room_id)->update(['status' => 'vacant']);
-            }
+            room::whereKey($attendance->room_id)->update([
+                'status' => $roomHasOpenAttendance ? 'occupied' : 'vacant',
+            ]);
         });
     }
 
