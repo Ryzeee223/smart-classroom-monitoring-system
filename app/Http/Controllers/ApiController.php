@@ -569,7 +569,7 @@ class ApiController extends Controller
         // Cache the dashboard payload for a few seconds so repeated page refreshes do not hit the
         // database repeatedly and create a slow render time. The data is updated often enough for
         // this to still feel live without sacrificing responsiveness.
-        $cacheKey = 'lcd-room-live-status:' . $today . ':' . $now->format('H:i:s');
+        $cacheKey = 'lcd-room-live-status:' . $today;
 
         $payload = Cache::remember($cacheKey, 5, function () use ($today, $now) {
             // For the general dashboard view, the system lists all rooms and their live class status.

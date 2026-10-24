@@ -24,7 +24,7 @@ class scheduleTester extends Seeder
             'program_id' => 1,
             'course_id' => 1,
 
-            'year_level' => '1st Year',
+            'year_level' => '1',
             'section' => 'A',
             'Semester' => '1st Semester',
             'School_year' => '2025-2026',
