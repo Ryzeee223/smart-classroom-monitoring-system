@@ -43,12 +43,15 @@ const ScanMode scanMode = BOTH_MODE; // Handles both settings and attendance
 
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
+unsigned long lastWifiCheck = 0;
+bool wasConnected = true;
+
 unsigned long attendanceDisplayUntil = 0;
 unsigned long lastLcdPoll = 0;
 
 // --- Helper Function to Update TFT Text Layout ---
 void updateTftText(String line1, String line2, uint16_t textColor = ILI9341_WHITE) {
-tft.fillScreen(ILI9341_BLACK);
+  tft.fillScreen(ILI9341_BLACK);
   
   // Line 1
   tft.setCursor(10, 30);
@@ -64,6 +67,34 @@ tft.fillScreen(ILI9341_BLACK);
 
   // Software Mask: Permanently covers any bottom/edge static noise strip
   tft.fillRect(0, 220, 320, 20, ILI9341_BLACK);
+}
+
+// --- Function to Monitor and Reconnect Wi-Fi ---
+void checkWiFiConnection() {
+  // Check every 10 seconds to avoid blocking loop operations
+  if (millis() - lastWifiCheck < 10000) return;
+  lastWifiCheck = millis();
+
+  if (WiFi.status() != WL_CONNECTED) {
+    if (wasConnected) {
+      updateTftText("WiFi Lost!", "Reconnecting...");
+      wasConnected = false;
+    }
+    
+    WiFi.disconnect();
+    WiFi.begin(ssid, password);
+    
+    unsigned long startAttemptTime = millis();
+    // Try reconnecting for up to 8 seconds
+    while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < 8000) {
+      delay(500);
+    }
+
+    if (WiFi.status() == WL_CONNECTED) {
+      wasConnected = true;
+      updateTftText("RFInsiDe Active", "Scan RFID Card..");
+    }
+  }
 }
 
 // --- Function to Handle HTTP POST Scans ---
@@ -152,10 +183,9 @@ void setup() {
   digitalWrite(BUZZER_PIN, LOW);
 
   // Initialize TFT Display properly
-  tft.begin();          // <--- THIS WAS MISSING AND CAUSED THE WHITE SCREEN
+  tft.begin();          
   tft.fillScreen(ILI9341_BLACK);
-   tft.setRotation(2);   // Change rotation (0, 1, 2, or 3) if needed
- 
+  tft.setRotation(2);   // Change rotation (0, 1, 2, or 3) if needed
   
   updateTftText("System Boot", "Connecting WiFi...");
 
@@ -173,6 +203,8 @@ void setup() {
 }
 
 void loop() {
+  checkWiFiConnection();
+  
   // Poll background classroom info from server
   pollLcdDisplay();
 

@@ -32,6 +32,10 @@ const char* room = "CC101";
 
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
+// --- Wi-Fi Monitoring Global Variables ---
+unsigned long lastWifiCheck = 0;
+bool wasConnected = true;
+
 unsigned long attendanceDisplayUntil = 0;
 unsigned long lastLcdPoll = 0;
 
@@ -50,6 +54,35 @@ void updateTftText(String line1, String line2, uint16_t textColor = ILI9341_WHIT
   tft.setTextColor(ILI9341_YELLOW);
   tft.setTextSize(2);
   tft.println(line2);
+
+  // Software Mask: Permanently covers any bottom/edge static noise strip
+  tft.fillRect(0, 220, 320, 20, ILI9341_BLACK);
+}
+
+// --- Function to Monitor and Reconnect Wi-Fi ---
+void checkWiFiConnection() {
+  if (millis() - lastWifiCheck < 10000) return;
+  lastWifiCheck = millis();
+
+  if (WiFi.status() != WL_CONNECTED) {
+    if (wasConnected) {
+      updateTftText("WiFi Lost!", "Reconnecting...");
+      wasConnected = false;
+    }
+    
+    WiFi.disconnect();
+    WiFi.begin(ssid, password);
+    
+    unsigned long startAttemptTime = millis();
+    while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < 8000) {
+      delay(500);
+    }
+
+    if (WiFi.status() == WL_CONNECTED) {
+      wasConnected = true;
+      updateTftText("RFInsiDe Active", "Scan RFID Card..");
+    }
+  }
 }
 
 // --- Function to Handle Attendance Scans ---
@@ -135,8 +168,7 @@ void setup() {
 
   // Initialize TFT Display
   tft.begin();
-  // Add this inside your setup() after tft.begin()
-tft.fillScreen(ILI9341_BLACK);
+  tft.fillScreen(ILI9341_BLACK);
   tft.setRotation(2); // Change to 1 if you need it flipped the other way around
   tft.fillScreen(ILI9341_BLACK);
   
@@ -156,8 +188,10 @@ tft.fillScreen(ILI9341_BLACK);
 }
 
 void loop() {
-  // Poll background classroom info from server
+  // Periodically check Wi-Fi connection health
   checkWiFiConnection();
+  
+  // Poll background classroom info from server
   pollLcdDisplay();
 
   // Look for new RFID cards
