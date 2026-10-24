@@ -265,6 +265,7 @@ Route::post('/settings/change-school-year', [App\Http\Controllers\semyrControlle
 
 Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile');
 Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+Route::post('/profile/name', [App\Http\Controllers\ProfileController::class, 'updateName'])->name('profile.name.update');
 Route::post('/profile/request', [App\Http\Controllers\RequestController::class, 'storeRequest'])->name('profile.request.store');
 
 

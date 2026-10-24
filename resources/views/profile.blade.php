@@ -75,7 +75,7 @@
                                 > --}}
 
                                 <div>
-                                    <h4 class="mb-1">{{ $user ? ($user->first_name . ' ' . $user->last_name) : 'Guest' }}</h4>
+                                    <h4 class="mb-1">{{ $user ? ($user->first_name .' '.$user->middle_name .' ' . $user->last_name) : 'Guest' }}</h4>
 
                                     <div class="text-muted">
                                         @php
@@ -89,9 +89,54 @@
                                         <div><strong>Role:</strong> {{ $roleName ?? 'Unknown' }}</div>
                                         <div><strong>Status:</strong> {{ $AccStatus ?? 'Unknown' }}</div>
                                     </div>
+                                    
+
+                                </div>
+                                
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-center">
+                                <button class="btn btn-primary" id="changeprofilename" type="button" data-bs-toggle="modal" data-bs-target="#updateProfileNameModal">Update Profile Name</button>
+                            </div>
+                            <div class="modal fade" id="updateProfileNameModal" tabindex="-1" aria-labelledby="updateProfileNameModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <form class="modal-content" action="{{ route('profile.name.update') }}" method="POST">
+                                        @csrf
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="updateProfileNameModalLabel">Update Profile Name</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label for="profileFirstName" class="form-label">First name</label>
+                                                <input type="text" class="form-control @error('first_name') is-invalid @enderror" id="profileFirstName" name="first_name" value="{{ old('first_name', $user->first_name ?? '') }}" maxlength="100" required>
+                                                @error('first_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="profileMiddleName" class="form-label">Middle name</label>
+                                                <input type="text" class="form-control @error('middle_name') is-invalid @enderror" id="profileMiddleName" name="middle_name" value="{{ old('middle_name', $user->middle_name ?? '') }}" maxlength="100" required>
+                                                @error('middle_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                            </div>
+                                            <div class="mb-0">
+                                                <label for="profileLastName" class="form-label">Last name</label>
+                                                <input type="text" class="form-control @error('last_name') is-invalid @enderror" id="profileLastName" name="last_name" value="{{ old('last_name', $user->last_name ?? '') }}" maxlength="100" required>
+                                                @error('last_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-primary">Save Name</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
-
+                            @if($errors->hasAny(['first_name', 'middle_name', 'last_name']))
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        bootstrap.Modal.getOrCreateInstance(document.getElementById('updateProfileNameModal')).show();
+                                    });
+                                </script>
+                            @endif
                             <hr>
 
                             <script>
@@ -140,7 +185,7 @@
                                                         <option value="" selected disabled>Select option</option>
                                                         <option value="Sick leave">Sick leave</option>
                                                         <option value="official business leave">Official Business leave</option>
-                                                        {{-- <option value="Summer class">Request a summer class</option> --}}
+                                                        
                                                         
                                                     </select>
                                                 </div>
@@ -264,4 +309,3 @@
     @include('partials.notifications-modal')
 </body>
 </html>
-

@@ -293,8 +293,8 @@ while ($startTime <= $endTimeLimit) {
                                         }
 
                                         function populateConfirmation() {
-                                            document.getElementById('confirmSemester').textContent = selectedText('select[name="Semester"]');
-                                            document.getElementById('confirmSchoolYear').textContent = selectedText('select[name="School_year"]');
+                                            document.getElementById('confirmSemester').textContent = form.querySelector('input[name="Semester"]')?.value || 'Current Semester';
+                                            document.getElementById('confirmSchoolYear').textContent = form.querySelector('input[name="School_year"]')?.value || 'Current School Year';
                                             document.getElementById('confirmFaculty').textContent = selectedText('select[name="user_id"]');
                                             document.getElementById('confirmProgram').textContent = selectedText('select[name="program_id"]');
                                             document.getElementById('confirmCourse').textContent = selectedText('select[name="Course"]');

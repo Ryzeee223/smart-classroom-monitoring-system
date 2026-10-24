@@ -75,10 +75,27 @@ class ProfileController extends Controller
         return redirect()->route('profile')->with('success', 'Profile photo updated successfully!');
     }
 
+    public function updateName(Request $request)
+    {
+        if (!session('logged_in')) {
+            return redirect('/');
+        }
+
+        $validated = $request->validate([
+            'first_name' => ['required', 'string', 'max:100'],
+            'middle_name' => ['required', 'string', 'max:100'],
+            'last_name' => ['required', 'string', 'max:100'],
+        ]);
+
+        $user = User::findOrFail(session('user_id'));
+        $user->update($validated);
+
+        return redirect()->route('profile')->with('success', 'Profile name updated successfully!');
+    }
+
     public function showStatus()
     {
 
     }
 }
-
 

@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Profile</title>
-    <link href="<?php echo e(asset('bootstrap-5.3.8-dist/css/bootstrap.min.css')); ?>" rel="stylesheet">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="<?php echo e(asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js')); ?>"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
@@ -71,7 +71,7 @@
                                  
 
                                 <div>
-                                    <h4 class="mb-1"><?php echo e($user ? ($user->first_name . ' ' . $user->last_name) : 'Guest'); ?></h4>
+                                    <h4 class="mb-1"><?php echo e($user ? ($user->first_name .' '.$user->middle_name .' ' . $user->last_name) : 'Guest'); ?></h4>
 
                                     <div class="text-muted">
                                         <?php
@@ -85,9 +85,96 @@
                                         <div><strong>Role:</strong> <?php echo e($roleName ?? 'Unknown'); ?></div>
                                         <div><strong>Status:</strong> <?php echo e($AccStatus ?? 'Unknown'); ?></div>
                                     </div>
+                                    
+
+                                </div>
+                                
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-center">
+                                <button class="btn btn-primary" id="changeprofilename" type="button" data-bs-toggle="modal" data-bs-target="#updateProfileNameModal">Update Profile Name</button>
+                            </div>
+                            <div class="modal fade" id="updateProfileNameModal" tabindex="-1" aria-labelledby="updateProfileNameModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <form class="modal-content" action="<?php echo e(route('profile.name.update')); ?>" method="POST">
+                                        <?php echo csrf_field(); ?>
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="updateProfileNameModalLabel">Update Profile Name</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label for="profileFirstName" class="form-label">First name</label>
+                                                <input type="text" class="form-control <?php $__errorArgs = ['first_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" id="profileFirstName" name="first_name" value="<?php echo e(old('first_name', $user->first_name ?? '')); ?>" maxlength="100" required>
+                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['first_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <div class="invalid-feedback"><?php echo e($message); ?></div> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="profileMiddleName" class="form-label">Middle name</label>
+                                                <input type="text" class="form-control <?php $__errorArgs = ['middle_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" id="profileMiddleName" name="middle_name" value="<?php echo e(old('middle_name', $user->middle_name ?? '')); ?>" maxlength="100" required>
+                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['middle_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <div class="invalid-feedback"><?php echo e($message); ?></div> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                            </div>
+                                            <div class="mb-0">
+                                                <label for="profileLastName" class="form-label">Last name</label>
+                                                <input type="text" class="form-control <?php $__errorArgs = ['last_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" id="profileLastName" name="last_name" value="<?php echo e(old('last_name', $user->last_name ?? '')); ?>" maxlength="100" required>
+                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['last_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <div class="invalid-feedback"><?php echo e($message); ?></div> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-primary">Save Name</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
-
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($errors->hasAny(['first_name', 'middle_name', 'last_name'])): ?>
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        bootstrap.Modal.getOrCreateInstance(document.getElementById('updateProfileNameModal')).show();
+                                    });
+                                </script>
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                             <hr>
 
                             <script>
@@ -260,5 +347,4 @@
     <?php echo $__env->make('partials.notifications-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
 </html>
-
 <?php /**PATH /Volumes/shared file/capstone project/backups/RFInsiDe/resources/views/profile.blade.php ENDPATH**/ ?>

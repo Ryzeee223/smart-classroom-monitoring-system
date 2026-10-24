@@ -157,6 +157,7 @@ tft.fillScreen(ILI9341_BLACK);
 
 void loop() {
   // Poll background classroom info from server
+  checkWiFiConnection();
   pollLcdDisplay();
 
   // Look for new RFID cards

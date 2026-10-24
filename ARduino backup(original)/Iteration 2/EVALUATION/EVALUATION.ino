@@ -22,8 +22,14 @@
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST, TFT_MISO);
 
 // --- Network & API Configuration ---
-const char* ssid = "Our2.4G";
+const char* ssid     = "Our2.4G";
 const char* password = "RZE-2004";
+
+// const char* ssid     = "Ryze";
+// const char* password = "Rize212004";
+
+// const char* ssid     = "";
+// const char* password = "";
 
 const char* settingsUrl = "https://rfinside.vercel.app/api/rfid-scan";
 const char* attendanceLcdUrl = "https://rfinside.vercel.app/api/attendance-scan?format=lcd";
@@ -42,7 +48,7 @@ unsigned long lastLcdPoll = 0;
 
 // --- Helper Function to Update TFT Text Layout ---
 void updateTftText(String line1, String line2, uint16_t textColor = ILI9341_WHITE) {
-  tft.fillScreen(ILI9341_BLACK);
+tft.fillScreen(ILI9341_BLACK);
   
   // Line 1
   tft.setCursor(10, 30);
@@ -147,8 +153,9 @@ void setup() {
 
   // Initialize TFT Display properly
   tft.begin();          // <--- THIS WAS MISSING AND CAUSED THE WHITE SCREEN
-  tft.setRotation(2);   // Change rotation (0, 1, 2, or 3) if needed
   tft.fillScreen(ILI9341_BLACK);
+   tft.setRotation(2);   // Change rotation (0, 1, 2, or 3) if needed
+ 
   
   updateTftText("System Boot", "Connecting WiFi...");
 
