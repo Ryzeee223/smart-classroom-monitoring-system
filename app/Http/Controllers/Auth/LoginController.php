@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Models\users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\Controller;
 
 class LoginController extends Controller
@@ -26,10 +25,13 @@ class LoginController extends Controller
             ])->withInput();
         }
 
-        Session::put('logged_in', true);
-        Session::put('user_id', $user->id);
-        Session::put('user_role', (int) ($user->role ?? 0));
-        Session::put('college_id', $user->college_id ?? 0);
+        $request->session()->regenerate();
+        $request->session()->put([
+            'logged_in' => true,
+            'user_id' => $user->id,
+            'user_role' => (int) ($user->role ?? 0),
+            'college_id' => $user->college_id ?? 0,
+        ]);
 
         // Redirect based on role
         return match((int) ($user->role ?? 0)) {
@@ -42,10 +44,11 @@ class LoginController extends Controller
         };
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-        Session::flush();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         return redirect('/')->with('success', 'Logged out successfully!');
     }
 }
-
