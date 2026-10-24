@@ -146,14 +146,20 @@ class ReportController extends Controller
         $reportDay = $reportDate->format('l');
         $reportShortDay = $reportDate->format('D');
 
-        Schedule::with('User')
-            ->where(function ($query) use ($reportDay, $reportShortDay) {
-                $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($reportDay) . '%'])
-                    ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower($reportShortDay) . '%']);
-            })
-            ->when($collegeId > 0, fn ($query) => $query->whereHas('User', fn ($userQuery) => $userQuery->where('college_id', $collegeId)))
-            ->get()
-            ->each(fn ($schedule) => Report::syncForSchedule($schedule, $reportDate->toDateString(), $reportDate->copy()->endOfDay()));
+        if ($reportDate->startOfDay()->lessThanOrEqualTo(Carbon::today())) {
+            $syncAt = $reportDate->isToday()
+                ? Carbon::now()
+                : $reportDate->copy()->endOfDay();
+
+            Schedule::with('User')
+                ->where(function ($query) use ($reportDay, $reportShortDay) {
+                    $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($reportDay) . '%'])
+                        ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower($reportShortDay) . '%']);
+                })
+                ->when($collegeId > 0, fn ($query) => $query->whereHas('User', fn ($userQuery) => $userQuery->where('college_id', $collegeId)))
+                ->get()
+                ->each(fn ($schedule) => Report::syncForSchedule($schedule, $reportDate->toDateString(), $syncAt));
+        }
 
         $attendanceRecords = Report::with(['user', 'schedule.course'])
             ->whereDate('attendance_date', $reportDate->toDateString())

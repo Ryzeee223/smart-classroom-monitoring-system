@@ -107,7 +107,12 @@ class Report extends Model
                 $attendance->update(['status' => 'absent']);
             } elseif ($attendance->time_in && $now->lessThan($checkoutDeadline) && $attendance->status !== 'ongoing') {
                 $attendance->update(['status' => 'ongoing']);
-            } elseif (!$attendance->time_in && !$attendance->time_out && $attendance->status !== 'waiting') {
+            } elseif (
+                !$attendance->time_in
+                && !$attendance->time_out
+                && $attendance->status !== 'waiting'
+                && $attendance->status !== 'absent'
+            ) {
                 $attendance->update(['status' => 'waiting']);
             }
         }
