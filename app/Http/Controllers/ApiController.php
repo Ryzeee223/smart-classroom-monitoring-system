@@ -302,7 +302,7 @@ class ApiController extends Controller
             $attendance->time_in = $attendance->time_in ?? $now->format('H:i:s');
             $attendance->status = 'on_leave';
             $attendance->save();
-            $schedule->room()->update(['status' => 'occupied']);
+            $schedule->room()->update(['status' => 'vacant']);
 
             return [
                 'status' => 'accepted',
@@ -365,6 +365,8 @@ class ApiController extends Controller
             if ($now->greaterThanOrEqualTo($checkoutDeadline)) {
                 $attendance->time_out = $now->format('H:i:s');
                 $attendance->status = 'overtime';
+                $schedule->room()->update(['status' => 'vacant']);
+
                 $attendance->save();
 
                 return [
@@ -528,7 +530,7 @@ class ApiController extends Controller
                         ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower(substr($today, 0, 3)) . '%']);
                 })
                 ->whereTime('start_time', '<=', $now->format('H:i:s'))
-                ->whereTime('end_time', '>=', $now->format('H:i:s'))
+                ->whereTime('end_time', '>', $now->format('H:i:s'))
                 ->orderBy('start_time')
                 ->first();
 
@@ -551,9 +553,7 @@ class ApiController extends Controller
                         $scheduledEnd->addDay();
                     }
 
-                    if ($now->greaterThanOrEqualTo(
-                        $scheduledEnd->addMinutes(Report::NO_CLASS_AFTER_END_MINUTES)
-                    )) {
+                    if ($now->greaterThanOrEqualTo($scheduledEnd)) {
                         $attendance = null;
                         $schedule = null;
                     }

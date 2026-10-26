@@ -38,9 +38,12 @@ bool wasConnected = true;
 
 unsigned long attendanceDisplayUntil = 0;
 unsigned long lastLcdPoll = 0;
+String lastClassDisplayPayload = "";
+bool classDisplayNeedsRefresh = true;
 
 // --- Helper Function to Update TFT Text Layout ---
 void updateTftText(String line1, String line2, uint16_t textColor = ILI9341_WHITE) {
+  classDisplayNeedsRefresh = true;
   tft.fillScreen(ILI9341_BLACK);
   
   // Line 1
@@ -174,8 +177,11 @@ void pollLcdDisplay() {
           start = end + 1;
         }
 
-        if (hasFiveLines) {
+        if (hasFiveLines
+            && (classDisplayNeedsRefresh || displayText != lastClassDisplayPayload)) {
           updateTftLines(lines);
+          lastClassDisplayPayload = displayText;
+          classDisplayNeedsRefresh = false;
         }
       }
     }
@@ -247,7 +253,7 @@ void loop() {
   mfrc522.PICC_HaltA();
 
   // Cooldown delay before resetting display prompt (unless overridden by attendance message)
-  delay(2000);
+  delay(1000);
   if ((long)(millis() - attendanceDisplayUntil) >= 0) {
     updateTftText("RFInsiDe Active", "Scan RFID Card..");
   }

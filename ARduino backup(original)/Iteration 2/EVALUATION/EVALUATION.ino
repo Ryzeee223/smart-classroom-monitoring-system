@@ -58,9 +58,12 @@ bool wasConnected = true;
 
 unsigned long attendanceDisplayUntil = 0;
 unsigned long lastLcdPoll = 0;
+String lastClassDisplayPayload = "";
+bool classDisplayNeedsRefresh = true;
 
 // --- Helper Function to Update TFT Text Layout ---
 void updateTftText(String line1, String line2, uint16_t textColor = ILI9341_WHITE) {
+  classDisplayNeedsRefresh = true;
   tft.fillScreen(ILI9341_BLACK);
   
   // Line 1
@@ -200,8 +203,11 @@ void pollLcdDisplay() {
           start = end + 1;
         }
 
-        if (hasFiveLines) {
+        if (hasFiveLines
+            && (classDisplayNeedsRefresh || displayText != lastClassDisplayPayload)) {
           updateTftLines(lines);
+          lastClassDisplayPayload = displayText;
+          classDisplayNeedsRefresh = false;
         }
       }
     }

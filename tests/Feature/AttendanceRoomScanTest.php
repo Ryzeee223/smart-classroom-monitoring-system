@@ -443,6 +443,11 @@ class AttendanceRoomScanTest extends TestCase
             ->assertSeeText('Course: CS102')
             ->assertSeeText('Attend: Overtime');
 
+        Carbon::setTestNow(Carbon::parse('2026-10-03 15:00:00', 'Asia/Manila'));
+        $this->get('/api/live-classrooms?room=CC103')
+            ->assertOk()
+            ->assertSeeText('Course: No class');
+
         Carbon::setTestNow(Carbon::parse('2026-10-03 15:05:00', 'Asia/Manila'));
         $this->get('/api/live-classrooms?room=CC103')
             ->assertOk()
