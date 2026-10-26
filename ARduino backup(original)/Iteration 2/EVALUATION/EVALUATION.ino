@@ -235,8 +235,7 @@ void setup() {
   }
 
   updateTftText("Status:", "WiFi Connected!");
-  delay(1500);
-  updateTftText("RFInsiDe Active", "Scan RFID Card..");
+  delay(1000);
 }
 
 void loop() {
@@ -278,7 +277,7 @@ void loop() {
   mfrc522.PICC_HaltA();
 
   // Cooldown delay before resetting display prompt (unless overridden by active message)
-  delay(2000);
+  delay(1000);
   if ((long)(millis() - attendanceDisplayUntil) >= 0) {
     updateTftText("RFInsiDe Active", "Scan RFID Card..");
   }

@@ -393,7 +393,7 @@ class ApiController extends Controller
                 ->whereDate('attendance_date', $now->toDateString())
                 ->whereNotNull('time_in')
                 ->whereNull('time_out')
-                ->whereIn('status', ['ongoing', 'on_leave', 'overtime'])
+                ->whereIn('status', ['ongoing', 'on_leave'])
                 ->where('id', '!=', $attendance->id)
                 ->exists();
 
@@ -543,6 +543,21 @@ class ApiController extends Controller
                     ->latest('id')
                     ->first();
                 $schedule = $attendance?->schedule;
+
+                if ($attendance && $schedule) {
+                    $scheduledStart = Carbon::parse($attendance->attendance_date . ' ' . $schedule->start_time);
+                    $scheduledEnd = Carbon::parse($attendance->attendance_date . ' ' . $schedule->end_time);
+                    if ($scheduledEnd->lt($scheduledStart)) {
+                        $scheduledEnd->addDay();
+                    }
+
+                    if ($now->greaterThanOrEqualTo(
+                        $scheduledEnd->addMinutes(Report::NO_CLASS_AFTER_END_MINUTES)
+                    )) {
+                        $attendance = null;
+                        $schedule = null;
+                    }
+                }
             }
 
             if (!$schedule) {

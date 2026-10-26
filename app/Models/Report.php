@@ -8,6 +8,7 @@ class Report extends Model
 {
     public const TIME_IN_GRACE_MINUTES = 30;
     public const CHECKOUT_GRACE_MINUTES = 3;
+    public const NO_CLASS_AFTER_END_MINUTES = 5;
     public const EARLY_CHECKOUT = 30;
     protected $table = 'attendance';
 
@@ -34,7 +35,7 @@ class Report extends Model
                 ->whereDate('attendance_date', Carbon::today()->toDateString())
                 ->whereNotNull('time_in')
                 ->whereNull('time_out')
-                ->whereIn('status', ['ongoing', 'on_leave', 'overtime'])
+                ->whereIn('status', ['ongoing', 'on_leave'])
                 ->exists();
 
             room::whereKey($attendance->room_id)->update([

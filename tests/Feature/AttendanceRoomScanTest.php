@@ -436,8 +436,17 @@ class AttendanceRoomScanTest extends TestCase
         ]);
         $this->assertDatabaseHas('room', [
             'id' => $roomId,
-            'status' => 'occupied',
+            'status' => 'vacant',
         ]);
+        $this->get('/api/live-classrooms?room=CC103')
+            ->assertOk()
+            ->assertSeeText('Course: CS102')
+            ->assertSeeText('Attend: Overtime');
+
+        Carbon::setTestNow(Carbon::parse('2026-10-03 15:05:00', 'Asia/Manila'));
+        $this->get('/api/live-classrooms?room=CC103')
+            ->assertOk()
+            ->assertSeeText('Course: No class');
 
         Report::syncForSchedule(
             $noShowSchedule,
