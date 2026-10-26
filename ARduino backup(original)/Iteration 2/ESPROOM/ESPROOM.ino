@@ -28,6 +28,8 @@ const char* password = "RZE-2004";
 const char* attendanceLcdUrl = "https://rfinside.vercel.app/api/attendance-scan?format=lcd";
 const char* lcdUrl = "https://rfinside.vercel.app/api/live-classrooms?room=";
 
+
+
 const char* room = "CC101";
 
 MFRC522 mfrc522(SS_PIN, RST_PIN);

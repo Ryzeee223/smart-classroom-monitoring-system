@@ -186,11 +186,11 @@ body {
                         <input type="text" class="form-control form-control-sm" name="first_name" id="first_name-lead" placeholder="Enter first name">
                     </div>
                     <div class="col-md">
-                        <label class="form-label form-label-sm">Middle Name</label>
-                        <input type="text" class="form-control form-control-sm" name="middle_name" id="last_name-lead" placeholder="Enter last name">
+                        <label class="form-label form-label-sm">Middle Initial</label>
+                        <input type="text" class="form-control form-control-sm" name="middle_name" id="middle_name-lead" placeholder="Enter middle initial">
                     </div>
                     <div class="form-label form-label-sm">Last Name
-                    <input type="text" class="form-control form control-sm" name="last_name" id="middle_name-lead" placeholder="Enter middle name">
+                    <input type="text" class="form-control form control-sm" name="last_name" id="last_name-lead" placeholder="Enter last name">
                 </div>
             </div>
 
