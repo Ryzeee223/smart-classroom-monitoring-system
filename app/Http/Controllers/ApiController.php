@@ -539,7 +539,6 @@ class ApiController extends Controller
                     'Room: ' . $scannerRoom->room_name,
                     'No ongoing class',
                     '',
-                    '',
                     'Room: ' . $scannerRoom->status,
                 ];
             } else {
@@ -553,7 +552,10 @@ class ApiController extends Controller
                     Carbon::parse($schedule->start_time)->format('g:i A')
                         . ' - '
                         . Carbon::parse($schedule->end_time)->format('g:i A'),
+                        '',
+                        '',
                     'Attendance: ' . ($attendance?->status ?? 'waiting'),
+                    '',
                     'Room: ' . $scannerRoom->status,
                 ];
             }
