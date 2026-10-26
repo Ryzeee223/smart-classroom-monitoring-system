@@ -328,6 +328,17 @@ class AttendanceRoomScanTest extends TestCase
             'acc_status' => 'Attended',
         ]);
 
+        $attendance = Report::where('schedule_id', $schedule->id)
+            ->whereDate('attendance_date', $now->toDateString())
+            ->firstOrFail();
+        $attendance->update(['status' => 'absent']);
+
+        $this->get('/api/live-classrooms?room=CC103')
+            ->assertOk()
+            ->assertSeeText('Course: No class');
+
+        $attendance->update(['status' => 'ongoing']);
+
         $noShowSchedule = $schedule->replicate();
         $noShowSchedule->section = 'B';
         $noShowSchedule->save();

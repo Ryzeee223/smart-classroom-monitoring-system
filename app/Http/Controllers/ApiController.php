@@ -560,19 +560,25 @@ class ApiController extends Controller
                 }
             }
 
-            if (!$schedule) {
-                $lcdLines = [
-                    'Faculty: -',
-                    'Course: No class',
-                    'Time: -',
-                    'Attend: -',
-                    'Room: ' . ucfirst($scannerRoom->status),
-                ];
-            } else {
-                $faculty = trim(($schedule->User?->first_name ?? '') . ' ' . ($schedule->User?->last_name ?? ''));
+            if ($schedule) {
                 $attendance ??= Report::whereDate('attendance_date', $now->toDateString())
                     ->where('schedule_id', $schedule->id)
                     ->first();
+
+                if ($attendance?->status === 'absent') {
+                    $attendance = null;
+                    $schedule = null;
+                }
+            }
+
+            if (!$schedule) {
+                $lcdLines = [
+                    'No Class',
+                    '',
+                    ucfirst($scannerRoom->status),
+                ];
+            } else {
+                $faculty = trim(($schedule->User?->first_name ?? '') . ' ' . ($schedule->User?->last_name ?? ''));
                 $startTime = Carbon::parse($schedule->start_time)->format('H:i');
                 $endTime = Carbon::parse($schedule->end_time)->format('H:i');
                 $lcdLines = [
