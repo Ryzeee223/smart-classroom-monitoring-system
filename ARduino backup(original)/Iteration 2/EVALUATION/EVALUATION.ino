@@ -22,14 +22,14 @@
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST, TFT_MISO);
 
 // --- Network & API Configuration ---
-const char* ssid     = "Our2.4G";
-const char* password = "RZE-2004";
+// const char* ssid     = "Our2.4G";
+// const char* password = "RZE-2004";
 
-// const char* ssid     = "Ryze";
-// const char* password = "Rize212004";
+const char* ssid     = "Ryze";
+const char* password = "Rize212004";
 
-// const char* ssid     = "";
-// const char* password = "";
+// const char* ssid     = "ROUGEASSASIN 0491";
+// const char* password = "test123456";
 
 const char* settingsUrl = "https://rfinside.vercel.app/api/rfid-scan";
 const char* attendanceLcdUrl = "https://rfinside.vercel.app/api/attendance-scan?format=lcd";
