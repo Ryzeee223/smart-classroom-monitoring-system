@@ -139,7 +139,7 @@
                                         <td>{{ $schedule['course_code'] }}</td>
                                         <td>
                                             <span class="d-flex align-items-center justify-content-center">
-                                                {{ ucfirst(str_replace('_', ' ', $schedule['attendance_status'])) }}
+                                                {{ ucwords(str_replace('_', ' ', $schedule['attendance_status'])) }}
                                             </span>
                                         </td>
                                     </tr>

@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - RFInsiDe</title>
     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <?php echo app('Illuminate\Foundation\Vite')('resources/js/bootstrap-vendor.js'); ?>
     
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
 
@@ -172,5 +171,4 @@
 <?php echo $__env->make('partials.notifications-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
 </html>
-
 <?php /**PATH /Volumes/shared file/capstone project/backups/RFInsiDe/resources/views/settings.blade.php ENDPATH**/ ?>

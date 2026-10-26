@@ -186,7 +186,7 @@ class ReportController extends Controller
                 echo '<td>' . $escape($record->time_out) . '</td>';
                 echo '<td>' . $escape($faculty) . '</td>';
                 echo '<td>' . $escape($schedule?->course?->course_code) . '</td>';
-                echo '<td>' . $escape(ucfirst(str_replace('_', ' ', $record->status ?? 'waiting'))) . '</td>';
+                echo '<td>' . $escape(ucwords(str_replace('_', ' ', $record->status ?? 'waiting'))) . '</td>';
                 echo '</tr>';
             }
 

@@ -5,10 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - RFInsiDe</title>
     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fontisto@v3.0.4/css/fontisto/fontisto.min.css">
+    <?php echo app('Illuminate\Foundation\Vite')('resources/js/bootstrap-vendor.js'); ?>
 </head>
 <body>
 <style>
@@ -309,8 +306,8 @@ body {
             </td>
             <td><?php echo e($schedule?->course?->course_name ?? 'N/A'); ?></td>
             <td>
-                <span class="badge <?php echo e(in_array($attendance->status, ['attended', 'present']) ? 'bg-success' : ($attendance->status === 'absent' ? 'bg-danger' : ($attendance->status === 'ongoing' ? 'bg-primary' : 'bg-warning'))); ?>">
-                    <?php echo e(ucfirst(str_replace('_', ' ', $attendance->status ?? 'N/A'))); ?>
+                <span class="badge <?php echo e(in_array($attendance->status, ['attended', 'present']) ? 'bg-success' : (in_array($attendance->status, ['absent', 'overtime']) ? 'bg-danger' : ($attendance->status === 'ongoing' ? 'bg-primary' : 'bg-warning text-dark'))); ?>">
+                    <?php echo e(ucwords(str_replace('_', ' ', $attendance->status ?? 'N/A'))); ?>
 
                 </span>
             </td>
@@ -397,12 +394,14 @@ body {
                     const timeOutCell = document.querySelector(`#time-out-${scan.attendance_id}`);
 
                     if (statusBadge) {
-                        statusBadge.textContent = scan.status_in.toUpperCase();
+                        statusBadge.textContent = scan.status_in.replaceAll('_', ' ').toUpperCase();
 
                         // Set badge colors according to enum value
                         let badgeClass = 'badge ';
                         switch(scan.status_in) {
                             case 'attended': badgeClass += 'bg-success'; break;
+                            case 'overtime': badgeClass += 'bg-danger'; break;
+                            case 'early_ended': badgeClass += 'bg-warning text-dark'; break;
                             case 'ongoing': badgeClass += 'bg-primary'; break;
                             case 'late': badgeClass += 'bg-warning text-dark'; break;
                             case 'on_leave': badgeClass += 'bg-info text-dark'; break;
@@ -431,8 +430,4 @@ body {
     <?php echo $__env->make('partials.notifications-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
 </html>
-
-
-
-
 <?php /**PATH /Volumes/shared file/capstone project/backups/RFInsiDe/resources/views/dashboard.blade.php ENDPATH**/ ?>

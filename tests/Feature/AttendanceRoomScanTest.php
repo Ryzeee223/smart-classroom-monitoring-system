@@ -422,11 +422,80 @@ class AttendanceRoomScanTest extends TestCase
         $this->assertDatabaseHas('attendance', [
             'id' => $missedCheckout->id,
             'time_out' => null,
-            'status' => 'absent',
+            'status' => 'overtime',
+        ]);
+        $this->assertDatabaseHas('room', [
+            'id' => $roomId,
+            'status' => 'occupied',
+        ]);
+
+        Report::syncForSchedule(
+            $noShowSchedule,
+            $now->toDateString(),
+            Carbon::parse('2026-10-03 15:02:59', 'Asia/Manila')
+        );
+        $this->assertDatabaseHas('attendance', [
+            'id' => $missedCheckout->id,
+            'time_out' => null,
+            'status' => 'overtime',
+        ]);
+
+        Carbon::setTestNow(Carbon::parse('2026-10-03 15:04:00', 'Asia/Manila'));
+        $this->postJson('/api/attendance-scan', [
+            'uid' => 'EF56GH78',
+            'room' => 'CC103',
+        ])->assertOk()
+            ->assertJsonPath('status', 'accepted')
+            ->assertJsonPath('time_out', '15:04:00')
+            ->assertJsonPath('attendance_status', 'overtime');
+
+        $this->assertDatabaseHas('attendance', [
+            'id' => $missedCheckout->id,
+            'time_out' => '15:04:00',
+            'status' => 'overtime',
         ]);
         $this->assertDatabaseHas('room', [
             'id' => $roomId,
             'status' => 'vacant',
+        ]);
+
+        Report::where('schedule_id', $schedule->id)
+            ->whereDate('attendance_date', $now->toDateString())
+            ->update([
+                'time_in' => '14:20:00',
+                'time_out' => null,
+                'status' => 'ongoing',
+            ]);
+
+        Carbon::setTestNow(Carbon::parse('2026-10-03 14:29:00', 'Asia/Manila'));
+        $this->postJson('/api/attendance-scan', [
+            'uid' => 'EF56GH78',
+            'room' => 'CC103',
+        ])->assertOk()
+            ->assertJsonPath('status', 'ignored')
+            ->assertJsonPath('attendance_status', 'ongoing');
+
+        Carbon::setTestNow(Carbon::parse('2026-10-03 14:30:00', 'Asia/Manila'));
+        $this->postJson('/api/attendance-scan', [
+            'uid' => 'EF56GH78',
+            'room' => 'CC103',
+        ])->assertOk()
+            ->assertJsonPath('status', 'accepted')
+            ->assertJsonPath('time_out', '14:30:00')
+            ->assertJsonPath('attendance_status', 'early_ended');
+
+        $earlyEndedAttendance = Report::where('schedule_id', $schedule->id)
+            ->whereDate('attendance_date', $now->toDateString())
+            ->firstOrFail();
+        Report::syncForSchedule(
+            $schedule,
+            $now->toDateString(),
+            Carbon::parse('2026-10-03 14:45:00', 'Asia/Manila')
+        );
+        $this->assertDatabaseHas('attendance', [
+            'id' => $earlyEndedAttendance->id,
+            'time_out' => '14:30:00',
+            'status' => 'early_ended',
         ]);
     }
 }

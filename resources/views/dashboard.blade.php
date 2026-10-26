@@ -303,8 +303,8 @@ body {
             </td>
             <td>{{ $schedule?->course?->course_name ?? 'N/A' }}</td>
             <td>
-                <span class="badge {{ in_array($attendance->status, ['attended', 'present']) ? 'bg-success' : ($attendance->status === 'absent' ? 'bg-danger' : ($attendance->status === 'ongoing' ? 'bg-primary' : 'bg-warning')) }}">
-                    {{ ucfirst(str_replace('_', ' ', $attendance->status ?? 'N/A')) }}
+                <span class="badge {{ in_array($attendance->status, ['attended', 'present']) ? 'bg-success' : (in_array($attendance->status, ['absent', 'overtime']) ? 'bg-danger' : ($attendance->status === 'ongoing' ? 'bg-primary' : 'bg-warning text-dark')) }}">
+                    {{ ucwords(str_replace('_', ' ', $attendance->status ?? 'N/A')) }}
                 </span>
             </td>
         </tr>
@@ -390,12 +390,14 @@ body {
                     const timeOutCell = document.querySelector(`#time-out-${scan.attendance_id}`);
 
                     if (statusBadge) {
-                        statusBadge.textContent = scan.status_in.toUpperCase();
+                        statusBadge.textContent = scan.status_in.replaceAll('_', ' ').toUpperCase();
 
                         // Set badge colors according to enum value
                         let badgeClass = 'badge ';
                         switch(scan.status_in) {
                             case 'attended': badgeClass += 'bg-success'; break;
+                            case 'overtime': badgeClass += 'bg-danger'; break;
+                            case 'early_ended': badgeClass += 'bg-warning text-dark'; break;
                             case 'ongoing': badgeClass += 'bg-primary'; break;
                             case 'late': badgeClass += 'bg-warning text-dark'; break;
                             case 'on_leave': badgeClass += 'bg-info text-dark'; break;
@@ -424,6 +426,3 @@ body {
     @include('partials.notifications-modal')
 </body>
 </html>
-
-
-

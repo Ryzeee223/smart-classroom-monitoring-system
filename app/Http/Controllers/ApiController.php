@@ -234,7 +234,7 @@ class ApiController extends Controller
         }
 
         if (!$schedule->room_id || !in_array((int) $schedule->room_id, array_map('intval', $allowedRoomIds), true)) {
-            Log::warning('Attendance scan rejected because the schedule room does not match the scanner room.', [
+            Log::warning('Room mismatch for the schedule', [
                 'schedule_id' => $schedule->id,
                 'schedule_room_id' => $schedule->room_id,
                 'scanned_room' => $normalizedRoom,
@@ -242,7 +242,7 @@ class ApiController extends Controller
 
             return [
                 'status' => 'denied',
-                'message' => 'This RFID card is not assigned to the scheduled room.',
+                'message' => 'No Scheduled Room.',
                 'uid' => $scannedUid,
                 'room' => $normalizedRoom,
             ];
@@ -272,6 +272,7 @@ class ApiController extends Controller
 
         // The schedule end time determines the checkout grace deadline.
         $end = Carbon::today()->setTimeFromTimeString($schedule->end_time);
+        $earlyCheck = $end->copy()->subMinutes(Report::EARLY_CHECKOUT);
         $checkoutDeadline = $end->copy()->addMinutes(Report::CHECKOUT_GRACE_MINUTES);
 
         // Create a report entry if this is the first attendance action for the class period.
@@ -342,17 +343,16 @@ class ApiController extends Controller
             ];
         }
 
-        // A second tap while the class is still active is ignored. This prevents duplicate scans
-        // from corrupting or double-counting the attendance record before class end time.
+        // A second tap before the early-checkout window is ignored.
         if (!empty($attendance->time_in) && empty($attendance->time_out)) {
-            if ($now->lt($end)) {
+            if ($now->lt($earlyCheck)) {
                 return [
                     'status' => 'ignored',
                     'attendance_status' => $attendance->status,
                     'status_in' => $attendance->status,
                     'time_in' => $attendance->time_in,
                     'time_out' => $attendance->time_out,
-                    'message' => 'Duplicate tap ignored before class end time.',
+                    'message' => 'Checkout is only allowed during the final 30 minutes of class.',
                     'uid' => $scannedUid,
                     'user' => [
                         'id' => $user->id,
@@ -363,16 +363,17 @@ class ApiController extends Controller
             }
 
             if ($now->greaterThanOrEqualTo($checkoutDeadline)) {
-                $attendance->status = 'absent';
+                $attendance->time_out = $now->format('H:i:s');
+                $attendance->status = 'overtime';
                 $attendance->save();
 
                 return [
-                    'status' => 'ignored',
+                    'status' => 'accepted',
                     'attendance_status' => $attendance->status,
                     'status_in' => $attendance->status,
                     'time_in' => $attendance->time_in,
                     'time_out' => $attendance->time_out,
-                    'message' => 'Checkout grace period expired.',
+                    'message' => 'Overtime checkout recorded.',
                     'uid' => $scannedUid,
                     'user' => [
                         'id' => $user->id,
@@ -384,7 +385,7 @@ class ApiController extends Controller
 
             // A scan during the grace period records checkout and completes attendance.
             $attendance->time_out = $now->format('H:i:s');
-            $attendance->status = 'attended';
+            $attendance->status = $now->lt($end) ? 'early_ended' : 'attended';
             $attendance->save();
 
             // If nobody else is still inside the room, this room returns to vacant status.
@@ -392,7 +393,7 @@ class ApiController extends Controller
                 ->whereDate('attendance_date', $now->toDateString())
                 ->whereNotNull('time_in')
                 ->whereNull('time_out')
-                ->whereIn('status', ['ongoing', 'on_leave'])
+                ->whereIn('status', ['ongoing', 'on_leave', 'overtime'])
                 ->where('id', '!=', $attendance->id)
                 ->exists();
 

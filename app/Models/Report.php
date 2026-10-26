@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 class Report extends Model
 {
     public const CHECKOUT_GRACE_MINUTES = 3;
-
+    public const EARLY_CHECKOUT = 30;
     protected $table = 'attendance';
 
     protected $fillable = [
@@ -33,7 +33,7 @@ class Report extends Model
                 ->whereDate('attendance_date', Carbon::today()->toDateString())
                 ->whereNotNull('time_in')
                 ->whereNull('time_out')
-                ->whereIn('status', ['ongoing', 'on_leave'])
+                ->whereIn('status', ['ongoing', 'on_leave', 'overtime'])
                 ->exists();
 
             room::whereKey($attendance->room_id)->update([
@@ -91,7 +91,7 @@ class Report extends Model
         if ($isOnLeave && $attendance->status !== 'on_leave') {
             $attendance->update(['status' => 'on_leave', 'time_in' => null]);
         } elseif (!$isOnLeave && $attendance->time_in && $attendance->time_out) {
-            if ($attendance->status !== 'attended') {
+            if (!in_array($attendance->status, ['attended', 'early_ended', 'overtime'], true)) {
                 $attendance->update(['status' => 'attended']);
             }
         } elseif (!$isOnLeave && (!$attendance->time_in || !$attendance->time_out)) {
@@ -103,9 +103,15 @@ class Report extends Model
 
             $checkoutDeadline = $end->copy()->addMinutes(self::CHECKOUT_GRACE_MINUTES);
 
-            if ($now->greaterThanOrEqualTo($checkoutDeadline) && $attendance->status !== 'absent') {
+            if ($now->greaterThanOrEqualTo($checkoutDeadline) && $attendance->time_in && $attendance->status !== 'overtime') {
+                $attendance->update(['status' => 'overtime']);
+            } elseif ($now->greaterThanOrEqualTo($checkoutDeadline) && !$attendance->time_in && $attendance->status !== 'absent') {
                 $attendance->update(['status' => 'absent']);
-            } elseif ($attendance->time_in && $now->lessThan($checkoutDeadline) && $attendance->status !== 'ongoing') {
+            } elseif (
+                $attendance->time_in
+                && $now->lessThan($checkoutDeadline)
+                && !in_array($attendance->status, ['ongoing', 'overtime'], true)
+            ) {
                 $attendance->update(['status' => 'ongoing']);
             } elseif (
                 !$attendance->time_in
@@ -149,9 +155,9 @@ class Report extends Model
             : Carbon::today()->toDateString();
 
         if ($status !== 'on_leave') {
-            if ($timeIn && $timeOut) {
+            if ($timeIn && $timeOut && !in_array($status, ['early_ended', 'overtime'], true)) {
                 $status = 'attended';
-            } elseif ($timeIn) {
+            } elseif ($timeIn && !$timeOut && $status !== 'overtime') {
                 $status = 'ongoing';
             }
         }
