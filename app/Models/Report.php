@@ -6,6 +6,7 @@ use Illuminate\Support\Carbon;
 
 class Report extends Model
 {
+    public const TIME_IN_GRACE_MINUTES = 30;
     public const CHECKOUT_GRACE_MINUTES = 3;
     public const EARLY_CHECKOUT = 30;
     protected $table = 'attendance';

@@ -59,6 +59,19 @@ void updateTftText(String line1, String line2, uint16_t textColor = ILI9341_WHIT
   tft.fillRect(0, 220, 320, 20, ILI9341_BLACK);
 }
 
+void updateTftLines(String lines[5]) {
+  tft.fillScreen(ILI9341_BLACK);
+  tft.setTextSize(2);
+
+  for (int i = 0; i < 5; i++) {
+    tft.setCursor(10, 12 + (i * 42));
+    tft.setTextColor(i == 3 ? ILI9341_YELLOW : ILI9341_WHITE);
+    tft.println(lines[i]);
+  }
+
+  tft.fillRect(0, 220, 320, 20, ILI9341_BLACK);
+}
+
 // --- Function to Monitor and Reconnect Wi-Fi ---
 void checkWiFiConnection() {
   if (millis() - lastWifiCheck < 10000) return;
@@ -145,10 +158,24 @@ void pollLcdDisplay() {
       if (payload.length() > 0) {
         bool isClassUpdate = payload.startsWith("LCD:");
         String displayText = isClassUpdate ? payload.substring(4) : payload;
-        int separator = displayText.indexOf('|');
+        String lines[5];
+        int start = 0;
+        bool hasFiveLines = true;
 
-        if (separator >= 0) {
-          updateTftText(displayText.substring(0, separator), displayText.substring(separator + 1));
+        for (int i = 0; i < 5; i++) {
+          int separator = displayText.indexOf('|', start);
+          if (i < 4 && separator < 0) {
+            hasFiveLines = false;
+            break;
+          }
+
+          int end = separator < 0 ? displayText.length() : separator;
+          lines[i] = displayText.substring(start, end);
+          start = end + 1;
+        }
+
+        if (hasFiveLines) {
+          updateTftLines(lines);
         }
       }
     }

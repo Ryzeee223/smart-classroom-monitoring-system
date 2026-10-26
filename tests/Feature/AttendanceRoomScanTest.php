@@ -109,7 +109,7 @@ class AttendanceRoomScanTest extends TestCase
         Carbon::setTestNow();
     }
 
-    public function test_room_in_scan_request_is_used_to_validate_the_schedule(): void
+    public function test_room_validation_and_thirty_minute_early_check_in_grace(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-10-03 10:00:00', 'Asia/Manila'));
 
@@ -209,17 +209,27 @@ class AttendanceRoomScanTest extends TestCase
             'status' => 'vacant',
         ]);
 
+        $schedule->update(['start_time' => '10:31:00']);
+
+        $this->postJson('/api/attendance-scan', [
+            'uid' => 'AB12CD34',
+            'room' => 'CC102',
+        ])->assertStatus(200)
+            ->assertJsonPath('status', 'denied')
+            ->assertJsonPath('message', 'No active schedule');
+
+        Carbon::setTestNow(Carbon::parse('2026-10-03 10:01:00', 'Asia/Manila'));
         $this->postJson('/api/attendance-scan', [
             'uid' => 'AB12CD34',
             'room' => 'CC102',
         ])->assertOk()
             ->assertJsonPath('status', 'accepted')
-            ->assertJsonPath('time_in', '10:00:00')
+            ->assertJsonPath('time_in', '10:01:00')
             ->assertJsonPath('attendance_status', 'ongoing');
 
         $this->assertDatabaseHas('attendance', [
             'user_id' => $userId,
-            'time_in' => '10:00:00',
+            'time_in' => '10:01:00',
             'time_out' => null,
             'status' => 'ongoing',
         ]);

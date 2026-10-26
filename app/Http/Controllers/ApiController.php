@@ -200,7 +200,7 @@ class ApiController extends Controller
             });
 
         $schedule = $scheduleQuery
-            ->whereTime('start_time', '<=', $now->format('H:i:s'))
+            ->whereTime('start_time', '<=', $now->copy()->addMinutes(Report::TIME_IN_GRACE_MINUTES)->format('H:i:s'))
             ->whereTime('end_time', '>=', $now->format('H:i:s'))
             ->first();
 
@@ -504,9 +504,7 @@ class ApiController extends Controller
     }
 
     /**
-     * This endpoint serves the LCD display by showing either the currently active class in a room
-     * or a message indicating that the room is idle. It returns five pipe-delimited lines for
-     * hardware displays.
+     * This endpoint serves five pipe-delimited lines for the room LCD display.
      */
     public function DisplaytoLcd()
     {
@@ -534,29 +532,40 @@ class ApiController extends Controller
                 ->orderBy('start_time')
                 ->first();
 
+            $attendance = null;
+            if (!$schedule) {
+                $attendance = Report::with(['schedule.User', 'schedule.course'])
+                    ->where('room_id', $scannerRoom->id)
+                    ->whereDate('attendance_date', $now->toDateString())
+                    ->whereNotNull('time_in')
+                    ->whereNull('time_out')
+                    ->whereIn('status', ['ongoing', 'overtime'])
+                    ->latest('id')
+                    ->first();
+                $schedule = $attendance?->schedule;
+            }
+
             if (!$schedule) {
                 $lcdLines = [
-                    'Room: ' . $scannerRoom->room_name,
-                    'No ongoing class',
-                    '',
-                    'Room: ' . $scannerRoom->status,
+                    'Faculty: -',
+                    'Course: No class',
+                    'Time: -',
+                    'Attend: -',
+                    'Room: ' . ucfirst($scannerRoom->status),
                 ];
             } else {
                 $faculty = trim(($schedule->User?->first_name ?? '') . ' ' . ($schedule->User?->last_name ?? ''));
-                $attendance = Report::whereDate('attendance_date', $now->toDateString())
+                $attendance ??= Report::whereDate('attendance_date', $now->toDateString())
                     ->where('schedule_id', $schedule->id)
                     ->first();
+                $startTime = Carbon::parse($schedule->start_time)->format('H:i');
+                $endTime = Carbon::parse($schedule->end_time)->format('H:i');
                 $lcdLines = [
-                    $faculty ?: 'Faculty',
-                    $schedule->course?->course_code ?? $schedule->course?->course_name ?? 'Class in session',
-                    Carbon::parse($schedule->start_time)->format('g:i A')
-                        . ' - '
-                        . Carbon::parse($schedule->end_time)->format('g:i A'),
-                        '',
-                        '',
-                    'Attendance: ' . ($attendance?->status ?? 'waiting'),
-                    '',
-                    'Room: ' . $scannerRoom->status,
+                    'Faculty: ' . ($faculty ?: 'Unknown'),
+                    'Course: ' . ($schedule->course?->course_code ?? $schedule->course?->course_name ?? 'Class'),
+                    'Time: ' . $startTime . '-' . $endTime,
+                    'Attend: ' . ucwords(str_replace('_', ' ', $attendance?->status ?? 'waiting')),
+                    'Room: ' . ucfirst($scannerRoom->status),
                 ];
             }
 
