@@ -141,11 +141,6 @@ void pollLcdDisplay() {
   }
   lastLcdPoll = millis();
 
-  // Skip polling if an active attendance message is locked on screen
-  if ((long)(millis() - attendanceDisplayUntil) < 0) {
-    return;
-  }
-
   WiFiClientSecure client;
   client.setInsecure();
 
@@ -178,6 +173,7 @@ void pollLcdDisplay() {
         }
 
         if (hasFiveLines
+            && (long)(millis() - attendanceDisplayUntil) >= 0
             && (classDisplayNeedsRefresh || displayText != lastClassDisplayPayload)) {
           updateTftLines(lines);
           lastClassDisplayPayload = displayText;

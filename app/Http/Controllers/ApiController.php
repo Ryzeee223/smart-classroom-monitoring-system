@@ -573,9 +573,11 @@ class ApiController extends Controller
 
             if (!$schedule) {
                 $lcdLines = [
-                    'No Class',
-                    '',
-                    ucfirst($scannerRoom->status),
+                    'Faculty: -',
+                    'Course: No class',
+                    'Time: -',
+                    'Attend: -',
+                    'Room: ' . ucfirst($scannerRoom->status),
                 ];
             } else {
                 $faculty = trim(($schedule->User?->first_name ?? '') . ' ' . ($schedule->User?->last_name ?? ''));

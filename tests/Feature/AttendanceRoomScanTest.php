@@ -457,12 +457,12 @@ class AttendanceRoomScanTest extends TestCase
         Carbon::setTestNow(Carbon::parse('2026-10-03 15:00:00', 'Asia/Manila'));
         $this->get('/api/live-classrooms?room=CC103')
             ->assertOk()
-            ->assertSeeText('Course: No class');
+            ->assertContent('Faculty: -|Course: No class|Time: -|Attend: -|Room: Vacant');
 
         Carbon::setTestNow(Carbon::parse('2026-10-03 15:05:00', 'Asia/Manila'));
         $this->get('/api/live-classrooms?room=CC103')
             ->assertOk()
-            ->assertSeeText('Course: No class');
+            ->assertContent('Faculty: -|Course: No class|Time: -|Attend: -|Room: Vacant');
 
         Report::syncForSchedule(
             $noShowSchedule,
