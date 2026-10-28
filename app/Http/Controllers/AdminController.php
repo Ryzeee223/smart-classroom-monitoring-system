@@ -170,6 +170,9 @@ public function assignRfid(Request $request)
 
     if ($existingUser) {
         return redirect()->back()->with('error', "This RFID card is already assigned.");
+        if($existingUser){
+
+        }
     }
 
     $user = User::findOrFail($request->user_id);

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users - RFInsiDe</title>
     
-    @vite('resources/js/bootstrap-vendor.js')
+    @vite(['resources/sass/app.scss', 'resources/js/bootstrap-vendor.js'])
     <link rel="stylesheet" href="bootstrap-icons-1.10.5/bootstrap-icons.css">
     
 <style>
@@ -350,5 +350,4 @@ body {
 </main>
 
 </html>
-
 

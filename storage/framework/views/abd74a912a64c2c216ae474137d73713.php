@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit User - RFINSIDE</title>
     
-    <?php echo app('Illuminate\Foundation\Vite')('resources/js/bootstrap-vendor.js'); ?>
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/sass/app.scss', 'resources/js/bootstrap-vendor.js']); ?>
     
 </head>
 <body>
@@ -59,7 +59,10 @@
                                 <label class="form-label form-label-sm">Last Name</label>
                                 <input type="text" class="form-control form-control-sm" name="last_name" value="<?php echo e(old('last_name', $user->last_name)); ?>" required>
                             </div>
-
+                            <div class="col-md-12">
+                                <label for="" class="form-label form-label-sm">Employee ID</label>
+                                <input type="text" class="form-control form-control-sm" name="employee_ID" value="<?php echo e(old('empoyee_ID', $user->employee_ID)); ?>" required>
+                            </div>
                             <div class="col-md-12">
                                 <label class="form-label form-label-sm">Role</label>
                                 <select name="role" class="form-select form-select-sm" required>

@@ -1,31 +1,24 @@
 {
-  "_bootstrap-DBkz-poX.css": {
-    "file": "assets/bootstrap-DBkz-poX.css",
-    "src": "_bootstrap-DBkz-poX.css"
-  },
-  "_bootstrap.esm-Cwyk18Em.js": {
-    "file": "assets/bootstrap.esm-Cwyk18Em.js",
-    "name": "bootstrap.esm",
-    "css": [
-      "assets/bootstrap-DBkz-poX.css"
-    ]
+  "_bootstrap.esm-CiZvvyki.js": {
+    "file": "assets/bootstrap.esm-CiZvvyki.js",
+    "name": "bootstrap.esm"
   },
   "resources/js/app.js": {
-    "file": "assets/app-DZgCNSLw.js",
+    "file": "assets/app-BOdu4wmg.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "imports": [
-      "_bootstrap.esm-Cwyk18Em.js"
+      "_bootstrap.esm-CiZvvyki.js"
     ]
   },
   "resources/js/bootstrap-vendor.js": {
-    "file": "assets/bootstrap-vendor-CNhWqa3_.js",
+    "file": "assets/bootstrap-vendor-4zHgbPqK.js",
     "name": "bootstrap-vendor",
     "src": "resources/js/bootstrap-vendor.js",
     "isEntry": true,
     "imports": [
-      "_bootstrap.esm-Cwyk18Em.js"
+      "_bootstrap.esm-CiZvvyki.js"
     ]
   },
   "resources/sass/app.scss": {

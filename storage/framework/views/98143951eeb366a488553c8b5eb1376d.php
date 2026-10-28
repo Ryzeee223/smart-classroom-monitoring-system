@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - RFInsiDe</title>
     
-    <?php echo app('Illuminate\Foundation\Vite')('resources/js/bootstrap-vendor.js'); ?>
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/sass/app.scss', 'resources/js/bootstrap-vendor.js']); ?>
 </head>
 <body>
 <style>

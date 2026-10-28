@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users - RFInsiDe</title>
     
-    <?php echo app('Illuminate\Foundation\Vite')('resources/js/bootstrap-vendor.js'); ?>
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/sass/app.scss', 'resources/js/bootstrap-vendor.js']); ?>
     <link rel="stylesheet" href="bootstrap-icons-1.10.5/bootstrap-icons.css">
     
 <style>
@@ -188,11 +188,11 @@ body {
                         <input type="text" class="form-control form-control-sm" name="first_name" id="first_name-lead" placeholder="Enter first name">
                     </div>
                     <div class="col-md">
-                        <label class="form-label form-label-sm">Middle Name</label>
-                        <input type="text" class="form-control form-control-sm" name="middle_name" id="last_name-lead" placeholder="Enter last name">
+                        <label class="form-label form-label-sm">Middle Initial</label>
+                        <input type="text" class="form-control form-control-sm" name="middle_name" id="middle_name-lead" placeholder="Enter middle initial">
                     </div>
                     <div class="form-label form-label-sm">Last Name
-                    <input type="text" class="form-control form control-sm" name="last_name" id="middle_name-lead" placeholder="Enter middle name">
+                    <input type="text" class="form-control form control-sm" name="last_name" id="last_name-lead" placeholder="Enter last name">
                 </div>
             </div>
 
@@ -352,6 +352,5 @@ body {
 </main>
 
 </html>
-
 
 <?php /**PATH /Volumes/shared file/capstone project/backups/RFInsiDe/resources/views/users.blade.php ENDPATH**/ ?>

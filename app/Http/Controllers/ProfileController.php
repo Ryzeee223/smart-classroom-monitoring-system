@@ -7,6 +7,7 @@ use App\Models\Report;
 use App\Models\Schedule;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 class ProfileController extends Controller
 {
     public function show()
@@ -68,11 +69,11 @@ class ProfileController extends Controller
             }
         }
 
-        $user->update([
-            'profile_picture' => $path,
-        ]);
+        // $user->update([
+        //     'profile_picture' => $path,
+        // ]);
 
-        return redirect()->route('profile')->with('success', 'Profile photo updated successfully!');
+        // return redirect()->route('profile')->with('success', 'Profile photo updated successfully!');
     }
 
     public function updateName(Request $request)
@@ -81,16 +82,23 @@ class ProfileController extends Controller
             return redirect('/');
         }
 
+        $user = User::findOrFail(session('user_id'));
+
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:100'],
             'middle_name' => ['required', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
+            'employee_ID' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('users', 'employee_ID')->ignore($user->id),
+            ],
         ]);
 
-        $user = User::findOrFail(session('user_id'));
         $user->update($validated);
 
-        return redirect()->route('profile')->with('success', 'Profile name updated successfully!');
+        return redirect()->route('profile')->with('success', 'Profile updated successfully!');
     }
 
     public function showStatus()
@@ -98,4 +106,3 @@ class ProfileController extends Controller
 
     }
 }
-

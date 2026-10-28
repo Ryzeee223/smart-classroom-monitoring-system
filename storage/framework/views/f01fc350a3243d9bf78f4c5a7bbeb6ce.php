@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - RFInsiDe</title>
     
-    <?php echo app('Illuminate\Foundation\Vite')('resources/js/bootstrap-vendor.js'); ?>
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/sass/app.scss', 'resources/js/bootstrap-vendor.js']); ?>
     
 </head>
 <body>
@@ -60,11 +60,15 @@
                         <?php echo csrf_field(); ?>
 
                         <div class="mb-3">
-                            <label for="user_id" class="form-label">User</label>
-                            <select name="user_id" id="user_id" class="form-select" required>
+                            <label for="rfid_user_id" class="form-label">User</label>
+                            <select name="user_id" id="rfid_user_id" class="form-select" required>
                                 <option value="">Select a user</option>
                                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
-                                    <option value="<?php echo e($user->id); ?>"><?php echo e($user->first_name); ?> <?php echo e($user->last_name); ?> (<?php echo e($user->email); ?>)</option>
+                                    <?php
+                                        $rfidCode = strtoupper(trim((string) $user->RFID_code));
+                                        $hasAssignedRfid = $rfidCode !== '' && !in_array($rfidCode, ['0', 'N/A'], true);
+                                    ?>
+                                    <option value="<?php echo e($user->id); ?>" data-rfid-assigned="<?php echo e($hasAssignedRfid ? '1' : '0'); ?>"><?php echo e($user->first_name); ?> <?php echo e($user->last_name); ?> (<?php echo e($user->email); ?>)</option>
                                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                             </select>
                         </div>
@@ -78,34 +82,51 @@
 
 
 <script>
-    const rfidInput = document.getElementById('rfid_input');
-    const rfidLabel = document.getElementById('rfid_label');
+    document.addEventListener('DOMContentLoaded', function () {
+        const rfidInput = document.getElementById('rfid_input');
+        const rfidLabel = document.getElementById('rfid_label');
+        const userSelect = document.getElementById('rfid_user_id');
+        const assignButton = document.getElementById('assign_rfid_button');
+        const updateButton = document.getElementById('update_rfid_button');
 
-    
-    // POST /api/rfid-scan (sent by the ESP8266 when a card is tapped).
-    const pollInterval = setInterval(async () => {
-        try {
-            const response = await fetch('/api/check-latest-assignment', { cache: 'no-store' });
-            if (!response.ok) throw new Error(`Scan check failed: ${response.status}`);
-            const data = await response.json();
+        function updateRfidAction() {
+            const selectedOption = userSelect.selectedOptions[0];
+            const hasAssignedRfid = selectedOption?.dataset.rfidAssigned === '1';
 
-            if (data.uid && data.uid !== 'N/A' && data.uid !== rfidInput.value) {
-                // 1. Update the hidden input value
-                rfidInput.value = data.uid;
-
-                // 2. Update the visual span text
-                rfidLabel.textContent = data.uid;
-
-                // Keep polling so the next card can also be detected.
-            }
-        } catch (error) {
-            console.error("Error fetching RFID scan:", error);
-            rfidLabel.textContent = 'Unable to read scanner';
+            assignButton.classList.toggle('d-none', !selectedOption?.value || hasAssignedRfid);
+            updateButton.classList.toggle('d-none', !selectedOption?.value || !hasAssignedRfid);
+            assignButton.disabled = true;
+            updateButton.disabled = true;
+            rfidInput.value = '';
+            rfidLabel.textContent = 'Waiting for card...';
         }
-    }, 2000);
+
+        userSelect.addEventListener('change', updateRfidAction);
+        updateRfidAction();
+
+        // POST /api/rfid-scan (sent by the ESP8266 when a card is tapped).
+        setInterval(async () => {
+            try {
+                const response = await fetch('/api/check-latest-assignment', { cache: 'no-store' });
+                if (!response.ok) throw new Error(`Scan check failed: ${response.status}`);
+                const data = await response.json();
+
+                if (data.uid && data.uid !== 'N/A' && data.uid !== rfidInput.value) {
+                    rfidInput.value = data.uid;
+                    rfidLabel.textContent = data.uid;
+                    assignButton.disabled = false;
+                    updateButton.disabled = false;
+                }
+            } catch (error) {
+                console.error("Error fetching RFID scan:", error);
+                rfidLabel.textContent = 'Unable to read scanner';
+            }
+        }, 2000);
+    });
 </script>
 
-                        <button type="submit" class="btn btn-primary">Assign RFID</button>
+                        <button type="submit" id="assign_rfid_button" class="btn btn-primary d-none" disabled>Assign RFID</button>
+                        <button type="submit" id="update_rfid_button" class="btn btn-warning d-none" disabled>Update RFID</button>
                     </form>
 
                 <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>

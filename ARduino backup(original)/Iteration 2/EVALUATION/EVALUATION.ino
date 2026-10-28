@@ -36,14 +36,14 @@ const char* password = "RZE-2004";
 
 
 //online
-// const char* settingsUrl = "https://rfinside.vercel.app/api/rfid-scan";
-// const char* attendanceLcdUrl = "https://rfinside.vercel.app/api/attendance-scan?format=lcd";
-// const char* lcdUrl = "https://rfinside.vercel.app/api/live-classrooms?room=";
+const char* settingsUrl = "https://rfinside.vercel.app/api/rfid-scan";
+const char* attendanceLcdUrl = "https://rfinside.vercel.app/api/attendance-scan?format=lcd";
+const char* lcdUrl = "https://rfinside.vercel.app/api/live-classrooms?room=";
 
 // local, refer to the ip address of the laptop for the .x.x
-const char* settingsUrl ="http://192.168.x.x:8000/api/rfid-scan";
-const char* attendanceLcdUrl = "http://192.168.x.x:8000/api/check-latest-attendance";
-const char* lcdUrl = "http://192.168.x.x:8000/api/live-classrooms";
+// const char* settingsUrl ="http://192.168.100.2:8000/api/rfid-scan";
+// const char* attendanceLcdUrl = "http://192.168.100.2:8000/api/check-latest-attendance";
+// const char* lcdUrl = "http://192.168.100.2:8000/api/live-classrooms";
 
 
 const char* room = "CC101";

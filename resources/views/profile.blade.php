@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Profile</title>
     
-    @vite('resources/js/bootstrap-vendor.js')
+    @vite(['resources/sass/app.scss', 'resources/js/bootstrap-vendor.js'])
     
 </head>
 <body>
@@ -95,14 +95,14 @@
                             </div>
                             <hr>
                             <div class="d-flex justify-content-center">
-                                <button class="btn btn-primary" id="changeprofilename" type="button" data-bs-toggle="modal" data-bs-target="#updateProfileNameModal">Update Profile Name</button>
+                                <button class="btn btn-primary" id="changeprofilename" type="button" data-bs-toggle="modal" data-bs-target="#updateProfileNameModal">Update Profile</button>
                             </div>
                             <div class="modal fade" id="updateProfileNameModal" tabindex="-1" aria-labelledby="updateProfileNameModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <form class="modal-content" action="{{ route('profile.name.update') }}" method="POST">
                                         @csrf
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="updateProfileNameModalLabel">Update Profile Name</h5>
+                                            <h5 class="modal-title" id="updateProfileNameModalLabel">Update Profile</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
@@ -120,6 +120,11 @@
                                                 <label for="profileLastName" class="form-label">Last name</label>
                                                 <input type="text" class="form-control @error('last_name') is-invalid @enderror" id="profileLastName" name="last_name" value="{{ old('last_name', $user->last_name ?? '') }}" maxlength="100" required>
                                                 @error('last_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                            </div> <br>
+                                            <div class="mb-0">
+                                                <label for="profileEmployeeId" class="form-label">Employee ID</label>
+                                                <input type="text" class="form-control @error('employee_ID') is-invalid @enderror" id="profileEmployeeId" name="employee_ID" value="{{ old('employee_ID', $user->employee_ID ?? '') }}" maxlength="100" required>
+                                                @error('employee_ID') <div class="invalid-feedback">{{$message}}</div> @enderror
                                             </div>
                                         </div>
                                         <div class="modal-footer">
@@ -129,7 +134,7 @@
                                     </form>
                                 </div>
                             </div>
-                            @if($errors->hasAny(['first_name', 'middle_name', 'last_name']))
+                            @if($errors->hasAny(['first_name', 'middle_name', 'last_name','employee_ID']))
                                 <script>
                                     document.addEventListener('DOMContentLoaded', function () {
                                         bootstrap.Modal.getOrCreateInstance(document.getElementById('updateProfileNameModal')).show();

@@ -23,6 +23,7 @@ class userscontroller extends Controller
         $request->validate([
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
+            'employee_ID' => 'required|string|max:100',
             'role' => 'required|integer|in:2,3,4,5',
             'acc_status' => 'nullable|string',
         ]);
@@ -32,6 +33,7 @@ class userscontroller extends Controller
         $user->update([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
+            'employee_ID' => $request->employee_ID,
             'role' => $request->role,
             'acc_status' => $request->acc_status,
         ]);
