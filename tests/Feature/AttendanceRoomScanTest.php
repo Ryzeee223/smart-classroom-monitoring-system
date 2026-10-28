@@ -272,11 +272,29 @@ class AttendanceRoomScanTest extends TestCase
             'status' => 'waiting',
         ]);
 
+        $ongoingSchedule = $schedule->replicate();
+        $ongoingSchedule->section = 'Y';
+        $ongoingSchedule->day = 'Monday';
+        $ongoingSchedule->start_time = '11:00:00';
+        $ongoingSchedule->save();
+        Report::create([
+            'user_id' => $userId,
+            'college_id' => $collegeId,
+            'schedule_id' => $ongoingSchedule->id,
+            'room_id' => $roomId,
+            'day' => 'Monday',
+            'time_in' => '10:01:00',
+            'time_out' => null,
+            'attendance_date' => $now->toDateString(),
+            'status' => 'ongoing',
+        ]);
+
         $this->withSession(['user_id' => $userId])
             ->getJson('/dashboard/attendance')
             ->assertOk()
-            ->assertJsonCount(1, 'attendance')
-            ->assertJsonPath('attendance.0.class', 'CS101');
+            ->assertJsonCount(2, 'attendance')
+            ->assertJsonPath('attendance.1.time_in', '10:01:00')
+            ->assertJsonPath('attendance.1.status', 'ongoing');
     }
 
     public function test_attendance_scan_checks_out_after_the_local_schedule_end_time(): void

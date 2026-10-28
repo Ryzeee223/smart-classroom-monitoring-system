@@ -16,15 +16,15 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label">School Year</label>
-                    <input type="text" name="school_year" class="form-control" placeholder="e.g., 2023-2024">
+                    <input type="text" name="school_year" class="form-control" placeholder="e.g., 2026-2027">
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label">Semester</label>
                     <select name="semester" class="form-select">
                         <option value="">Select semester</option>
-                        <option value="1st sem">1st Semester</option>
-                        <option value="2nd sem">2nd Semester</option>
+                        <option value="1st Sem">1st Semester</option>
+                        <option value="2nd Sem">2nd Semester</option>
                         <option value="midyear">Mid-Year</option>
                     </select>
                 </div>

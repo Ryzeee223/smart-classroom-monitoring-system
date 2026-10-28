@@ -95,7 +95,7 @@ class InitAcc extends Seeder
     ]);
 
         semyr::create([
-            'semester' => '1st Semester',
+            'semester' => '1st Sem',
             'school_year' => '2025-2026',
         ]);
 

@@ -169,14 +169,20 @@ $attendanceClasses = $todaySchedules
 $myAttendance = Report::with(['schedule.user', 'schedule.course', 'schedule.room'])
     ->whereDate('attendance_date', $todayDate)
     ->where('user_id', $currentUserId)
-    ->whereHas('schedule', function ($query) use ($currentUserId, $todayFull, $todayShort, $activeTerm) {
-        $query->where('user_id', $currentUserId)
-            ->where('School_year', $activeTerm?->school_year ?? '')
-            ->where('Semester', $activeTerm?->semester ?? '')
-            ->where(function ($scheduleQuery) use ($todayFull, $todayShort) {
-                $scheduleQuery->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayFull) . '%'])
-                    ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayShort) . '%']);
-            });
+    ->where(function ($query) use ($currentUserId, $todayFull, $todayShort, $activeTerm) {
+        $query->whereHas('schedule', function ($scheduleQuery) use ($currentUserId, $todayFull, $todayShort, $activeTerm) {
+            $scheduleQuery->where('user_id', $currentUserId)
+                ->where('School_year', $activeTerm?->school_year ?? '')
+                ->where('Semester', $activeTerm?->semester ?? '')
+                ->where(function ($dayQuery) use ($todayFull, $todayShort) {
+                    $dayQuery->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayFull) . '%'])
+                        ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayShort) . '%']);
+                });
+        })->orWhere(function ($openAttendanceQuery) use ($currentUserId) {
+            $openAttendanceQuery->whereNotNull('time_in')
+                ->whereNull('time_out')
+                ->whereHas('schedule', fn ($scheduleQuery) => $scheduleQuery->where('user_id', $currentUserId));
+        });
     })
     ->get()
     ->sortBy(fn ($a) => $a->schedule?->start_time ?? '23:59:59')
@@ -203,14 +209,20 @@ Route::get('/dashboard/attendance', function () {
     $attendance = Report::with(['schedule.user', 'schedule.course', 'schedule.room'])
         ->whereDate('attendance_date', now()->toDateString())
         ->where('user_id', $userId)
-        ->whereHas('schedule', function ($query) use ($userId, $todayDay, $todayShort, $activeTerm) {
-            $query->where('user_id', $userId)
-                ->where('School_year', $activeTerm?->school_year ?? '')
-                ->where('Semester', $activeTerm?->semester ?? '')
-                ->where(function ($scheduleQuery) use ($todayDay, $todayShort) {
-                    $scheduleQuery->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayDay) . '%'])
-                        ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayShort) . '%']);
-                });
+        ->where(function ($query) use ($userId, $todayDay, $todayShort, $activeTerm) {
+            $query->whereHas('schedule', function ($scheduleQuery) use ($userId, $todayDay, $todayShort, $activeTerm) {
+                $scheduleQuery->where('user_id', $userId)
+                    ->where('School_year', $activeTerm?->school_year ?? '')
+                    ->where('Semester', $activeTerm?->semester ?? '')
+                    ->where(function ($dayQuery) use ($todayDay, $todayShort) {
+                        $dayQuery->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayDay) . '%'])
+                            ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayShort) . '%']);
+                    });
+            })->orWhere(function ($openAttendanceQuery) use ($userId) {
+                $openAttendanceQuery->whereNotNull('time_in')
+                    ->whereNull('time_out')
+                    ->whereHas('schedule', fn ($scheduleQuery) => $scheduleQuery->where('user_id', $userId));
+            });
         })
         ->get()
         ->sortBy(fn ($record) => $record->schedule?->start_time ?? '23:59:59')
