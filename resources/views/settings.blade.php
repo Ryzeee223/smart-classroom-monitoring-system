@@ -123,8 +123,8 @@
     });
 </script>
 
-                        <button type="submit" id="assign_rfid_button" class="btn btn-primary d-none" disabled>Assign RFID</button>
-                        <button type="submit" id="update_rfid_button" class="btn btn-warning d-none" disabled>Update RFID</button>
+                        <button type="submit" id="assign_rfid_button" class="btn btn-primary d-none mx-3" disabled>Assign RFID</button>
+                        <button type="submit" id="update_rfid_button" class="btn btn-warning d-none mx-3" disabled>Update RFID</button>
                     </form>
 
                 @endif

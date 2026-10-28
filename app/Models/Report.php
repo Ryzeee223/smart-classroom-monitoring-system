@@ -3,6 +3,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use App\Models\semyr;
 
 class Report extends Model
 {
@@ -56,6 +57,14 @@ class Report extends Model
     public function college()
     {
         return $this->belongsTo(college::class, 'college_id');
+    }
+
+    public static function activeTerm(): ?semyr
+    {
+        return semyr::query()
+            ->orderByDesc('updated_at')
+            ->orderByDesc('id')
+            ->first();
     }
 
     public static function syncForSchedule(Schedule $schedule, string $attendanceDate, Carbon $now): ?self
@@ -130,10 +139,17 @@ class Report extends Model
     public static function syncForToday(?Carbon $now = null): int
     {
         $now ??= Carbon::now();
+        $activeTerm = self::activeTerm();
+        if (!$activeTerm) {
+            return 0;
+        }
+
         $attendanceDate = $now->toDateString();
         $today = strtolower($now->format('l'));
         $shortToday = strtolower($now->format('D'));
         $schedules = Schedule::with('User')
+            ->where('School_year', $activeTerm->school_year)
+            ->where('Semester', $activeTerm->semester)
             ->where(function ($query) use ($today, $shortToday) {
                 $query->whereRaw('LOWER(day) LIKE ?', ['%' . $today . '%'])
                     ->orWhereRaw('LOWER(day) LIKE ?', ['%' . $shortToday . '%']);

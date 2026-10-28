@@ -88,6 +88,17 @@ class AttendanceRoomScanTest extends TestCase
             'School_year' => '2026-2027',
         ]);
 
+        DB::table('semyr')->insert([
+            'semester' => '1st Semester',
+            'school_year' => '2026-2027',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+        $previousTermSchedule = $schedule->replicate();
+        $previousTermSchedule->section = 'B';
+        $previousTermSchedule->School_year = '2025-2026';
+        $previousTermSchedule->save();
+
         $this->get('/')->assertOk();
         $this->get('/')->assertOk();
 
@@ -189,6 +200,13 @@ class AttendanceRoomScanTest extends TestCase
             'School_year' => '2026-2027',
         ]);
 
+        DB::table('semyr')->insert([
+            'semester' => '1st Semester',
+            'school_year' => '2026-2027',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         $response = $this->postJson('/api/attendance-scan', [
             'uid' => 'AB12CD34',
             'room' => 'CC101',
@@ -237,6 +255,28 @@ class AttendanceRoomScanTest extends TestCase
             'id' => $roomId,
             'status' => 'occupied',
         ]);
+
+        $unrelatedSchedule = $schedule->replicate();
+        $unrelatedSchedule->section = 'Z';
+        $unrelatedSchedule->day = 'Monday';
+        $unrelatedSchedule->save();
+        Report::create([
+            'user_id' => $userId,
+            'college_id' => $collegeId,
+            'schedule_id' => $unrelatedSchedule->id,
+            'room_id' => $roomId,
+            'day' => 'Monday',
+            'time_in' => null,
+            'time_out' => null,
+            'attendance_date' => $now->toDateString(),
+            'status' => 'waiting',
+        ]);
+
+        $this->withSession(['user_id' => $userId])
+            ->getJson('/dashboard/attendance')
+            ->assertOk()
+            ->assertJsonCount(1, 'attendance')
+            ->assertJsonPath('attendance.0.class', 'CS101');
     }
 
     public function test_attendance_scan_checks_out_after_the_local_schedule_end_time(): void
@@ -306,6 +346,13 @@ class AttendanceRoomScanTest extends TestCase
             'end_time' => '15:00:00',
             'Semester' => '1st Semester',
             'School_year' => '2026-2027',
+        ]);
+
+        DB::table('semyr')->insert([
+            'semester' => '1st Semester',
+            'school_year' => '2026-2027',
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
         $this->postJson('/api/attendance-scan', [

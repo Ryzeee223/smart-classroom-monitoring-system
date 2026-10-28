@@ -1,3 +1,7 @@
+@if(request()->routeIs('school-year-settings'))
+    @vite('resources/sass/app.scss')
+@endif
+
 {{-- School Year settings container (UI-only) --}}
 <div class="card mt-4">
     <div class="card-header">
@@ -40,4 +44,3 @@
         </form>
     </div>
 </div>
-

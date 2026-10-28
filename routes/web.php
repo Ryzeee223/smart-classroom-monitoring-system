@@ -96,6 +96,7 @@ $now = \Illuminate\Support\Carbon::now();
 $todayDate = $now->toDateString();
 $todayFull = $now->format('l'); // e.g., "Monday"
 $todayShort = $now->format('D'); // e.g., "Mon"
+$activeTerm = Report::activeTerm();
 
 // 2. Fetch Static UI Dropdowns
 $buildings = \App\Models\bldg::all();
@@ -108,6 +109,13 @@ $currentDeans = \App\Models\users::where('role', 2)
 
 // 3. Retrieve Base Schedules for Today
 $schedulesQuery = \App\Models\Schedule::with(['User', 'course', 'room', 'Program'])
+    ->when(
+        $activeTerm,
+        fn ($query) => $query
+            ->where('School_year', $activeTerm->school_year)
+            ->where('Semester', $activeTerm->semester),
+        fn ($query) => $query->whereRaw('1 = 0')
+    )
     ->where(function ($q) use ($todayFull, $todayShort) {
         $q->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayFull) . '%'])
           ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayShort) . '%']);
@@ -161,6 +169,15 @@ $attendanceClasses = $todaySchedules
 $myAttendance = Report::with(['schedule.user', 'schedule.course', 'schedule.room'])
     ->whereDate('attendance_date', $todayDate)
     ->where('user_id', $currentUserId)
+    ->whereHas('schedule', function ($query) use ($currentUserId, $todayFull, $todayShort, $activeTerm) {
+        $query->where('user_id', $currentUserId)
+            ->where('School_year', $activeTerm?->school_year ?? '')
+            ->where('Semester', $activeTerm?->semester ?? '')
+            ->where(function ($scheduleQuery) use ($todayFull, $todayShort) {
+                $scheduleQuery->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayFull) . '%'])
+                    ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayShort) . '%']);
+            });
+    })
     ->get()
     ->sortBy(fn ($a) => $a->schedule?->start_time ?? '23:59:59')
     ->values();
@@ -180,17 +197,21 @@ Route::get('/dashboard/attendance', function () {
 
     $today = now();
     $todayDay = $today->format('l');
-    $schedules = \App\Models\Schedule::with('User')
-        ->where('user_id', $userId)
-        ->where(function ($query) use ($todayDay) {
-            $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayDay) . '%'])
-                ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower(substr($todayDay, 0, 3)) . '%']);
-        })
-        ->get();
+    $todayShort = $today->format('D');
+    $activeTerm = Report::activeTerm();
 
     $attendance = Report::with(['schedule.user', 'schedule.course', 'schedule.room'])
         ->whereDate('attendance_date', now()->toDateString())
         ->where('user_id', $userId)
+        ->whereHas('schedule', function ($query) use ($userId, $todayDay, $todayShort, $activeTerm) {
+            $query->where('user_id', $userId)
+                ->where('School_year', $activeTerm?->school_year ?? '')
+                ->where('Semester', $activeTerm?->semester ?? '')
+                ->where(function ($scheduleQuery) use ($todayDay, $todayShort) {
+                    $scheduleQuery->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayDay) . '%'])
+                        ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower($todayShort) . '%']);
+                });
+        })
         ->get()
         ->sortBy(fn ($record) => $record->schedule?->start_time ?? '23:59:59')
         ->values()

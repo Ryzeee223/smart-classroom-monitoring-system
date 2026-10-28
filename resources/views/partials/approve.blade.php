@@ -1,3 +1,7 @@
+@if(request()->routeIs('approve'))
+    @vite('resources/sass/app.scss')
+@endif
+
 @php
     $records = isset($requests)
         ? collect($requests)

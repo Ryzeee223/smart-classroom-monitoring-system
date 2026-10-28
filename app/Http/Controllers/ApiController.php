@@ -193,7 +193,15 @@ class ApiController extends Controller
         }
 
         // Find the user's active schedule first, then validate its room against the scanner.
+        $activeTerm = Report::activeTerm();
         $scheduleQuery = Schedule::where('user_id', $user->id)
+            ->when(
+                $activeTerm,
+                fn ($query) => $query
+                    ->where('School_year', $activeTerm->school_year)
+                    ->where('Semester', $activeTerm->semester),
+                fn ($query) => $query->whereRaw('1 = 0')
+            )
             ->where(function ($query) use ($today, $shortToday) {
                 $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($today) . '%'])
                     ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower($shortToday) . '%']);
@@ -512,6 +520,7 @@ class ApiController extends Controller
     {
         $now = Carbon::now();
         $today = $now->format('l');
+        $activeTerm = Report::activeTerm();
 
         // If a specific room is requested, the LCD shows only that room's current class information.
         if (request()->filled('room')) {
@@ -525,6 +534,13 @@ class ApiController extends Controller
 
             $schedule = Schedule::with(['User', 'course'])
                 ->where('room_id', $scannerRoom->id)
+                ->when(
+                    $activeTerm,
+                    fn ($query) => $query
+                        ->where('School_year', $activeTerm->school_year)
+                        ->where('Semester', $activeTerm->semester),
+                    fn ($query) => $query->whereRaw('1 = 0')
+                )
                 ->where(function ($query) use ($today) {
                     $query->whereRaw('LOWER(day) LIKE ?', ['%' . strtolower($today) . '%'])
                         ->orWhereRaw('LOWER(day) LIKE ?', ['%' . strtolower(substr($today, 0, 3)) . '%']);
