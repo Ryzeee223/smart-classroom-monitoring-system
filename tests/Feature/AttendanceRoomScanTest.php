@@ -499,6 +499,11 @@ class AttendanceRoomScanTest extends TestCase
             'id' => $roomId,
             'status' => 'vacant',
         ]);
+        $this->get('/api/live-classrooms?room=CC103')
+            ->assertOk()
+            ->assertSeeText('Faculty: Checkout Faculty')
+            ->assertSeeText('Attend: Attended')
+            ->assertHeader('Cache-Control', 'no-store, private, max-age=0');
 
         $missedCheckout = Report::where('schedule_id', $noShowSchedule->id)
             ->whereDate('attendance_date', $now->toDateString())

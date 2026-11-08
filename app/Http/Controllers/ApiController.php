@@ -15,6 +15,8 @@ use App\Services\AttendanceService;
 
 class ApiController extends Controller
 {
+    private const LCD_ATTENDANCE_FRESHNESS_SECONDS = 30;
+
     public function __construct(private AttendanceService $attendanceService)
     {
     }
@@ -228,7 +230,10 @@ class ApiController extends Controller
 
             if (!$scannerRoom) {
                 return response('Room not found|Check room setup||', 404)
-                    ->header('Content-Type', 'text/plain');
+                    ->header('Content-Type', 'text/plain')
+                    ->header('Cache-Control', 'no-store, private, max-age=0')
+                    ->header('Pragma', 'no-cache')
+                    ->header('Expires', '0');
             }
 
             $schedule = Schedule::with(['User', 'course'])
@@ -275,6 +280,21 @@ class ApiController extends Controller
                 }
             }
 
+            if (!$schedule) {
+                $attendance = Report::with(['schedule.User', 'schedule.course'])
+                    ->where('room_id', $scannerRoom->id)
+                    ->whereDate('attendance_date', $now->toDateString())
+                    ->whereIn('status', ['attended', 'early_ended', 'overtime', 'on_leave'])
+                    ->whereBetween('updated_at', [
+                        $now->copy()->subSeconds(self::LCD_ATTENDANCE_FRESHNESS_SECONDS),
+                        $now,
+                    ])
+                    ->latest('updated_at')
+                    ->latest('id')
+                    ->first();
+                $schedule = $attendance?->schedule;
+            }
+
             if ($schedule) {
                 $attendance ??= Report::whereDate('attendance_date', $now->toDateString())
                     ->where('schedule_id', $schedule->id)
@@ -313,7 +333,10 @@ class ApiController extends Controller
             );
 
             return response(implode('|', $lcdLines))
-                ->header('Content-Type', 'text/plain');
+                ->header('Content-Type', 'text/plain')
+                ->header('Cache-Control', 'no-store, private, max-age=0')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0');
         }
 
         // Cache the dashboard payload for a few seconds so repeated page refreshes do not hit the
