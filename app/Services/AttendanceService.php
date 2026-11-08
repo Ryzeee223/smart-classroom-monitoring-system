@@ -23,7 +23,7 @@ class AttendanceService
         if (!$user) {
             return [
                 'status' => 'denied',
-                'message' => 'card is not assigned',
+                'message' => 'card not assigned',
                 'uid' => $scannedUid,
             ];
         }
@@ -57,7 +57,7 @@ class AttendanceService
         if (empty($allowedRoomIds)) {
             return [
                 'status' => 'denied',
-                'message' => 'This room not exist .',
+                'message' => 'room not exist .',
                 'uid' => $scannedUid,
                 'room' => $normalizedRoom,
                 'user' => [

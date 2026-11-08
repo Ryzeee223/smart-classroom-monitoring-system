@@ -53,7 +53,7 @@ class ApiController extends Controller
 
         // If either value is missing, the scan is invalid and should be rejected early.
         if ($scannedUid === '' || $roomName === '') {
-            Log::warning('Attendance RFID packet rejected because UID or room is missing.', [
+            Log::warning('rejected, UID or room is missing.', [
                 'has_uid' => $scannedUid !== '',
                 'has_room' => $roomName !== '',
             ]);
