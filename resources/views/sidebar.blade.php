@@ -40,59 +40,59 @@
 
             {{-- for admin --}}
            @if ($role === 1 )
-                <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold' : '' }}" href="{{ route('dashboard') }}">Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link {{ request()->routeIs('users.index') ? 'active fw-bold' : '' }}" href="{{ route('users.index') }}">Users</a></li>
-                <li class="nav-item"><a class="nav-link {{ request()->routeIs('college') ? 'active fw-bold' : '' }}" href= "{{ route('college') }}">Colleges</a></li>
-                <li class="nav-item"><a class="nav-link {{ request()->routeIs('rooms.index') ? 'active fw-bold' : '' }}" href="{{ route('rooms.index') }}">Rooms and Buildings</a></li>
-                <li class="nav-item"><a class="nav-link {{ request()->routeIs('settings') ? 'active fw-bold' : '' }}" href="{{ route('settings') }}">Settings</a></li>
+                <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold' : '' }}" href="{{ route('dashboard') }}">📊Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link {{ request()->routeIs('users.index') ? 'active fw-bold' : '' }}" href="{{ route('users.index') }}">👥Users</a></li>
+                <li class="nav-item"><a class="nav-link {{ request()->routeIs('college') ? 'active fw-bold' : '' }}" href= "{{ route('college') }}">🏫Colleges</a></li>
+                <li class="nav-item"><a class="nav-link {{ request()->routeIs('rooms.index') ? 'active fw-bold' : '' }}" href="{{ route('rooms.index') }}">🏙Rooms and Buildings</a></li>
+                <li class="nav-item"><a class="nav-link {{ request()->routeIs('settings') ? 'active fw-bold' : '' }}" href="{{ route('settings') }}">⚙️Settings</a></li>
                 {{-- for dean/asst dean--}}
             @elseif ($role === 2)
             {{-- dashboard --}}
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold' : '' }}" href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold' : '' }}" href="{{ route('dashboard') }}"> 📊Dashboard</a></li>
             {{-- users --}}
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('users.index') ? 'active fw-bold' : '' }}" href={{ route('users.index') }}>Users</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('users.index') ? 'active fw-bold' : '' }}" href={{ route('users.index') }}>👥Users</a></li>
             {{-- mysched --}}
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('myschedule') ? 'active fw-bold' : '' }}" href="{{ route('myschedule') }}">My Schedule</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('myschedule') ? 'active fw-bold' : '' }}" href="{{ route('myschedule') }}">📆My Schedule</a></li>
             {{-- Subjects --}}
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('course') ? 'active fw-bold' : '' }}" href="{{ route ('course') }}">Course</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('course') ? 'active fw-bold' : '' }}" href="{{ route ('course') }}">📚Course</a></li>
             {{-- schedule --}}
            {{-- College --}}
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('programs') || request()->routeIs('programs.index') ? 'active fw-bold' : '' }}" href="{{ route('programs') }}">Programs</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('programs') || request()->routeIs('programs.index') ? 'active fw-bold' : '' }}" href="{{ route('programs') }}">🎓Programs</a></li>
             {{-- settings --}}
-            <li class="nav-item"><a class="nav-link" href="{{ route('settings') }}">Settings</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ route('settings') }}">⚙️Settings</a></li>
 
             @elseif ($role === 3)
             {{-- Asst Dean --}}
-                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold' : '' }}" href="{{ route('dashboard') }}">Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold' : '' }}" href="{{ route('dashboard') }}">📊Dashboard</a></li>
             {{-- users --}}
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('users.index') ? 'active fw-bold' : '' }}" href={{ route('users.index') }}>Users</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('users.index') ? 'active fw-bold' : '' }}" href={{ route('users.index') }}>👥Users</a></li>
             {{-- mysched --}}
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('myschedule') ? 'active fw-bold' : '' }}" href="{{ route('myschedule') }}">My Schedule</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('myschedule') ? 'active fw-bold' : '' }}" href="{{ route('myschedule') }}">📆My Schedule</a></li>
             {{-- Subjects --}}
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('course') ? 'active fw-bold' : '' }}" href="{{ route ('course') }}">Course</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('course') ? 'active fw-bold' : '' }}" href="{{ route ('course') }}">📚Course</a></li>
             {{-- schedule --}}
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('schedules') ? 'active fw-bold' : '' }}" href="{{ route('schedules') }}">Create Schedules</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('schedules') ? 'active fw-bold' : '' }}" href="{{ route('schedules') }}">✏️Create Schedules</a></li>
            {{-- College --}}
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('programs') ? 'active fw-bold' : '' }}" href="{{ route('programs') }}">Programs</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('programs') ? 'active fw-bold' : '' }}" href="{{ route('programs') }}">🎓Programs</a></li>
             {{-- settings --}}
-            <li class="nav-item"><a class="nav-link" href="{{ route('settings') }}">Settings</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ route('settings') }}">🎓Settings</a></li>
 
             {{-- for faculty and head--}}
         @elseif ($role === 4)
             {{-- dashboard --}}
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold' : '' }}" href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold' : '' }}" href="{{ route('dashboard') }}">📊Dashboard</a></li>
             {{-- mysched --}}
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('myschedule') ? 'active fw-bold' : '' }}" href="{{ route('myschedule') }}">My Schedule</a></li>
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('settings') ? 'active fw-bold' : '' }}" href="{{ route('settings') }}">Settings</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('myschedule') ? 'active fw-bold' : '' }}" href="{{ route('myschedule') }}">📆My Schedule</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('settings') ? 'active fw-bold' : '' }}" href="{{ route('settings') }}">⚙️Settings</a></li>
         @elseif ($role === 5)
-        <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold' : '' }}" href="{{ route('dashboard') }}">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold' : '' }}" href="{{ route('dashboard') }}">📊Dashboard</a></li>
             {{-- mysched --}}
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('myschedule') ? 'active fw-bold' : '' }}" href="{{ route('myschedule') }}">My Schedule</a></li>
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('settings') ? 'active fw-bold' : '' }}" href="{{ route('settings') }}">Settings</a></li>
-        <li class="nav-item"><a class="nav-link {{ request()->routeIs('reports') ? 'active fw-bold' : '' }}" href="{{ route('reports') }}">Reports</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('myschedule') ? 'active fw-bold' : '' }}" href="{{ route('myschedule') }}">📆My Schedule</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('settings') ? 'active fw-bold' : '' }}" href="{{ route('settings') }}">⚙️Settings</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('reports') ? 'active fw-bold' : '' }}" href="{{ route('reports') }}">📋Reports</a></li>
             @else
             
-            <li class="nav-item"><a class="nav-link" href="/">Logout</a></li>
+            <li class="nav-item"><a class="nav-link" href="/">⏻Logout</a></li>
             @endif
         </ul>
     </div>
@@ -114,7 +114,7 @@
 @endif
 
 <div class="btn btn-outline-dark w-100 nav-item text-center">
-    <a class="nav-link {{ request()->routeIs('profile') ? 'active fw-bold' : '' }}" href="{{ route('profile') }}">Profile</a>
+    <a class="nav-link {{ request()->routeIs('profile') ? 'active fw-bold' : '' }}" href="{{ route('profile') }}">👤Profile</a>
 </div>
 
     {{-- log out --}}
@@ -122,7 +122,7 @@
         <div class="app-sidebar__footer " style="margin-bottom: 5rem;">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="btn btn-outline-danger w-100">Logout</button>
+                <button type="submit" class="btn btn-outline-danger w-100">⏻Logout</button>
             </form>
         </div>
     @endif

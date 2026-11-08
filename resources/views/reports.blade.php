@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    @include('partials.favicon')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -76,7 +77,7 @@
 <body>
     @include('sidebar')
 
-    <div class="container-fluid p-5 mt-3">
+    <div class="container-fluid p-5 mt-3 mx-auto " style="max-width: 1200px;">
         <div class="row justify-content-end">
             <div class="col-xl-10 col-lg-12 col-md-12">
 

@@ -61,6 +61,7 @@ class Report extends Model
 
     public static function activeTerm(): ?semyr
     {
+        // The latest saved term is active; schedules must match both fields so old-term classes cannot create or appear as current attendance.
         return semyr::query()
             ->orderByDesc('updated_at')
             ->orderByDesc('id')
@@ -80,19 +81,7 @@ class Report extends Model
             return null;
         }
 
-        $attendance = self::firstOrCreate(
-            [
-                'user_id' => $schedule->user_id,
-                'schedule_id' => $schedule->id,
-                'attendance_date' => $attendanceDate,
-            ],
-            [
-                'room_id' => $schedule->room_id,
-                'college_id' => $schedule->User?->college_id,
-                'day' => $schedule->day,
-                'status' => 'waiting',
-            ]
-        );
+        $attendance = self::findOrCreateForSchedule($schedule, $attendanceDate);
 
         $accountStatus = strtolower(str_replace(['-', '_'], ' ', trim((string) $schedule->User?->acc_status)));
         $isOnLeave = str_contains($accountStatus, 'sick') || str_contains($accountStatus, 'leave');
@@ -163,6 +152,40 @@ class Report extends Model
         return $schedules->count();
     }
 
+    public static function findOrCreateForSchedule(
+        Schedule $schedule,
+        string $attendanceDate,
+        ?int $userId = null
+    ): self
+    {
+        $attendanceDate = Carbon::parse($attendanceDate)->toDateString();
+        $userId ??= (int) $schedule->user_id;
+        $attendance = self::query()
+            ->where('user_id', $userId)
+            ->where('schedule_id', $schedule->id)
+            ->whereDate('attendance_date', $attendanceDate)
+            ->orderByDesc('time_in')
+            ->first();
+
+        if ($attendance) {
+            return $attendance;
+        }
+
+        return self::firstOrCreate(
+            [
+                'user_id' => $userId,
+                'schedule_id' => $schedule->id,
+                'attendance_date' => $attendanceDate,
+            ],
+            [
+                'room_id' => $schedule->room_id,
+                'college_id' => $schedule->User?->college_id,
+                'day' => $schedule->day,
+                'status' => 'waiting',
+            ]
+        );
+    }
+
     public static function CreateAttendance($userId, $scheduleId, $timeIn, $timeOut, $attendanceDate, $status, $statusOut = null)
     {
         $schedule = Schedule::findOrFail($scheduleId);
@@ -179,20 +202,16 @@ class Report extends Model
             }
         }
 
-        return self::updateOrCreate(
-            [
-                'user_id' => $userId,
+        $attendance = self::findOrCreateForSchedule($schedule, $attendanceDate, (int) $userId);
+        $attendance->update([
             'college_id' => $schedule->User?->college_id,
-                'schedule_id' => $scheduleId,
-                'attendance_date' => $attendanceDate,
-            ],
-            [
-                'room_id' => $schedule->room_id,
-                'day' => $schedule->day,
-                'time_in' => $timeIn,
-                'time_out' => $timeOut,
-                'status' => $status,
-            ]
-        );
+            'room_id' => $schedule->room_id,
+            'day' => $schedule->day,
+            'time_in' => $timeIn,
+            'time_out' => $timeOut,
+            'status' => $status,
+        ]);
+
+        return $attendance;
     }
 }

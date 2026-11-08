@@ -101,6 +101,8 @@ class AttendanceRoomScanTest extends TestCase
 
         $this->get('/')->assertOk();
         $this->get('/')->assertOk();
+        Report::syncForSchedule($schedule, $now->toDateString(), $now);
+        Report::syncForSchedule($schedule, $now->toDateString(), $now);
 
         $this->assertDatabaseHas('attendance', [
             'user_id' => $userId,
@@ -255,6 +257,14 @@ class AttendanceRoomScanTest extends TestCase
             'id' => $roomId,
             'status' => 'occupied',
         ]);
+
+        $this->postJson('/api/attendance-scan', [
+            'uid' => 'AB12CD34',
+            'room' => 'CC102',
+        ])->assertOk()
+            ->assertJsonPath('status', 'ignored');
+
+        $this->assertDatabaseCount('attendance', 1);
 
         $unrelatedSchedule = $schedule->replicate();
         $unrelatedSchedule->section = 'Z';

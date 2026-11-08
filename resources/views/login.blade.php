@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    @include('partials.favicon')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <link rel="icon" href="{{ asset('icons/favicon.ico') }}" type="image/x-icon">
     @vite(['resources/sass/app.scss', 'resources/js/bootstrap-vendor.js'])
     
     
@@ -23,8 +24,8 @@
         @csrf
         <div class="row card rounded-4 shadow justify-content-center align-items-center d-flex">
             <div class="card-body">   
-                <h2 class="align-items-center d-flex justify-content-center card-body">RFInsiDe: Smart Classroom Monitoring System</h2>
-                 
+{{-- w --}}
+ <h2 class="align-items-center d-flex justify-content-center card-body">RFInsiDe: Smart Classroom Monitoring System</h2>
             </div>
         </div>
         <br>

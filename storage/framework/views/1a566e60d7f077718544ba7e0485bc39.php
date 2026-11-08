@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <?php echo $__env->make('partials.favicon', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users - RFInsiDe</title>
@@ -255,7 +256,7 @@ body {
                 User Accounts
                
             </h5>
-            <div class="table-responsive mb-0">
+            <div class="table-responsive mx-12 overflow-x-hidden mb-0">
                 <table class="table table-hover table-sm mb-0">
                     <thead class="table-light">
                         <tr>
@@ -321,15 +322,15 @@ body {
                                     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                 </td>
                                 <td class="text-center">
-                                    <div class="d-flex flex-column align-items-center gap-2">
+                                    <div class="d-flex align-items-center gap-2">
                                         <a href="<?php echo e(route('users.edit', $user->id)); ?>" class="btn btn-sm btn-outline-primary" title="Edit">
-                                            Edit
+                                            ✏️
                                         </a>
 
                                         <form method="POST" action="<?php echo e(route('users.destroy', $user->id)); ?>" onsubmit="return confirm('Delete this user?')" class="m-0">
                                             <?php echo csrf_field(); ?>
                                             <?php echo method_field('DELETE'); ?>
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">Delete</button>
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">🗑</button>
                                         </form>
                                     </div>
                                 </td>
@@ -352,5 +353,4 @@ body {
 </main>
 
 </html>
-
 <?php /**PATH /Volumes/shared file/capstone project/backups/RFInsiDe/resources/views/users.blade.php ENDPATH**/ ?>

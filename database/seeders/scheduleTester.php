@@ -26,8 +26,9 @@ class scheduleTester extends Seeder
 
             'year_level' => '1',
             'section' => 'A',
-            'Semester' => '2nd Sem', //change me if you want to test different semesters
-            'School_year' => '2026-2027',
+            'Semester' => '1st Sem', //change me if you want to test different semesters
+            // always use: midyear,1st Sem,2nd Sem 
+            'School_year' => '2025-2026',
             'day' => $now->format('l'),
             'start_time' => $timenow, 
             'end_time' => $endtime,   
