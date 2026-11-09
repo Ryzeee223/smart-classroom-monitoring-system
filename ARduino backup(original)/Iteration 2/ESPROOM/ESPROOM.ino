@@ -25,11 +25,11 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_
 const char* ssid = "Our2.4G";
 const char* password = "RZE-2004";
 
+const char* ssid =" ";
+const char* password=" ";
+
 const char* attendanceLcdUrl = "https://rfinside.vercel.app/api/attendance-scan?format=lcd";
 const char* lcdUrl = "https://rfinside.vercel.app/api/live-classrooms?room=";
-
-
-
 const char* room = "CC101";
 
 MFRC522 mfrc522(SS_PIN, RST_PIN);

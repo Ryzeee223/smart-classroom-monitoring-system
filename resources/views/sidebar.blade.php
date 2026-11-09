@@ -53,6 +53,7 @@
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('users.index') ? 'active fw-bold' : '' }}" href={{ route('users.index') }}>👥Users</a></li>
             {{-- mysched --}}
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('myschedule') ? 'active fw-bold' : '' }}" href="{{ route('myschedule') }}">📆My Schedule</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('schedules') ? 'active fw-bold' : '' }}" href="{{ route('schedules') }}">✏️Create Schedules</a></li>
             {{-- Subjects --}}
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('course') ? 'active fw-bold' : '' }}" href="{{ route ('course') }}">📚Course</a></li>
             {{-- schedule --}}

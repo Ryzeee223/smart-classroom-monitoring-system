@@ -6,15 +6,17 @@
 
 // --- Pin Definitions for ESP32 ---
 #define SS_PIN    5     // MFRC522 SDA/SS
-#define RST_PIN   27    // MFRC522 RST
+#define RST_PIN   21    // MFRC522 RST
 #define BUZZER_PIN 25   // Buzzer pin
 
 // --- Network & API Configuration ---
 const char* ssid     = "Our2.4G";
 const char* password = "RZE-2004";
 
+
+
 const char* settingsUrl = "https://rfinside.vercel.app/api/rfid-scan";
-const char* room = "CC101";
+
 
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
@@ -136,7 +138,7 @@ void loop() {
   tone(BUZZER_PIN, 2000, 100);
 
   // Build JSON Payload
-  String jsonPayload = "{\"uid\":\"" + cardUID + "\",\"room\":\"" + String(room) + "\"}";
+  String jsonPayload = "{\"uid\":\"" + cardUID + "\",\"room\":\"" + "\"}";
 
   // Send request to settings endpoint
   postScan(jsonPayload);
