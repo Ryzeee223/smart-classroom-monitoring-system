@@ -99,7 +99,6 @@ body {
     <div class="row g-4 mb-4">
         <div class="col-lg-8">
         <div class="card p-3 shadow-sm bg-white border-1" >
-            <h2 class="h5 mb-2">Add User</h2>
 
             <form action="{{ route('users.store') }}" method="POST">
                  @csrf
@@ -114,6 +113,8 @@ body {
                 @endphp
 
                 <div class="mt-2">
+                    
+
                     <label class="form-label form-label-sm">College</label>
 
                     <select name="college_id" id="collegeSelect" class="form-select form-select-sm" {{ in_array($sessionRole, [2, 3], true) ? 'disabled' : '' }}>
@@ -146,6 +147,17 @@ body {
                         <input type="hidden" name="college_id" value="{{ $currentCollegeId }}">
                     @endif
 
+                </div>
+                {{-- assign rfid --}}
+                     <div class="mt-3">
+                    <label class="form-label form-label-sm" for="newUserRfidLabel">Assign RFID</label>
+                    <input type="hidden" name="RFID_code" id="newUserRfidInput" value="{{ old('RFID_code') }}">
+                    <div class="input-group">
+                        <span class="form-control form-control-sm bg-light font-monospace" id="newUserRfidLabel" aria-live="polite">
+                            {{ old('RFID_code') ?: 'Tap a card on the RFID reader to assign it' }}
+                        </span>
+                        <button class="btn btn-outline-secondary btn-sm" type="button" id="clearNewUserRfid">Clear</button>
+                    </div>
                 </div>
                       <div class="row g-2 mt-2">
                     <div class="col-md">
@@ -208,6 +220,7 @@ body {
                         <input type="email" class="form-control form-control-sm" name="email" id="email-lead" placeholder="Enter email">
                     </div>
                 </div>
+                
 {{-- password --}}
                 <div class="mt-2">
                     <label class="form-label form-label-sm">Password</label>
@@ -220,10 +233,11 @@ body {
                 </div>
                 <div class="row g-2 mt-2">
                    
+
                     
                 </div>
                 <div class="col-md d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary btn-sm w-100 h-100">Add User</button>
+                        <button type="submit" class="btn btn-primary btn-sm w-100 h-100">Create User</button>
                     </div>
                
                     <div class="row g-2 mt-2" id="adminCourseRow" style="display:none;">
@@ -244,6 +258,37 @@ body {
                         
                         adminCourseRow.style.display = (roleSelect.value === '1') ? 'block' : 'none';
                     })();
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const rfidInput = document.getElementById('newUserRfidInput');
+                        const rfidLabel = document.getElementById('newUserRfidLabel');
+                        const clearButton = document.getElementById('clearNewUserRfid');
+                        if (!rfidInput || !rfidLabel || !clearButton) return;
+
+                        clearButton.addEventListener('click', function () {
+                            rfidInput.value = '';
+                            rfidLabel.textContent = 'Tap a card on the RFID reader to assign it';
+                        });
+
+                        async function readScannedRfid() {
+                            try {
+                                const response = await fetch('/api/check-latest-assignment', { cache: 'no-store' });
+                                if (!response.ok) throw new Error(`RFID scan check failed: ${response.status}`);
+                                const data = await response.json();
+
+                                if (data.uid && data.uid !== 'N/A') {
+                                    rfidInput.value = data.uid;
+                                    rfidLabel.textContent = data.uid;
+                                }
+                            } catch (error) {
+                                console.error('Unable to read the RFID scanner:', error);
+                                if (!rfidInput.value) rfidLabel.textContent = 'Unable to read scanner';
+                            }
+                        }
+
+                        readScannedRfid();
+                        window.setInterval(readScannedRfid, 2000);
+                    });
                 </script>
             </form>
         </div>

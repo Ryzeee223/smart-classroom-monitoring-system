@@ -270,8 +270,8 @@ body {
 
             <!-- Attendance -->
             @if (in_array(session('user_role'), [2,3,4,5]))
-<div class="col-lg-12 mt-3 width-100">
-                        <div class="card shadow">
+                <div class="col-lg-11  d-box mt-2 mx-5 justify-content-center">
+                        <div class="card shadow ">
                             <div class="card-header">
                                 <h5 class="mb-0 fw-bold">My Attendance</h5>
                             </div>

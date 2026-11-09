@@ -21,4 +21,5 @@ class main extends Seeder
 'role' => '1',
         ]);
     }
+    
 }

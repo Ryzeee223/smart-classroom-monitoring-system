@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <?php echo $__env->make('partials.favicon', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - RFInsiDe</title>
@@ -270,8 +271,8 @@ body {
 
             <!-- Attendance -->
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(in_array(session('user_role'), [2,3,4,5])): ?>
-<div class="col-lg-12 mt-3 width-100">
-                        <div class="card shadow">
+                <div class="col-lg-11  d-box mt-2 mx-5 justify-content-center">
+                        <div class="card shadow ">
                             <div class="card-header">
                                 <h5 class="mb-0 fw-bold">My Attendance</h5>
                             </div>

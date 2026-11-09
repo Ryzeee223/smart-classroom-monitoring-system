@@ -51,7 +51,7 @@
             </div>
 
             <div class="card-body">
-                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if((int) (session('user_role') ?? 0) === 1): ?>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if((int) (session('user_role') ?? 0) === 2 || (int) (session('user_role') ?? 0) === 3): ?>
                     <?php echo $__env->make('partials.school-year-settings', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
                     <!-- RFID Assign -->

@@ -4,15 +4,16 @@
 #include <SPI.h>
 #include <MFRC522.h>
 
-// --- Pin Definitions for ESP32 ---
+// --- Pin Definitions for ESP32 RC522 ---
 #define SS_PIN    5     // MFRC522 SDA/SS
 #define RST_PIN   21    // MFRC522 RST
 #define BUZZER_PIN 25   // Buzzer pin
 
 // --- Network & API Configuration ---
-const char* ssid     = "Our2.4G";
-const char* password = "RZE-2004";
-
+// const char* ssid     = "Our2.4G";
+// const char* password = "RZE-2004";
+const char* ssid ="vivo Y02A";
+const char* password="okay2314";
 
 
 const char* settingsUrl = "https://rfinside.vercel.app/api/rfid-scan";

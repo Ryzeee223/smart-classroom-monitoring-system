@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <?php echo $__env->make('partials.favicon', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
@@ -90,6 +91,7 @@ while ($startTime <= $endTimeLimit) {
             <div value="<?php echo e($latestSemyr->school_year ?? ''); ?>"><?php echo e($latestSemyr->school_year ?? 'Current School Year'); ?></div>
         </div>
         <input type="hidden" name="School_year" value="<?php echo e($latestSemyr->school_year ?? ''); ?>">
+        <input type="hidden" name="status" value="Regular">
     </div>
 </div>
 
@@ -150,12 +152,13 @@ while ($startTime <= $endTimeLimit) {
                                 
                                 <div class="row mt-2">
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label">Course</label>
+                                        <label class="form-label">Subject</label>
                                         <select class="form-select" name="Course" required>
-                                            <option value="">Select Course</option>
+                                            <option value="">Select Subject</option>
                                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $courses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $courses): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                                                 <option value="<?php echo e($courses->id); ?>">
-                                                    <?php echo e($courses->course_name); ?> (<?php echo e($courses->course_code); ?>)
+                                                    (<?php echo e($courses->course_code); ?>) <?php echo e($courses->course_name); ?>
+
                                                 </option>
                                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                                         </select>
@@ -200,7 +203,7 @@ while ($startTime <= $endTimeLimit) {
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Day</label>
                                         <div class="d-flex flex-wrap gap-3 mt-1">
-                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = ['Mon','Tue','Wed','Thu','Fri', 'Sat']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $day): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = ['Mon','Tue','Wed','Thu','Fri', 'Sat', 'Sun']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $day): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                                                 <label class="d-flex align-items-center gap-1">
                                                     <input type="checkbox" name="Day[]" value="<?php echo e($day); ?>" class="form-check-input">
                                                     <span><?php echo e($day); ?></span>

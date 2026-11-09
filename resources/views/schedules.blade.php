@@ -91,6 +91,7 @@ while ($startTime <= $endTimeLimit) {
             <div value="{{ $latestSemyr->school_year ?? '' }}">{{ $latestSemyr->school_year ?? 'Current School Year' }}</div>
         </div>
         <input type="hidden" name="School_year" value="{{ $latestSemyr->school_year ?? '' }}">
+        <input type="hidden" name="status" value="Regular">
     </div>
 </div>
 
@@ -150,12 +151,12 @@ while ($startTime <= $endTimeLimit) {
                                 {{-- course --}}
                                 <div class="row mt-2">
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label">Course</label>
+                                        <label class="form-label">Subject</label>
                                         <select class="form-select" name="Course" required>
-                                            <option value="">Select Course</option>
+                                            <option value="">Select Subject</option>
                                             @foreach($courses as $courses)
                                                 <option value="{{ $courses->id }}">
-                                                    {{ $courses->course_name }} ({{ $courses->course_code }})
+                                                    ({{ $courses->course_code }}) {{ $courses->course_name }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -200,7 +201,7 @@ while ($startTime <= $endTimeLimit) {
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Day</label>
                                         <div class="d-flex flex-wrap gap-3 mt-1">
-                                            @foreach(['Mon','Tue','Wed','Thu','Fri', 'Sat'] as $day)
+                                            @foreach(['Mon','Tue','Wed','Thu','Fri', 'Sat', 'Sun'] as $day)
                                                 <label class="d-flex align-items-center gap-1">
                                                     <input type="checkbox" name="Day[]" value="{{ $day }}" class="form-check-input">
                                                     <span>{{ $day }}</span>

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <?php echo $__env->make('partials.favicon', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -45,6 +46,8 @@
                                             // Assume it's a filename only
                                             $profileUrl = asset('storage/profile_pictures/' . ltrim((string) $pic, '/'));
                                         }
+                                    } elseif (isset($user) && $user && !empty($user->profile_picture_mime)) {
+                                        $profileUrl = route('profile.picture', $user->id);
                                     }
 
 
@@ -67,7 +70,16 @@
                                     
                                 ?>
 
-                                 
+                                <div class="text-center">
+                                    <img
+                                        src="<?php echo e($profileUrl ?? asset('images/default-avatar.png')); ?>"
+                                        alt="Profile picture"
+                                        style="width:140px; height:140px; object-fit:cover; border-radius:50%;"
+                                    >
+                                    <button class="btn btn-outline-primary btn-sm d-block mt-2 mx-auto" type="button" data-bs-toggle="modal" data-bs-target="#updateProfilePictureModal">
+                                        Change picture
+                                    </button>
+                                </div>
 
                                 <div>
                                     <h4 class="mb-1"><?php echo e($user ? ($user->first_name .' '.$user->middle_name .' ' . $user->last_name) : 'Guest'); ?></h4>
@@ -88,6 +100,57 @@
 
                                 </div>
                                 
+                            </div>
+                            <div class="modal fade" id="updateProfilePictureModal" tabindex="-1" aria-labelledby="updateProfilePictureModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <form class="modal-content" action="<?php echo e(route('profile.update')); ?>" method="POST" enctype="multipart/form-data">
+                                        <?php echo csrf_field(); ?>
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="updateProfilePictureModalLabel">Update profile picture</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body text-center">
+                                            <img
+                                                id="profilePicturePreview"
+                                                src="<?php echo e($profileUrl ?? asset('images/default-avatar.png')); ?>"
+                                                alt="Selected profile picture preview"
+                                                class="rounded-circle mb-3"
+                                                style="width:140px; height:140px; object-fit:cover;"
+                                            >
+                                            <label for="profilePictureInput" class="form-label d-block text-start">Choose an image</label>
+                                            <input
+                                                type="file"
+                                                class="form-control <?php $__errorArgs = ['profile_picture'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                                id="profilePictureInput"
+                                                name="profile_picture"
+                                                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                                                required
+                                            >
+                                            <div class="form-text text-start">JPG, PNG, or WebP. Maximum file size: 2 MB.</div>
+                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['profile_picture'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                <div class="invalid-feedback d-block text-start"><?php echo e($message); ?></div>
+                                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-primary">Save picture</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                             <hr>
                             <div class="d-flex justify-content-center">
@@ -121,6 +184,7 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                             </div>
+
                                             <div class="mb-3">
                                                 <label for="profileMiddleName" class="form-label">Middle name</label>
                                                 <input type="text" class="form-control <?php $__errorArgs = ['middle_name'];
@@ -196,20 +260,29 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                             <hr>
 
                             <script>
-                                const changeBtn = document.getElementById('changePhotoBtn');
-                                const saveBtn = document.getElementById('savePhotoBtn');
-                                const input = document.getElementById('profilePictureInput');
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const input = document.getElementById('profilePictureInput');
+                                    const preview = document.getElementById('profilePicturePreview');
+                                    if (!input || !preview) return;
 
-                                // If file input changes, reveal save button.
-                                input.addEventListener('change', () => {
-                                    if (input.files && input.files.length > 0) {
-                                        saveBtn.style.display = 'inline-block';
-                                    }
+                                    let previewUrl = null;
+                                    input.addEventListener('change', function () {
+                                        const file = input.files?.[0];
+                                        if (!file) return;
+
+                                        if (previewUrl) URL.revokeObjectURL(previewUrl);
+                                        previewUrl = URL.createObjectURL(file);
+                                        preview.src = previewUrl;
+                                    });
                                 });
-
-                                // Clicking the button should open the file picker.
-                                changeBtn.addEventListener('click', () => input.click());
                             </script>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($errors->has('profile_picture')): ?>
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        bootstrap.Modal.getOrCreateInstance(document.getElementById('updateProfilePictureModal')).show();
+                                    });
+                                </script>
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
                             
                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($user) && in_array((int) $user->role, [2, 3, 4, 5], true)): ?>

@@ -22,7 +22,8 @@ class User extends Authenticatable
         'password',
         'role',
         'college_id',
-        'profile_picture',
+        'profile_picture_data',
+        'profile_picture_mime',
         'RFID_code',
         'acc_status',
     ];

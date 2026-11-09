@@ -95,7 +95,7 @@ class schedulecontroller extends Controller
             'Course' => ['required', 'exists:courses,id'],
             'Room' => ['required', 'exists:room,id'],
             'user_id' => ['required', 'exists:users,id'],
-
+            'sched_Status' => ['required'],
             'Semester' => ['required', 'string'],
             'School_year' => ['required', 'string'],
 

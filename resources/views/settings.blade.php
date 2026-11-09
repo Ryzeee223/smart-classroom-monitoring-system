@@ -49,7 +49,7 @@
             </div>
 
             <div class="card-body">
-                @if ((int) (session('user_role') ?? 0) === 1)
+                @if ((int) (session('user_role') ?? 0) === 2 || (int) (session('user_role') ?? 0) === 3)
                     @include('partials.school-year-settings')
 
                     <!-- RFID Assign -->

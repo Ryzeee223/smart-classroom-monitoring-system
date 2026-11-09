@@ -49,6 +49,9 @@ class AdminController extends Controller
 
 public function store(Request $request)
     {
+        $rfidCode = strtoupper(trim((string) $request->input('RFID_code', '')));
+        $request->merge(['RFID_code' => $rfidCode === '' ? null : $rfidCode]);
+
         $request->validate([
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
@@ -57,6 +60,7 @@ public function store(Request $request)
             'password' => 'required|string|min:8',
             'role' => 'required|integer',
             'college_id' => 'required|exists:college,id',
+            'RFID_code' => 'nullable|string|max:50|unique:users,RFID_code',
         ]);
 
 
@@ -71,7 +75,7 @@ public function store(Request $request)
             'password' => bcrypt($request->password),
             'college_id' => $request->college_id,
             'profile_picture' => null,
-            'RFID_code' => null,
+            'RFID_code' => $request->input('RFID_code'),
             'acc_status' => 'Present',
         ]);
 

@@ -1,6 +1,6 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
-#include <WiFiClientSecure.h>
+// #include <WiFiClientSecure.h> //only enable me for vercel
 #include <SPI.h>
 #include <MFRC522.h>
 #include <Adafruit_GFX.h>
@@ -22,28 +22,21 @@
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST, TFT_MISO);
 
 // --- Network & API Configuration ---
+// const char* ssid ="vivo Y02A";
+// const char* password="okay2314";
+
 const char* ssid     = "Our2.4G";
 const char* password = "RZE-2004";
 
-// const char* ssid     = "Ryze";
-// const char* password = "Rize212004";
-
-// const char* ssid     = "ROUGEASSASIN 0491";
-// const char* password = "test123456";
-
-// const char* ssid     = "Hexx";
-// const char* password = "12345678";
-
-
 //online
-const char* settingsUrl = "https://rfinside.vercel.app/api/rfid-scan";
-const char* attendanceLcdUrl = "https://rfinside.vercel.app/api/attendance-scan?format=lcd";
-const char* lcdUrl = "https://rfinside.vercel.app/api/live-classrooms?room=";
+// const char* settingsUrl = "https://rfinside.vercel.app/api/rfid-scan";
+// const char* attendanceLcdUrl = "https://rfinside.vercel.app/api/attendance-scan?format=lcd";
+// const char* lcdUrl = "https://rfinside.vercel.app/api/live-classrooms?room=";
 
 // local, refer to the ip address of the laptop for the .x.x
-// const char* settingsUrl ="http://192.168.100.2:8000/api/rfid-scan";
-// const char* attendanceLcdUrl = "http://192.168.100.2:8000/api/check-latest-attendance";
-// const char* lcdUrl = "http://192.168.100.2:8000/api/live-classrooms";
+const char* settingsUrl ="http://192.168.100.2:8000/api/rfid-scan";
+const char* attendanceLcdUrl = "http://192.168.100.2:8000/api/attendance-scan?format=lcd";
+const char* lcdUrl = "http://192.168.100.2:8000/api/live-classrooms?room=";
 
 
 const char* room = "CC101";
@@ -128,8 +121,9 @@ void checkWiFiConnection() {
 void postScan(const char* scanUrl, const String& jsonPayload, bool showAttendance = false) {
   if (WiFi.status() != WL_CONNECTED) return;
 
-  WiFiClientSecure client;
-  client.setInsecure(); // Bypass SSL certificate validation for Vercel
+  // WiFiClientSecure client; //only set me for vercel
+  WiFiClient client; //only set me for local server
+  // client.setInsecure(); // Bypass SSL certificate validation for Vercel
 
   HTTPClient http;
   if (http.begin(client, scanUrl)) {
@@ -137,17 +131,19 @@ void postScan(const char* scanUrl, const String& jsonPayload, bool showAttendanc
     http.addHeader("Content-Type", "application/json");
 
     int responseCode = http.POST(jsonPayload);
-    if (responseCode > 0) {
+    if (responseCode >= HTTP_CODE_OK && responseCode < 300) {
       String responseBody = http.getString();
       responseBody.replace("\r", "");
       responseBody.trim();
 
-      if (responseBody.length() > 0) {
+      if (responseBody.length() > 0 && !responseBody.startsWith("<")) {
         int separator = responseBody.indexOf('|');
         if (separator >= 0) {
           updateTftText(responseBody.substring(0, separator), responseBody.substring(separator + 1), ILI9341_GREEN);
+        } else if (showAttendance) {
+          updateTftText("Invalid server", "response");
         } else {
-          updateTftText("Response:", responseBody.substring(0, 20), ILI9341_GREEN);
+          updateTftText("Card received", "UID sent");
         }
 
         if (showAttendance) {
@@ -155,7 +151,13 @@ void postScan(const char* scanUrl, const String& jsonPayload, bool showAttendanc
         } else {
           delay(3000); // Standard delay for settings responses
         }
+      } else {
+        Serial.println("[Scan] Ignored unexpected response body.");
+        updateTftText("Invalid server", "response");
       }
+    } else {
+      Serial.printf("[Scan] Request failed with HTTP status %d\n", responseCode);
+      updateTftText("Server error", String(responseCode));
     }
     http.end();
   }
@@ -168,45 +170,55 @@ void pollLcdDisplay() {
   }
   lastLcdPoll = millis();
 
-  WiFiClientSecure client;
-  client.setInsecure();
+  // WiFiClientSecure client; //for vercel
+  WiFiClient client;
+  // client.setInsecure(); //for vercel
 
   HTTPClient http;
   String lcdRequestUrl = String(lcdUrl) + room;
   if (http.begin(client, lcdRequestUrl)) {
     int responseCode = http.GET();
-    if (responseCode > 0) {
+    if (responseCode == HTTP_CODE_OK) {
       String payload = http.getString();
       payload.replace("\r", "");
       payload.trim();
 
-      if (payload.length() > 0) {
-        bool isClassUpdate = payload.startsWith("LCD:");
-        String displayText = isClassUpdate ? payload.substring(4) : payload;
+      bool hasExpectedFields = payload.startsWith("Faculty: ");
+      const char* expectedLabels[] = {"Course: ", "Time: ", "Attend: ", "Room: "};
+      int separator = 0;
+      for (int i = 0; hasExpectedFields && i < 4; i++) {
+        separator = payload.indexOf('|', separator);
+        hasExpectedFields = separator >= 0
+            && payload.substring(separator + 1).startsWith(expectedLabels[i]);
+        separator++;
+      }
+      hasExpectedFields = hasExpectedFields
+          && payload.indexOf('|', separator) < 0
+          && payload.indexOf('<') < 0;
+
+      if (hasExpectedFields) {
+        String displayText = payload;
         String lines[5];
         int start = 0;
-        bool hasFiveLines = true;
 
         for (int i = 0; i < 5; i++) {
           int separator = displayText.indexOf('|', start);
-          if (i < 4 && separator < 0) {
-            hasFiveLines = false;
-            break;
-          }
-
           int end = separator < 0 ? displayText.length() : separator;
           lines[i] = displayText.substring(start, end);
           start = end + 1;
         }
 
-        if (hasFiveLines
-            && (long)(millis() - attendanceDisplayUntil) >= 0
+        if ((long)(millis() - attendanceDisplayUntil) >= 0
             && (classDisplayNeedsRefresh || displayText != lastClassDisplayPayload)) {
           updateTftLines(lines);
           lastClassDisplayPayload = displayText;
           classDisplayNeedsRefresh = false;
         }
+      } else {
+        Serial.println("[LCD] Ignored unexpected response; expected five plain-text room fields.");
       }
+    } else {
+      Serial.printf("[LCD] Request failed with HTTP status %d\n", responseCode);
     }
     http.end();
   }
