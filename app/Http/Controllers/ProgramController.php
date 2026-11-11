@@ -72,7 +72,7 @@ class ProgramController extends Controller
         }
 
         $program = Programs::findOrFail($id);
-        return view('program.edit', compact('program'));
+        return view('programs.edit', compact('program'));
     }
 
     public function update(Request $request, $id)

@@ -240,44 +240,7 @@
     </main>
 </div>
 
-@if(session('error') || session('success') || $errors->any())
-    @php
-        $roomNotificationIsError = session()->has('error') || $errors->any();
-        $roomNotificationMessage = session('error') ?? session('success');
-    @endphp
-    <div class="modal fade" id="roomNotificationModal" tabindex="-1" aria-labelledby="roomNotificationModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header {{ $roomNotificationIsError ? 'text-bg-danger' : 'text-bg-success' }}">
-                    <h5 class="modal-title" id="roomNotificationModalLabel">
-                        {{ $roomNotificationIsError ? 'Unable to complete request' : 'Success' }}
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    @if($roomNotificationMessage)
-                        <p class="mb-0">{{ $roomNotificationMessage }}</p>
-                    @endif
-                    @if($errors->any())
-                        <ul class="mb-0 {{ $roomNotificationMessage ? 'mt-2' : '' }}">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    @endif
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('roomNotificationModal')).show();
-        });
-    </script>
-@endif
+@include('partials.feedback-modal')
 
 <script>
     function filterBuildingsByCollege() {

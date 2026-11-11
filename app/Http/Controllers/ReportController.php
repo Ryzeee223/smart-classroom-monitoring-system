@@ -5,6 +5,7 @@ use App\Models\Schedule;
 use App\Models\semyr;
 use App\Models\Report;
 use App\Models\room;
+use App\Models\users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -28,6 +29,19 @@ class ReportController extends Controller
         $currentUserId = session('user_id');
         $currentUser = \App\Models\users::find($currentUserId);
         $collegeId = (int) ($currentUser?->college_id ?? session('college_id') ?? 0);
+        $isDean = (int) ($currentUser?->role ?? 0) === 2;
+
+        $facultyMembers = collect();
+        $rooms = collect();
+
+        if ($isDean && $currentUser?->college_id) {
+            $facultyMembers = users::query()
+                ->whereIn('role', [2, 3, 4, 5])
+                ->where('college_id', $currentUser->college_id)
+                ->orderBy('first_name')
+                ->orderBy('last_name')
+                ->get();
+        }
 
         // Attendance is the source of report rows. Schedule only supplies
         // the planned class time and course code for each attendance record.
@@ -95,60 +109,64 @@ class ReportController extends Controller
             ];
         })->sortBy(fn ($item) => $item['start_datetime']?->timestamp ?? PHP_INT_MAX)->values();
 
-        $rooms = room::query()
-            ->with(['building', 'schedules:id,room_id,day,start_time,end_time'])
-            ->get();
+        if ($isDean) {
+            $rooms = room::query()
+                ->with(['building', 'schedules:id,room_id,day,start_time,end_time'])
+                ->get();
 
-        $dayStartMinutes = 7 * 60;
-        $dayEndMinutes = 18 * 60 + 30;
-        $availableMinutesPerWeek = ($dayEndMinutes - $dayStartMinutes) * 7;
+            $dayStartMinutes = 7 * 60;
+            $dayEndMinutes = 18 * 60 + 30;
+            $availableMinutesPerWeek = ($dayEndMinutes - $dayStartMinutes) * 7;
 
-        $rooms->each(function (room $room) use ($dayStartMinutes, $dayEndMinutes, $availableMinutesPerWeek): void {
-            $scheduledMinutes = 0;
+            $rooms->each(function (room $room) use ($dayStartMinutes, $dayEndMinutes, $availableMinutesPerWeek): void {
+                $scheduledMinutes = 0;
 
-            foreach ($room->schedules->groupBy(fn ($schedule) => substr(strtolower(trim((string) $schedule->day)), 0, 3)) as $daySchedules) {
-                $intervals = $daySchedules->map(function ($schedule) use ($dayStartMinutes, $dayEndMinutes): ?array {
-                    $start = Carbon::parse($schedule->start_time);
-                    $end = Carbon::parse($schedule->end_time);
-                    $startMinutes = max($dayStartMinutes, ($start->hour * 60) + $start->minute);
-                    $endMinutes = min($dayEndMinutes, ($end->hour * 60) + $end->minute);
+                foreach ($room->schedules->groupBy(fn ($schedule) => substr(strtolower(trim((string) $schedule->day)), 0, 3)) as $daySchedules) {
+                    $intervals = $daySchedules->map(function ($schedule) use ($dayStartMinutes, $dayEndMinutes): ?array {
+                        $start = Carbon::parse($schedule->start_time);
+                        $end = Carbon::parse($schedule->end_time);
+                        $startMinutes = max($dayStartMinutes, ($start->hour * 60) + $start->minute);
+                        $endMinutes = min($dayEndMinutes, ($end->hour * 60) + $end->minute);
 
-                    return $endMinutes > $startMinutes ? [$startMinutes, $endMinutes] : null;
-                })->filter()->sortBy(0)->values();
+                        return $endMinutes > $startMinutes ? [$startMinutes, $endMinutes] : null;
+                    })->filter()->sortBy(0)->values();
 
-                $currentInterval = null;
-                foreach ($intervals as [$start, $end]) {
-                    if ($currentInterval === null) {
+                    $currentInterval = null;
+                    foreach ($intervals as [$start, $end]) {
+                        if ($currentInterval === null) {
+                            $currentInterval = [$start, $end];
+                            continue;
+                        }
+
+                        if ($start <= $currentInterval[1]) {
+                            $currentInterval[1] = max($currentInterval[1], $end);
+                            continue;
+                        }
+
+                        $scheduledMinutes += $currentInterval[1] - $currentInterval[0];
                         $currentInterval = [$start, $end];
-                        continue;
                     }
 
-                    if ($start <= $currentInterval[1]) {
-                        $currentInterval[1] = max($currentInterval[1], $end);
-                        continue;
+                    if ($currentInterval !== null) {
+                        $scheduledMinutes += $currentInterval[1] - $currentInterval[0];
                     }
-
-                    $scheduledMinutes += $currentInterval[1] - $currentInterval[0];
-                    $currentInterval = [$start, $end];
                 }
 
-                if ($currentInterval !== null) {
-                    $scheduledMinutes += $currentInterval[1] - $currentInterval[0];
-                }
-            }
-
-            $room->setAttribute(
-                'utilization_percentage',
-                round(($scheduledMinutes / $availableMinutesPerWeek) * 100, 1)
-            );
-            $room->setAttribute('scheduled_hours_per_week', round($scheduledMinutes / 60, 1));
-        });
+                $room->setAttribute(
+                    'utilization_percentage',
+                    round(($scheduledMinutes / $availableMinutesPerWeek) * 100, 1)
+                );
+                $room->setAttribute('scheduled_hours_per_week', round($scheduledMinutes / 60, 1));
+            });
+        }
 
         $nextClass = $facultySchedules->first();
 
         return view('reports', [
             'facultySchedules' => $facultySchedules,
+            'facultyMembers' => $facultyMembers,
             'rooms' => $rooms,
+            'isDean' => $isDean,
             'nextClass' => $nextClass,
             'todayLabel' => $now->translatedFormat('l, F d, Y'),
             'currentSemester' => $currentSemester,

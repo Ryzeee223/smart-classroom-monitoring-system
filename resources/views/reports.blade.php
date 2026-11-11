@@ -87,10 +87,10 @@
 
     <div class="container-fluid p-5 mt-3">
         <div class="row justify-content-end">
-            <div class="col-md-9">
+            <div class="col-md-9  shadow">
 
                 <div class="card schedule-card shadow-sm border-1">
-                    <div class="schedule-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div class="schedule-header d-flex justify-content-between align-items-center flex-wrap gap-3 ">
                         <div>
                             <h5 class="mb-1 fw-bold text-dark">Faculty Schedule Overview</h5>
                             <small class="text-muted d-block">{{ $todayLabel ?? now()->translatedFormat('l, F d, Y') }}</small>
@@ -163,11 +163,13 @@
                     </div>
                   </div>
                 </div>
-            {{-- Room utilization --}}
+            
+                @if($isDean)
+                {{-- Room utilization --}}
             @php
                 $availableRoomHoursPerWeek = 80.5;
             @endphp
-            <div class="col-md-9 d-box justify-content-center">
+            <div class="col-md-9 d-box justify-content-center mt-5">
                 <div class="card rooms-card shadow">
                     <div class="card-header">
                         <h2 class="h5 mb-1">Room Utilization</h2>
@@ -211,15 +213,49 @@
             </div>
 
             {{-- Instructional Faculty Load --}}
-            <div class="col-md-9 d-box justify-content-center mt-5 card">
-                <div class="card-header">
-                    <h5 class="mb-1 fw-bold text-dark">Instructional Faculty Load</h5>
-                    
-                </div>
-                <div class="card-body">
 
+                <div class="col-md-9 mt-4 d-box">
+                    <div class="card shadow-lg ">
+                        <div class="card-header">
+                            <h5>Individual Faculty Load</h5>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap gap-2">
+                                @forelse($facultyMembers as $faculty)
+                                    @php
+                                        $facultyLoadModalId = 'facultyLoadModal' . $faculty->id;
+                                        $facultyName = trim($faculty->first_name . ' ' . $faculty->last_name) ?: 'Faculty';
+                                    @endphp
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-primary rounded-pill"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#{{ $facultyLoadModalId }}"
+                                    >
+                                        {{ $facultyName }}
+                                    </button>
+
+                                    <div class="modal fade" id="{{ $facultyLoadModalId }}" tabindex="-1" aria-labelledby="{{ $facultyLoadModalId }}Label" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="{{ $facultyLoadModalId }}Label">{{ $facultyName }}</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <p class="text-muted mb-0">No faculty available.</p>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+
+                @endif
 
             </div>
         </div>  

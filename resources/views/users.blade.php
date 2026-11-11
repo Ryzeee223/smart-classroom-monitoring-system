@@ -80,7 +80,7 @@ body {
         </div>
 
         <!-- main content -->
-        <main class="container py-2 shadow-sm bg-light rounded-3">
+        <main class="container py-2 bg-light rounded-3">
 
             <h1 class="mb-4">Users Management</h1>
 
@@ -91,7 +91,7 @@ body {
 
     <div class="row g-4 mb-4">
         <div class="col-lg-6">
-        <div class="card p-3 shadow-sm bg-white border-1" >
+        <div class="card p-3 shadow-lg bg-white border-1 h-100 card" >
 
             <form action="{{ route('users.store') }}" method="POST">
                  @csrf
@@ -166,7 +166,8 @@ body {
                     <div class="form-label form-label-sm">Last Name
                     <input type="text" class="form-control form control-sm" name="last_name" id="last_name-lead" placeholder="Enter last name">
                 </div>
-            </div>
+            
+        </div>
 
             {{-- Educ attain & acad rank --}}
 <div class="row g-2 mt-2 d-box">
@@ -302,11 +303,11 @@ body {
                         window.setInterval(readScannedRfid, 2000);
                     });
                 </script>
-            </form>
+         </form>
         </div>
         </div>
         <div class="col-lg-6">
-        <div class="card p-3 shadow-sm bg-white border-1 h-100">
+        <div class="card p-3 shadow-lg bg-white border-1 h-100 card">
             <h5 class="mb-3 d-flex justify-content-between align-items-center">
                 User Accounts
                

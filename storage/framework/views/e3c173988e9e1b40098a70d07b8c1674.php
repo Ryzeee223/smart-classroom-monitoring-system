@@ -93,9 +93,10 @@ while ($startTime <= $endTimeLimit) {
     <main class="app-shell__content d-flex justify-content-center">
         <div class="container-fluid px-3 px-lg-4 py-4">
             <div class="row align-items-start">
+
                 
-                <div class="col-12 mb-4">
-                    <div class="card schedule-form-card shadow-sm">
+                <div class="col-6 mb-4">
+                    <div class="card schedule-form-card shadow-lg">
                         <div class="card-header">
                             <h1 class="h5 mb-0">Add Faculty Schedule</h1>
                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($collegeName)): ?>
@@ -423,6 +424,7 @@ while ($startTime <= $endTimeLimit) {
                                             }
 
                                             // No conflicts: submit
+                                            window.showSubmitLoading(form);
                                             form.submit();
                                         });
 
@@ -454,8 +456,8 @@ while ($startTime <= $endTimeLimit) {
                 </div>
 
                 
-                <div class="col-md-12">
-                    <div class="card">
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow">
                         <div class="card-header">
                             <h5>Assigned Faculty Schedules</h5>
                             <span>Faculty schedules shown here and can be edited or delete</span>
@@ -495,6 +497,7 @@ while ($startTime <= $endTimeLimit) {
                                                 <div class="p-2 border rounded bg-light">
                                                     <div class="d-flex justify-content-between align-items-start">
                                                         <div>
+
                                                             
                                                             <strong><?php echo e($schedule->Program?->program_abbr ?? $schedule->programs?->program_abbr ?? 'N/A'); ?> <?php echo e($schedule->year_level ?? ''); ?> <?php echo e($schedule->section); ?></strong><br>
                                                             <strong><?php echo e($schedule->course->course_code ?? 'N/A'); ?></strong><br>
@@ -569,7 +572,7 @@ while ($startTime <= $endTimeLimit) {
 
 
                                                                     <div class="row">
-<div class="col-md-6 mb-3">
+                                                                    <div class="col-md-6 mb-3">
                                                                             <label class="form-label">Start Time</label>
                                                                             <select class="form-select" name="Start_time" required>
                                                                                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $startTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $start): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
@@ -633,6 +636,8 @@ while ($startTime <= $endTimeLimit) {
                         </div>
                     </div>
                 </div>
+
+                
             </div>
         </div>
     </main>

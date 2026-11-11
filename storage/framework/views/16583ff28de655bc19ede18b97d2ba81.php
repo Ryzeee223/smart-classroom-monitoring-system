@@ -87,10 +87,10 @@
 
     <div class="container-fluid p-5 mt-3">
         <div class="row justify-content-end">
-            <div class="col-md-9">
+            <div class="col-md-9  shadow">
 
                 <div class="card schedule-card shadow-sm border-1">
-                    <div class="schedule-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div class="schedule-header d-flex justify-content-between align-items-center flex-wrap gap-3 ">
                         <div>
                             <h5 class="mb-1 fw-bold text-dark">Faculty Schedule Overview</h5>
                             <small class="text-muted d-block"><?php echo e($todayLabel ?? now()->translatedFormat('l, F d, Y')); ?></small>
@@ -167,10 +167,12 @@
                   </div>
                 </div>
             
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($isDean): ?>
+                
             <?php
                 $availableRoomHoursPerWeek = 80.5;
             ?>
-            <div class="col-md-9 d-box justify-content-center">
+            <div class="col-md-9 d-box justify-content-center mt-5">
                 <div class="card rooms-card shadow">
                     <div class="card-header">
                         <h2 class="h5 mb-1">Room Utilization</h2>
@@ -215,15 +217,50 @@
             </div>
 
             
-            <div class="col-md-9 d-box justify-content-center mt-5 card">
-                <div class="card-header">
-                    <h5 class="mb-1 fw-bold text-dark">Instructional Faculty Load</h5>
-                    
-                </div>
-                <div class="card-body">
 
+                <div class="col-md-9 mt-4 d-box">
+                    <div class="card shadow-lg ">
+                        <div class="card-header">
+                            <h5>Individual Faculty Load</h5>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap gap-2">
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $facultyMembers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $faculty): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                    <?php
+                                        $facultyLoadModalId = 'facultyLoadModal' . $faculty->id;
+                                        $facultyName = trim($faculty->first_name . ' ' . $faculty->last_name) ?: 'Faculty';
+                                    ?>
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-primary rounded-pill"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#<?php echo e($facultyLoadModalId); ?>"
+                                    >
+                                        <?php echo e($facultyName); ?>
+
+                                    </button>
+
+                                    <div class="modal fade" id="<?php echo e($facultyLoadModalId); ?>" tabindex="-1" aria-labelledby="<?php echo e($facultyLoadModalId); ?>Label" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="<?php echo e($facultyLoadModalId); ?>Label"><?php echo e($facultyName); ?></h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                                    <p class="text-muted mb-0">No faculty available.</p>
+                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
             </div>
         </div>  

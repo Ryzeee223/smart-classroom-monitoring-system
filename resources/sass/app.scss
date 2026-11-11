@@ -6,3 +6,53 @@
 
 // Bootstrap
 @import 'bootstrap/scss/bootstrap';
+
+.modal.fade {
+    opacity: 0;
+    transition: opacity .3s ease-in-out;
+}
+
+.modal.fade.show {
+    opacity: 1;
+}
+
+.modal-backdrop.fade {
+    opacity: 0;
+    transition: opacity .3s ease-in-out;
+}
+
+.modal-backdrop.fade.show {
+    opacity: var(--bs-backdrop-opacity, .5);
+}
+
+.modal.fade .modal-dialog {
+    transform: translateY(1rem) scale(.98);
+    transition: transform .3s cubic-bezier(.2, .75, .3, 1);
+}
+
+.modal.show .modal-dialog {
+    transform: translateY(0) scale(1);
+}
+
+.modal.fade .modal-content {
+    opacity: 0;
+    transition: opacity .3s ease-in-out;
+}
+
+.modal.show .modal-content {
+    opacity: 1;
+}
+
+.form-submit-loading:disabled {
+    cursor: progress;
+    opacity: .8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .modal.fade,
+    .modal-backdrop.fade,
+    .modal.fade .modal-dialog,
+    .modal.fade .modal-content {
+        transition-duration: .01ms;
+    }
+}
