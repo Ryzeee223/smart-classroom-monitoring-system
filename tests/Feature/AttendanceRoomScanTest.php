@@ -122,6 +122,14 @@ class AttendanceRoomScanTest extends TestCase
         Carbon::setTestNow();
     }
 
+    public function test_dashboard_building_tabs_update_the_active_selection_state(): void
+    {
+        $this->get('/dashboard')
+            ->assertOk()
+            ->assertSee("classList.toggle('active', isActive)")
+            ->assertSee("setActiveBuildingButton(this)");
+    }
+
     public function test_room_validation_and_thirty_minute_early_check_in_grace(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-10-03 10:00:00', 'Asia/Manila'));

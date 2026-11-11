@@ -171,6 +171,15 @@ body {
                         return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
                     }
 
+                    function setActiveBuildingButton(button) {
+                        document.querySelectorAll('.building-tab').forEach(tab => {
+                            const isActive = tab === button;
+                            tab.classList.toggle('active', isActive);
+                            tab.setAttribute('aria-selected', String(isActive));
+                            tab.setAttribute('tabindex', isActive ? '0' : '-1');
+                        });
+                    }
+
                     function renderForBuilding(abbr, name) {
                         if (!grid) return;
 
@@ -246,6 +255,7 @@ body {
                             btn.addEventListener('click', function () {
                                 const abbr = this.getAttribute('data-building') || '';
                                 const name = this.getAttribute('data-building-name') || '';
+                                setActiveBuildingButton(this);
                                 renderForBuilding(abbr, name);
                             });
                         });

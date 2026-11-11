@@ -210,6 +210,19 @@
                                                         <option value="" selected disabled>Select option</option>
                                                         <option value="Sick leave">Sick leave</option>
                                                         <option value="official business leave">Official Business leave</option>
+                                                        <option value="vacation leave">Vacation leave</option>
+                                                        <option value="maternity leave">Maternity leave</option>
+                                                        <option value="paternity leave">Paternity leave</option>
+                                                        <option value="Special privilege leave">Special Privilege leave</option>
+                                                        <option value="Special Leave benefit for women">Special leave benefit for women</option>
+                                                        <option value="Special emergency Calamity leave">Special emergency Calamity leave</option>
+                                                        <option value="10-day VAWC leave">10-day VAWC leave</option>
+                                                        <option value="Solo parent leave">Solo parent leave</option>
+                                                        <option value="Study leave">Study leave</option>
+                                                        <option value="Adoption leave">Adoption leave</option>
+                                                        <option value="Parental leave">Parental leave</option>
+                                                        <option value="other">Other</option>
+
                                                         
                                                         
                                                     </select>

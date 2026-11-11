@@ -1,0 +1,2 @@
+<link rel="icon" type="image/png" href="<?php echo e(asset('icons/logo.png')); ?>">
+<?php /**PATH /Volumes/shared file/4th year/capstone project/RFInsiDe/resources/views/partials/favicon.blade.php ENDPATH**/ ?>
