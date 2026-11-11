@@ -80,7 +80,7 @@ class collegecontroller extends Controller
         return back()->with('success', 'College updated successfully!');
     }
 
-    public function destroy(College $college)
+    public function softDelete(College $college)
     {
         if (!session('logged_in')) {
             return redirect('/');
@@ -88,7 +88,6 @@ class collegecontroller extends Controller
 
         $college->delete();
 
-        return back()->with('success', 'College deleted successfully!');
+        return back()->with('success', 'College archived successfully!');
     }
 }
-

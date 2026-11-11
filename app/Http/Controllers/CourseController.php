@@ -35,8 +35,8 @@ class CourseController extends Controller
         $request->validate([
             'college_id' => 'required|integer|exists:college,id',
             'course_code' => 'required|string|max:100|unique:courses,course_code',
-            'course_name' => 'required|string|max:150',
-            'description' => 'nullable|string',
+            'unit'=> 'required|integer|max:3',
+            'course_name' => 'string, max:100'
         ]);
 
         $collegeId = (int) $request->input('college_id');
@@ -103,7 +103,7 @@ class CourseController extends Controller
         return redirect()->route('course')->with('success', 'Course updated successfully!');
     }
 
-    public function destroy($id)
+    public function softDelete($id)
     {
         if (!session('logged_in')) {
             return redirect('/');
@@ -111,6 +111,6 @@ class CourseController extends Controller
 
         Course::findOrFail($id)->delete();
 
-        return back()->with('success', 'Course deleted successfully!');
+        return back()->with('success', 'Course archived successfully!');
     }
 }

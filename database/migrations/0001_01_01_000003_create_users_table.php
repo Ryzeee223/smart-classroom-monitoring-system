@@ -16,15 +16,17 @@ return new class extends Migration
 
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->img('profile_picture')->nullable();
             $table->string('first_name', 100);
             $table->string('last_name', 100);
             $table->string('middle_name', 100);
+            $table->string('Academic_rank', 100)->nullable();
             $table->string('employee_ID', 255)->unique();
             $table->string('email', 100)->unique();
-            $table->string('profile_picture', 255)->nullable();
             $table->string('password');
             $table->integer('role');
+            $table->string('profile_picture', 255)->nullable();
+            $table->string('Advisory_class')->nullable();
+            $table->integer('class_count')->nullable();
             $table->foreignId('college_id')->constrained('college')->onDelete('cascade');
             $table->string('RFID_code', 50)->nullable()->unique();
             $table->string('acc_status', 70)->default('Present');

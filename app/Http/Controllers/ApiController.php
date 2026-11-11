@@ -85,15 +85,15 @@ class ApiController extends Controller
                 : 'Scan: ' . ucfirst((string) ($attendanceData['status'] ?? 'error'));
 
             if (!empty($attendanceData['time_out'])) {
-                $lineTwo = 'Out: ' . $attendanceData['time_out'];
+                $lineTwo = 'Out: ' . Carbon::parse($attendanceData['time_out'])->format('g:i A');
             } elseif (!empty($attendanceData['time_in'])) {
-                $lineTwo = 'In: ' . $attendanceData['time_in'];
+                $lineTwo = 'In: ' . Carbon::parse($attendanceData['time_in'])->format('g:i A');
             } else {
                 $lineTwo = $attendanceData['message'] ?? 'No attendance update';
             }
 
             return response(implode('|', array_map(
-                fn ($line) => substr(str_replace('|', ' ', $line), 0, 20),
+                fn ($line) => substr(str_replace('|', ' ', $line), 0, 24),
                 [$lineOne, $lineTwo]
             )))->header('Content-Type', 'text/plain');
         }
@@ -316,8 +316,8 @@ class ApiController extends Controller
                 ];
             } else {
                 $faculty = trim(($schedule->User?->first_name ?? '') . ' ' . ($schedule->User?->last_name ?? ''));
-                $startTime = Carbon::parse($schedule->start_time)->format('H:i');
-                $endTime = Carbon::parse($schedule->end_time)->format('H:i');
+                $startTime = Carbon::parse($schedule->start_time)->format('g:i A');
+                $endTime = Carbon::parse($schedule->end_time)->format('g:i A');
                 $lcdLines = [
                     'Faculty: ' . ($faculty ?: 'Unknown'),
                     'Course: ' . ($schedule->course?->course_code ?? $schedule->course?->course_name ?? 'Class'),
@@ -328,7 +328,7 @@ class ApiController extends Controller
             }
 
             $lcdLines = array_map(
-                fn ($line) => substr(str_replace('|', ' ', $line), 0, 20),
+                fn ($line) => substr(str_replace('|', ' ', $line), 0, 24),
                 $lcdLines
             );
 

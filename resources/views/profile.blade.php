@@ -17,17 +17,7 @@
                 <div class="col-md-3">@include('sidebar')</div>
 
                 <div class="col-md-9 mt-5">
-                    @if(session('success'))
-                                <div class="alert alert-success">{{ session('success') }}</div>
-                            @endif
-
-                            @if($errors->any())
-                                <div class="alert alert-danger">
-                                    @foreach($errors->all() as $error)
-                                        <div>{{ $error }}</div>
-                                    @endforeach
-                                </div>
-                            @endif
+                    @include('partials.feedback-modal')
                     <div class="card shadow-sm">
                         <div class="card-body">
                             
@@ -36,7 +26,12 @@
                                 @php
                                   
                                     $profileUrl = null;
-                                    if (isset($user) && $user && !empty($user->profile_picture)) {
+                                    if (isset($user) && $user && !empty($user->profile_picture_mime)) {
+                                        $profileUrl = route('profile.picture', [
+                                            'user' => $user->id,
+                                            'v' => $user->updated_at?->timestamp,
+                                        ]);
+                                    } elseif (isset($user) && $user && !empty($user->profile_picture)) {
                                         $pic = $user->profile_picture;
 
                                         // If it already contains the directory, use it as-is
@@ -46,8 +41,6 @@
                                             // Assume it's a filename only
                                             $profileUrl = asset('storage/profile_pictures/' . ltrim((string) $pic, '/'));
                                         }
-                                    } elseif (isset($user) && $user && !empty($user->profile_picture_mime)) {
-                                        $profileUrl = route('profile.picture', $user->id);
                                     }
 
 
@@ -76,9 +69,6 @@
                                         alt="Profile picture"
                                         style="width:140px; height:140px; object-fit:cover; border-radius:50%;"
                                     >
-                                    <button class="btn btn-outline-primary btn-sm d-block mt-2 mx-auto" type="button" data-bs-toggle="modal" data-bs-target="#updateProfilePictureModal">
-                                        Change picture
-                                    </button>
                                 </div>
 
                                 <div>
@@ -101,56 +91,40 @@
                                 </div>
                                 
                             </div>
-                            <div class="modal fade" id="updateProfilePictureModal" tabindex="-1" aria-labelledby="updateProfilePictureModalLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <form class="modal-content" action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
-                                        @csrf
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="updateProfilePictureModalLabel">Update profile picture</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body text-center">
-                                            <img
-                                                id="profilePicturePreview"
-                                                src="{{ $profileUrl ?? asset('images/default-avatar.png') }}"
-                                                alt="Selected profile picture preview"
-                                                class="rounded-circle mb-3"
-                                                style="width:140px; height:140px; object-fit:cover;"
-                                            >
-                                            <label for="profilePictureInput" class="form-label d-block text-start">Choose an image</label>
-                                            <input
-                                                type="file"
-                                                class="form-control @error('profile_picture') is-invalid @enderror"
-                                                id="profilePictureInput"
-                                                name="profile_picture"
-                                                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-                                                required
-                                            >
-                                            <div class="form-text text-start">JPG, PNG, or WebP. Maximum file size: 2 MB.</div>
-                                            @error('profile_picture')
-                                                <div class="invalid-feedback d-block text-start">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                            <button type="submit" class="btn btn-primary">Save picture</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
                             <hr>
                             <div class="d-flex justify-content-center">
                                 <button class="btn btn-primary" id="changeprofilename" type="button" data-bs-toggle="modal" data-bs-target="#updateProfileNameModal">Update Profile</button>
                             </div>
                             <div class="modal fade" id="updateProfileNameModal" tabindex="-1" aria-labelledby="updateProfileNameModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
-                                    <form class="modal-content" action="{{ route('profile.name.update') }}" method="POST">
+                                    <form class="modal-content" action="{{ route('profile.name.update') }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         <div class="modal-header">
                                             <h5 class="modal-title" id="updateProfileNameModalLabel">Update Profile</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
+                                            <div class="mb-3 text-center">
+                                                <img
+                                                    id="profilePicturePreview"
+                                                    src="{{ $profileUrl ?? asset('images/default-avatar.png') }}"
+                                                    alt="Profile picture preview"
+                                                    class="rounded-circle mb-2"
+                                                    style="width:120px; height:120px; object-fit:cover;"
+                                                >
+                                                <label for="profilePictureInput" class="form-label d-block text-start">Profile picture <span class="text-muted">(optional)</span></label>
+                                                <input
+                                                    type="file"
+                                                    class="form-control @error('profile_picture') is-invalid @enderror"
+                                                    id="profilePictureInput"
+                                                    name="profile_picture"
+                                                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                                                >
+                                                <div class="form-text text-start">JPG, PNG, or WebP. Maximum file size: 2 MB. Leave empty to keep your current picture.</div>
+                                                @error('profile_picture')
+                                                    <div class="invalid-feedback d-block text-start">{{ $message }}</div>
+                                                @enderror
+                                            </div>
                                             <div class="mb-3">
                                                 <label for="profileFirstName" class="form-label">First name</label>
                                                 <input type="text" class="form-control @error('first_name') is-invalid @enderror" id="profileFirstName" name="first_name" value="{{ old('first_name', $user->first_name ?? '') }}" maxlength="100" required>
@@ -175,12 +149,12 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                            <button type="submit" class="btn btn-primary">Save Name</button>
+                                            <button type="submit" class="btn btn-primary">Save Profile</button>
                                         </div>
                                     </form>
                                 </div>
                             </div>
-                            @if($errors->hasAny(['first_name', 'middle_name', 'last_name','employee_ID']))
+                            @if($errors->hasAny(['first_name', 'middle_name', 'last_name', 'employee_ID', 'profile_picture']))
                                 <script>
                                     document.addEventListener('DOMContentLoaded', function () {
                                         bootstrap.Modal.getOrCreateInstance(document.getElementById('updateProfileNameModal')).show();
@@ -206,14 +180,6 @@
                                     });
                                 });
                             </script>
-                            @if($errors->has('profile_picture'))
-                                <script>
-                                    document.addEventListener('DOMContentLoaded', function () {
-                                        bootstrap.Modal.getOrCreateInstance(document.getElementById('updateProfilePictureModal')).show();
-                                    });
-                                </script>
-                            @endif
-
                             {{-- request form + history --}}
                             @if(isset($user) && in_array((int) $user->role, [2, 3, 4, 5], true))
                                 <div class="mt-4">

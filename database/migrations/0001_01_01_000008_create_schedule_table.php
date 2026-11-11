@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('year_level', 50);
             $table->string('section', 1);
             $table->string('day');
-            $table->tring('sched_Status');
+            $table->string('sched_Status');
             $table->time('start_time');
             $table->time('end_time');
             $table->string('Semester', 20);

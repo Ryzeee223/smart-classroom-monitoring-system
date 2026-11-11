@@ -243,11 +243,11 @@
                                                                 Edit
                                                             </button>
 
-                                                            <form method="POST" action="{{ route('schedules.destroy', $schedule->id) }}" class="d-inline"
-                                                                  onsubmit="return confirm('Delete this schedule?')">
+                                                            <form method="POST" action="{{ route('schedules.archive', $schedule->id) }}" class="d-inline"
+                                                                  onsubmit="return confirm('Archive this schedule?')">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger">Archive</button>
                                                             </form>
                                                         </div>
                                                     </div>
@@ -341,4 +341,3 @@
 </div>
 </body>
 </html>
-

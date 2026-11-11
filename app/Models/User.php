@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\college;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected $table = 'users';
 
@@ -17,15 +18,18 @@ class User extends Authenticatable
         'first_name',
         'last_name',
         'middle_name',
+        'Academic_rank',
         'employee_ID',
         'email',
         'password',
         'role',
         'college_id',
+        'Advisory_class',
+        'class_count',
+        'acc_status',
         'profile_picture_data',
         'profile_picture_mime',
         'RFID_code',
-        'acc_status',
     ];
 
     protected $hidden = [

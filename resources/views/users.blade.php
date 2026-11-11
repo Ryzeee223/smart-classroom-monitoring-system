@@ -33,6 +33,15 @@ body {
         .account-row .col {
             padding: 0.25rem 0.5rem;
         }
+        .users-table-scroll {
+            max-height: 65vh;
+            overflow: auto;
+        }
+        .users-table-scroll thead {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -76,28 +85,12 @@ body {
             <h1 class="mb-4">Users Management</h1>
 
 
-         @if (session('success'))
-         <div class="alert alert-success alert-dismissible fade show" role="alert">
-             {{ session('success') }}
-             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-         </div>
-         @endif
-
-         @if ($errors->any())
-         <div class="alert alert-danger" role="alert">
-             <strong>Could not save user:</strong>
-             <ul class="mb-0">
-                 @foreach ($errors->all() as $error)
-                     <li>{{ $error }}</li>
-                 @endforeach
-             </ul>
-         </div>
-         @endif
+         @include('partials.feedback-modal')
 
     <!-- Add Users -->
 
     <div class="row g-4 mb-4">
-        <div class="col-lg-8">
+        <div class="col-lg-6">
         <div class="card p-3 shadow-sm bg-white border-1" >
 
             <form action="{{ route('users.store') }}" method="POST">
@@ -159,6 +152,37 @@ body {
                         <button class="btn btn-outline-secondary btn-sm" type="button" id="clearNewUserRfid">Clear</button>
                     </div>
                 </div>
+                {{-- basic info --}}
+                    <div class="col-md">
+
+                        {{-- Fill-up form basic info  --}}
+                        <label class="form-label form-label-sm">First Name</label>
+                        <input type="text" class="form-control form-control-sm" name="first_name" id="first_name-lead" placeholder="Enter first name">
+                    </div>
+                    <div class="col-md">
+                        <label class="form-label form-label-sm">Middle Initial</label>
+                        <input type="text" class="form-control form-control-sm" name="middle_name" id="middle_name-lead" placeholder="Enter middle initial">
+                    </div>
+                    <div class="form-label form-label-sm">Last Name
+                    <input type="text" class="form-control form control-sm" name="last_name" id="last_name-lead" placeholder="Enter last name">
+                </div>
+            </div>
+
+            {{-- Educ attain & acad rank --}}
+<div class="row g-2 mt-2 d-box">
+
+<div class="col-md-6 justify-content-center">
+<label for="eduAttain" class="form-label">Educational Attainment</label>
+<input type="text" class="form-control form-control-sm" placeholder="Enter Educational Attainment">
+</div>
+<div class="col-md-6 mt-2">
+    <label for="acadRank" class="form-label">Academic Rank</label>
+<input type="text" class="form-control form-control-sm" placeholder="Enter Academic Rank (e.g. Instructor I)">
+</div>
+
+</div>
+
+                {{-- roles --}}
                       <div class="row g-2 mt-2">
                     <div class="col-md">
                         <label class="form-label form-label-sm">Role</label>
@@ -192,20 +216,8 @@ body {
                     </div>
                 
                 </div>
-                    <div class="col-md">
 
-                        {{-- Fill-up form basic info  --}}
-                        <label class="form-label form-label-sm">First Name</label>
-                        <input type="text" class="form-control form-control-sm" name="first_name" id="first_name-lead" placeholder="Enter first name">
-                    </div>
-                    <div class="col-md">
-                        <label class="form-label form-label-sm">Middle Initial</label>
-                        <input type="text" class="form-control form-control-sm" name="middle_name" id="middle_name-lead" placeholder="Enter middle initial">
-                    </div>
-                    <div class="form-label form-label-sm">Last Name
-                    <input type="text" class="form-control form control-sm" name="last_name" id="last_name-lead" placeholder="Enter last name">
-                </div>
-            </div>
+
 
                 <div class="row g-2 mt-2">
                     <div class="col-md">
@@ -293,13 +305,13 @@ body {
             </form>
         </div>
         </div>
-        <div class="col-lg-4">
+        <div class="col-lg-6">
         <div class="card p-3 shadow-sm bg-white border-1 h-100">
             <h5 class="mb-3 d-flex justify-content-between align-items-center">
                 User Accounts
                
             </h5>
-            <div class="table-responsive mx-12 overflow-x-hidden mb-0">
+            <div class="table-responsive users-table-scroll mb-0">
                 <table class="table table-hover table-sm mb-0">
                     <thead class="table-light">
                         <tr>
@@ -307,7 +319,7 @@ body {
                             <th>Role</th>
                             <th>Status</th>
                             <th>RFID UID</th>
-                            
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -366,14 +378,15 @@ body {
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex align-items-center gap-2">
-                                        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" title="Edit"
+                                                data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">
                                             ✏️
-                                        </a>
+                                        </button>
 
-                                        <form method="POST" action="{{ route('users.destroy', $user->id) }}" onsubmit="return confirm('Delete this user?')" class="m-0">
+                                        <form method="POST" action="{{ route('users.archive', $user->id) }}" onsubmit="return confirm('Archive this user?')" class="m-0">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">🗑</button>
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Archive">🗑</button>
                                         </form>
                                     </div>
                                 </td>
@@ -386,6 +399,79 @@ body {
                     </tbody>
                 </table>
             </div>
+            @foreach($all_users as $user)
+                @php
+                    $uRole = (int) ($user->role ?? 0);
+                    $canView = $sessionRole === 1
+                        ? $uRole === 2
+                        : in_array($uRole, [3, 4, 5], true);
+                @endphp
+                @continue(!$canView)
+
+                <div class="modal fade" id="editUserModal{{ $user->id }}" tabindex="-1" aria-labelledby="editUserModalLabel{{ $user->id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                        <form method="POST" action="{{ route('users.update', $user->id) }}" class="modal-content">
+                            @csrf
+                            @method('PUT')
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editUserModalLabel{{ $user->id }}">Edit User</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="first_name_{{ $user->id }}" class="form-label">First Name</label>
+                                        <input id="first_name_{{ $user->id }}" type="text" class="form-control" name="first_name" value="{{ $user->first_name }}" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="middle_name_{{ $user->id }}" class="form-label">Middle Name</label>
+                                        <input id="middle_name_{{ $user->id }}" type="text" class="form-control" name="middle_name" value="{{ $user->middle_name }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="last_name_{{ $user->id }}" class="form-label">Last Name</label>
+                                        <input id="last_name_{{ $user->id }}" type="text" class="form-control" name="last_name" value="{{ $user->last_name }}" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="employee_ID_{{ $user->id }}" class="form-label">Employee ID</label>
+                                        <input id="employee_ID_{{ $user->id }}" type="text" class="form-control" name="employee_ID" value="{{ $user->employee_ID }}" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="role_{{ $user->id }}" class="form-label">Role</label>
+                                        <select id="role_{{ $user->id }}" name="role" class="form-select" required>
+                                            @foreach([2 => 'Dean', 3 => 'Assistant Dean', 4 => 'Faculty', 5 => 'Program Head'] as $roleId => $roleName)
+                                                <option value="{{ $roleId }}" {{ (int) $user->role === $roleId ? 'selected' : '' }}>{{ $roleName }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="acc_status_{{ $user->id }}" class="form-label">Status</label>
+                                        <select id="acc_status_{{ $user->id }}" name="acc_status" class="form-select">
+                                            <option value="Present" {{ $user->acc_status === 'Present' ? 'selected' : '' }}>Present</option>
+                                            <option value="Absent" {{ $user->acc_status === 'Absent' ? 'selected' : '' }}>Absent</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="Academic_rank_{{ $user->id }}" class="form-label">Academic Rank</label>
+                                        <input id="Academic_rank_{{ $user->id }}" type="text" class="form-control" name="Academic_rank" value="{{ $user->Academic_rank }}">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label for="Advisory_class_{{ $user->id }}" class="form-label">Advisory Class</label>
+                                        <input id="Advisory_class_{{ $user->id }}" type="text" class="form-control" name="Advisory_class" value="{{ $user->Advisory_class }}">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="class_count_{{ $user->id }}" class="form-label">Advisory Count</label>
+                                        <input id="class_count_{{ $user->id }}" type="number" class="form-control" name="class_count" value="{{ $user->class_count }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            @endforeach
         </div>
         </div>
     </div>

@@ -16,19 +16,7 @@
             <div class="container-fluid dashboard-container px-4">
         <div class="row">
             <div class="col-12 col-lg-6 mb-4">
-                @if ($errors->any())
-                                <div class="alert alert-danger mt-3">
-                                    <ul class="mb-0">
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            @endif
-
-                            @if (session('success'))
-                                <div class="alert alert-success mt-3">{{ session('success') }}</div>
-                            @endif
+                @include('partials.feedback-modal')
                 <div class="card shadow">
                     <div class="card-header">
                         
@@ -75,10 +63,10 @@
                                 </div>
                                 <div class="d-flex flex-column gap-1">
                                     <a class="btn btn-sm btn-outline-secondary" href="{{ route('college.edit', $college->id) }}">Edit</a>
-                                    <form method="POST" action="{{ route('college.destroy', $college->id) }}">
+                                    <form method="POST" action="{{ route('college.archive', $college->id) }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold" onclick="return confirm('Delete this college?')">Delete</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold" onclick="return confirm('Archive this college?')">Archive</button>
                                     </form>
                                 </div>
                             </li>

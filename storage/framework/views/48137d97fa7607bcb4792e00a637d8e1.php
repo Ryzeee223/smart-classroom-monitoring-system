@@ -60,12 +60,12 @@
                                 </div>
 
                                 <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
                                     <input type="text" name="course_name" placeholder="Course Name" class="form-control" required>
                                 </div>
-
                                 <div class="mb-3">
-                                    <label for="description" class="form-label">Description</label>
-                                    <input type="text" name="description" class="form-control">
+                                    <label for="unit" class="form-label">Unit</label>
+                                    <input type="number" class="form-control">
                                 </div>
 
                                 <button type="submit" class="btn btn-primary">Add Course</button>
@@ -145,20 +145,21 @@
                                             <th>Course</th>
                                             <th>Code</th>
                                             <th>Name</th>
-                                            <th>Desc</th>
+                                            <th>Unit</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        
                                         <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $course; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                                             <tr>
                                                 <td><?php echo e($course->course_name ?? 'N/A'); ?></td>
                                                 <td><?php echo e($course->course_code); ?></td>
                                                 <td><?php echo e($course->course_name); ?></td>
-                                                <td><?php echo e(Str::limit($course->description, 30)); ?></td>
+                                                <td><?php echo e(Str::limit($course->unit, 30)); ?></td>
                                                 <td class="text-nowrap">
                                                     <a href="<?php echo e(route('course.edit', $course->id)); ?>" class="btn btn-sm btn-outline-primary fw-semibold">Edit</a>
-                                                    <form method="POST" action="<?php echo e(route('course.destroy', $course->id)); ?>" class="d-inline" onsubmit="return confirm('Are you sure?')">
+                                                    <form method="POST" action="<?php echo e(route('course.archive', $course->id)); ?>" class="d-inline" onsubmit="return confirm('Delete this course?')">
                                                         <?php echo csrf_field(); ?>
                                                         <?php echo method_field('DELETE'); ?>
                                                         <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>

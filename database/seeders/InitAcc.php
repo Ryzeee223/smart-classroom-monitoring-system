@@ -102,7 +102,8 @@ class InitAcc extends Seeder
         course::create([
             'college_id' => 2,
             'course_code' => 'IT101',
-            'course_name' => 'Introduction to Programming'
+            'course_name' => 'Introduction to Programming',
+            'unit' => '2'
         ]);
 
         programs::create([

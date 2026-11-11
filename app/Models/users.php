@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class users extends model
 {
+    use SoftDeletes;
+
 protected $table = 'users';
 
     protected $hidden = ['password'];
@@ -39,4 +42,3 @@ protected $table = 'users';
     }
 
 }
-

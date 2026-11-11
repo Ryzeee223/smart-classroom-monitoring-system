@@ -43,7 +43,6 @@
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold' : '' }}" href="{{ route('dashboard') }}">📊Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('users.index') ? 'active fw-bold' : '' }}" href="{{ route('users.index') }}">👥Users</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('college') ? 'active fw-bold' : '' }}" href= "{{ route('college') }}">🏫Colleges</a></li>
-                <li class="nav-item"><a class="nav-link {{ request()->routeIs('rooms.index') ? 'active fw-bold' : '' }}" href="{{ route('rooms.index') }}">🏙Rooms and Buildings</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('settings') ? 'active fw-bold' : '' }}" href="{{ route('settings') }}">⚙️Settings</a></li>
                 {{-- for dean/asst dean--}}
             @elseif ($role === 2)
@@ -52,15 +51,17 @@
             {{-- users --}}
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('users.index') ? 'active fw-bold' : '' }}" href={{ route('users.index') }}>👥Users</a></li>
             {{-- mysched --}}
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('rooms.index') ? 'active fw-bold' : '' }}" href="{{ route('rooms.index') }}">🏙Rooms and Buildings</a></li>
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('myschedule') ? 'active fw-bold' : '' }}" href="{{ route('myschedule') }}">📆My Schedule</a></li>
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('schedules') ? 'active fw-bold' : '' }}" href="{{ route('schedules') }}">✏️Create Schedules</a></li>
             {{-- Subjects --}}
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('course') ? 'active fw-bold' : '' }}" href="{{ route ('course') }}">📚Course</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('course') ? 'active fw-bold' : '' }}" href="{{ route ('course') }}">📚Subject</a></li>
             {{-- schedule --}}
            {{-- College --}}
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('programs') || request()->routeIs('programs.index') ? 'active fw-bold' : '' }}" href="{{ route('programs') }}">🎓Programs</a></li>
             {{-- settings --}}
             <li class="nav-item"><a class="nav-link" href="{{ route('settings') }}">⚙️Settings</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('reports') ? 'active fw-bold' : '' }}" href="{{ route('reports') }}">📋Reports</a></li>
 
             @elseif ($role === 3)
             {{-- Asst Dean --}}
@@ -70,7 +71,7 @@
             {{-- mysched --}}
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('myschedule') ? 'active fw-bold' : '' }}" href="{{ route('myschedule') }}">📆My Schedule</a></li>
             {{-- Subjects --}}
-            <li class="nav-item"><a class="nav-link {{ request()->routeIs('course') ? 'active fw-bold' : '' }}" href="{{ route ('course') }}">📚Course</a></li>
+            <li class="nav-item"><a class="nav-link {{ request()->routeIs('course') ? 'active fw-bold' : '' }}" href="{{ route ('course') }}">📚Subject</a></li>
             {{-- schedule --}}
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('schedules') ? 'active fw-bold' : '' }}" href="{{ route('schedules') }}">✏️Create Schedules</a></li>
            {{-- College --}}

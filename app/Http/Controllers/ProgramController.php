@@ -98,7 +98,7 @@ class ProgramController extends Controller
         return redirect()->route('programs')->with('success', 'Program updated successfully!');
     }
 
-    public function destroy($id)
+    public function softDelete($id)
     {
         if (!session('logged_in')) {
             return redirect('/');
@@ -107,7 +107,6 @@ class ProgramController extends Controller
         $program = Programs::findOrFail($id);
         $program->delete();
 
-        return redirect()->route('programs')->with('success', 'Program deleted successfully!');
+        return redirect()->route('programs')->with('success', 'Program archived successfully!');
     }
 }
-

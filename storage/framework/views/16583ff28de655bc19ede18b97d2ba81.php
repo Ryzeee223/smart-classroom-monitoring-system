@@ -11,7 +11,7 @@
         body {
             background: #f5f7fb;
             overflow-x: auto;
-            overflow-y:hidden;
+            overflow-y: auto;
         }
 
         .schedule-card {
@@ -67,6 +67,14 @@
             padding: 1rem;
         }
 
+        .room-utilization-progress {
+            height: 0.75rem;
+        }
+
+        .room-utilization-label {
+            font-size: 0.875rem;
+        }
+
         @media (max-width: 767.98px) {
             .schedule-item {
                 padding: 0.85rem;
@@ -77,9 +85,9 @@
 <body>
     <?php echo $__env->make('sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-    <div class="container-fluid p-5 mt-3 mx-auto " style="max-width: 1200px;">
+    <div class="container-fluid p-5 mt-3">
         <div class="row justify-content-end">
-            <div class="col-xl-10 col-lg-12 col-md-12">
+            <div class="col-md-9">
 
                 <div class="card schedule-card shadow-sm border-1">
                     <div class="schedule-header d-flex justify-content-between align-items-center flex-wrap gap-3">
@@ -158,10 +166,69 @@
                     </div>
                   </div>
                 </div>
+            
+            <?php
+                $availableRoomHoursPerWeek = 80.5;
+            ?>
+            <div class="col-md-9 d-box justify-content-center">
+                <div class="card rooms-card shadow">
+                    <div class="card-header">
+                        <h2 class="h5 mb-1">Room Utilization</h2>
+                        <p class="text-muted mb-0">Scheduled time from 07:00 to 6:30, across all seven days</p>
+                    </div>
+
+                    <div class="card-body">
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $rooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                            <div class="room-utilization-item mb-3">
+                            <div class="room-utilization-label d-flex justify-content-between align-items-baseline gap-2 mb-1">
+                                    <span class="fw-semibold">
+                                        <?php echo e($room->room_name); ?>
+
+                                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($room->building?->bldg_abbr): ?>
+                                            <span class="text-muted fw-normal">(<?php echo e($room->building->bldg_abbr); ?>)</span>
+                                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                    </span>
+                                    <span class="text-muted text-end">
+                                        <?php echo e(number_format($room->utilization_percentage, 1)); ?>%
+                                        (<?php echo e(number_format($room->scheduled_hours_per_week, 1)); ?> of <?php echo e(number_format($availableRoomHoursPerWeek, 1)); ?> hours/week)
+                                    </span>
+                                </div>
+                                <div
+                                    class="progress room-utilization-progress"
+                                    role="progressbar"
+                                    aria-label="Room utilization for <?php echo e($room->room_name); ?>"
+                                    aria-valuenow="<?php echo e($room->utilization_percentage); ?>"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                >
+                                    <div
+                                        class="progress-bar"
+                                        style="width: <?php echo e($room->utilization_percentage); ?>%;"
+                                    ></div>
+                                </div>
+                            </div>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                            <p class="text-muted mb-0">No rooms available to display.</p>
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="col-md-9 d-box justify-content-center mt-5 card">
+                <div class="card-header">
+                    <h5 class="mb-1 fw-bold text-dark">Instructional Faculty Load</h5>
+                    
+                </div>
+                <div class="card-body">
+
+                </div>
+            </div>
+
             </div>
         </div>  
-            </div>
     </div>
+ </div>
     <?php echo $__env->make('partials.notifications-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
 

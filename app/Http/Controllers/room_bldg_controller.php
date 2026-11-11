@@ -33,7 +33,7 @@ class room_bldg_controller extends Controller
         return redirect()->back()->with('success', 'Room created successfully.');
     }
 
-    public function explode($id)
+    public function softDeleteBuilding($id)
     {
         if (!session('logged_in')) {
             return redirect('/');
@@ -41,25 +41,25 @@ class room_bldg_controller extends Controller
 
         $building = bldg::find($id);
         if (!$building) {
-            return redirect()->back()->with('error', 'building not found');
+            return redirect()->back()->with('error', 'Building not found.');
         }
 
         $building->delete();
-        return redirect()->back()->with('success', 'Building deleted');
+        return redirect()->back()->with('success', 'Building archived.');
     }
 
-    public function destroy($id)
+    public function softDeleteRoom($id)
     {
         if (!session ('logged_in')){
             return redirect('/');
         }
         $roomModel = room::find($id);
         if (!$roomModel) {
-            return redirect()->back()->with('error', 'room not found');
+            return redirect()->back()->with('error', 'Room not found.');
         }
 
         $roomModel->delete();
-        return redirect()->back()->with('success', 'room deleted');
+        return redirect()->back()->with('success', 'Room archived.');
 
     }
 
@@ -102,6 +102,7 @@ class room_bldg_controller extends Controller
             ->get();
 
         return view('rooms', compact('bldgModel', 'colleges', 'rooms'));
+        
     }
 
     public function display()

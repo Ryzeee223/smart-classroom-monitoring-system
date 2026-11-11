@@ -18,6 +18,49 @@
     body {
         overflow-x: hidden;
     }
+    .schedule-form-card {
+        border: 0;
+        border-radius: 0.75rem;
+        overflow: hidden;
+    }
+    .schedule-form-card > .card-header {
+        background: #fff;
+        border-bottom: 1px solid rgba(0, 0, 0, .08);
+        padding: 1rem 1.25rem;
+    }
+    .schedule-form-card > .card-body {
+        padding: 1.25rem;
+    }
+    .schedule-term-panel {
+        background: #f8f9fa;
+        border: 1px solid rgba(0, 0, 0, .08);
+        border-radius: .5rem;
+        padding: 1rem;
+    }
+    .schedule-day-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(4.5rem, 1fr));
+        gap: .5rem;
+    }
+    .schedule-day-option {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        min-height: 2.5rem;
+        padding: .5rem .65rem;
+        border: 1px solid #dee2e6;
+        border-radius: .375rem;
+        background: #fff;
+        cursor: pointer;
+    }
+    .schedule-day-option .form-check-input {
+        margin: 0;
+    }
+    @media (max-width: 575.98px) {
+        .schedule-form-card > .card-body {
+            padding: 1rem;
+        }
+    }
 </style>
 
 
@@ -35,7 +78,7 @@ $endTimeLimit = Carbon::createFromTimeString('17:00:00');
 
 while ($startTime <= $endTimeLimit) {
     $startTimes[] = $startTime->format('H:i:s'); // "07:00:00"
-    $startTimesDisplay[] = $startTime->format('g:i A'); // "7:00 AM"
+    $startTimesDisplay[] = $startTime->format('g:i A');
 
     $endTimes[] = $startTime->copy()->addHour()->format('H:i:s');
     $endTimesDisplay[] = $startTime->copy()->addHour()->format('g:i A');
@@ -48,58 +91,45 @@ while ($startTime <= $endTimeLimit) {
     @include('sidebar')
 
     <main class="app-shell__content d-flex justify-content-center">
-        <div class="container mt-5">
+        <div class="container-fluid px-3 px-lg-4 py-4">
             <div class="row align-items-start">
-                {{-- Conflict alert --}}
-                                <div id="scheduleConflictAlert" class="alert alert-danger mt-3 d-none" role="alert">
-                                    Schedule conflict detected. Please choose another time or room.
-                                </div>
                 {{-- ADD SCHEDULE FORM --}}
-                <div class="col-md-9">
-                    <div class="card bg-light shadow ">
+                <div class="col-12 mb-4">
+                    <div class="card schedule-form-card shadow-sm">
                         <div class="card-header">
-                            <h5>Add Schedule for Faculty</h5>
+                            <h1 class="h5 mb-0">Add Faculty Schedule</h1>
                             @if(!empty($collegeName))
-                            <div class="d-flex justify-content-center"><span class="mt-1 align-text-center justify-content-center">{{ $collegeName }}</span></div>
-                                
+                                <div class="text-muted small mt-1">{{ $collegeName }}</div>
                             @endif
                         </div>
                         <div class="card-body">
                             <form method="POST" action="{{ route('schedules.store') }}">
                                 @csrf
 
-                                <div class="row">
+                                @php
+                                    $latestSemyr = \App\Models\semyr::query()->latest('id')->first();
+                                @endphp
+                                <input type="hidden" name="Semester" value="{{ $latestSemyr->semester ?? '' }}">
+                                <input type="hidden" name="School_year" value="{{ $latestSemyr->school_year ?? '' }}">
+                                <input type="hidden" name="sched_Status" value="Regular">
 
+                                <div class="schedule-term-panel mb-4">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">Semester</div>
+                                            <div class="fw-semibold">{{ $latestSemyr->semester ?? 'Current Semester' }}</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">School Year</div>
+                                            <div class="fw-semibold">{{ $latestSemyr->school_year ?? 'Current School Year' }}</div>
+                                        </div>
+                                    </div>
+                                </div>
 
-<div class="row text-center mt-1 mb-5 p-2 mx-auto border rounded">
-    {{-- Semester / School Year--}}
-    <div class="col-md-6 mb-3">
-        @php
-            $latestSemyr = \App\Models\semyr::query()->latest('id')->first();
-        @endphp
-        <label class="form-label">Semester</label>
-        <div class="form-label" name="Semester" required disabled>
-            <div value="{{ $latestSemyr->semester ?? '' }}">{{ $latestSemyr->semester ?? 'Current Semester' }}</div>
-        </div>
-        <input type="hidden" name="Semester" value="{{ $latestSemyr->semester ?? '' }}">
-    </div>
-
-    {{-- school year --}}
-    <div class="col-md-6 mb-3">
-        <label class="form-label">School Year</label>
-        <div class="form-label" name="School_year" required disabled>
-            <div value="{{ $latestSemyr->school_year ?? '' }}">{{ $latestSemyr->school_year ?? 'Current School Year' }}</div>
-        </div>
-        <input type="hidden" name="School_year" value="{{ $latestSemyr->school_year ?? '' }}">
-        <input type="hidden" name="status" value="Regular">
-    </div>
-</div>
-
-
-                                {{-- selec faculty --}}
-                                    <div class="col-md-12 mb-3">
-                                        <label class="form-label">Faculty</label>
-                                        <select class="form-select" name="user_id" required>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="scheduleFaculty">Faculty</label>
+                                        <select class="form-select" name="user_id" id="scheduleFaculty" required>
                                             <option value="">Select Faculty</option>
                                             @foreach($faculty_list as $faculty)
                                                 <option value="{{ $faculty->id }}" {{ (isset($selectedFacultyId) && (int)$selectedFacultyId === (int)$faculty->id) ? 'selected' : '' }}>
@@ -109,25 +139,29 @@ while ($startTime <= $endTimeLimit) {
                                         </select>
                                     </div>
 
-                                <div class="row"> 
-                                    {{-- Programs --}}
-                                    <div class="row">
-                                    <div class="col-md-12 mb-3">
-                                        <label class="form-label">Program</label>
-                                        <select class="form-select" name="program_id" required>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="scheduleProgram">Program</label>
+                                        <select class="form-select" name="program_id" id="scheduleProgram" required>
                                             <option value="">Select Program</option>
-                                                @foreach ($programs as $program)
+                                            @foreach($programs as $program)
                                                 <option value="{{ $program->id }}">{{ $program->program_abbr }}</option>
-                                               @endforeach
-
+                                            @endforeach
                                         </select>
                                     </div>
-                                </div>
-                                    
-                                    {{-- year level --}}
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Year Level</label>
-                                        <select class="form-select" name="year_level" required>
+
+                                    <div class="col-lg-6">
+                                        <label class="form-label" for="scheduleCourse">Subject</label>
+                                        <select class="form-select" name="Course" id="scheduleCourse" required>
+                                            <option value="">Select Subject</option>
+                                            @foreach($courses as $course)
+                                                <option value="{{ $course->id }}">({{ $course->course_code }}) {{ $course->course_name }} <span class="mb-10">Unit: {{$course->unit}}</span></option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="col-sm-6 col-lg-3">
+                                        <label class="form-label" for="scheduleYear">Year Level</label>
+                                        <select class="form-select" name="year_level" id="scheduleYear" required>
                                             <option value="">Year</option>
                                             <option value="1">1st</option>
                                             <option value="2">2nd</option>
@@ -136,36 +170,19 @@ while ($startTime <= $endTimeLimit) {
                                         </select>
                                     </div>
 
-                                        {{-- sectioning --}}
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Section</label>
-                                        <select class="form-select" name="section" required>
+                                    <div class="col-sm-6 col-lg-3">
+                                        <label class="form-label" for="scheduleSection">Section</label>
+                                        <select class="form-select" name="section" id="scheduleSection" required>
                                             <option value="">Section</option>
-                                            @foreach(['A','B','C','D','E','F','G','H','I','J'] as $sec)
-                                                <option value="{{ $sec }}">{{ $sec }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-
-                                {{-- course --}}
-                                <div class="row mt-2">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Subject</label>
-                                        <select class="form-select" name="Course" required>
-                                            <option value="">Select Subject</option>
-                                            @foreach($courses as $courses)
-                                                <option value="{{ $courses->id }}">
-                                                    ({{ $courses->course_code }}) {{ $courses->course_name }}
-                                                </option>
+                                            @foreach(['A','B','C','D','E','F','G','H','I','J'] as $section)
+                                                <option value="{{ $section }}">{{ $section }}</option>
                                             @endforeach
                                         </select>
                                     </div>
 
-                                {{-- start time --}}
-                                    <div class="col-md-3 mb-3">
-                                        <label class="form-label">Start Time</label>
-                                        <select class="form-select" name="Start_time" required>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="scheduleStartTime">Start Time</label>
+                                        <select class="form-select" name="Start_time" id="scheduleStartTime" required>
                                             <option value="">Select Start Time</option>
                                             @foreach($startTimes as $index => $start)
                                                 <option value="{{ $start }}">{{ $startTimesDisplay[$index] }}</option>
@@ -173,48 +190,43 @@ while ($startTime <= $endTimeLimit) {
                                         </select>
                                     </div>
 
-                                    {{-- end time --}}
-                                    <div class="col-md-3 mb-3">
-                                        <label class="form-label">End Time</label>
-                                        <select class="form-select" name="End_time" required>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="scheduleEndTime">End Time</label>
+                                        <select class="form-select" name="End_time" id="scheduleEndTime" required>
                                             <option value="">Select End Time</option>
                                             @foreach($endTimes as $index => $end)
                                                 <option value="{{ $end }}">{{ $endTimesDisplay[$index] }}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                </div>
 
-                                {{-- rooms --}}
-                                <div class="row mt-2">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Room</label>
-                                        <select class="form-select" name="Room" required>
-                                            <option value="">Room</option>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="scheduleRoom">Room</label>
+                                        <select class="form-select" name="Room" id="scheduleRoom" required>
+                                            <option value="">Select Room</option>
                                             @foreach($rooms as $room)
                                                 <option value="{{ $room->id }}">{{ $room->room_name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
 
-                                    {{-- Day --}}
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Day</label>
-                                        <div class="d-flex flex-wrap gap-3 mt-1">
-                                            @foreach(['Mon','Tue','Wed','Thu','Fri', 'Sat', 'Sun'] as $day)
-                                                <label class="d-flex align-items-center gap-1">
-                                                    <input type="checkbox" name="Day[]" value="{{ $day }}" class="form-check-input">
-                                                    <span>{{ $day }}</span>
-                                                </label>
-                                            @endforeach
-                                        </div>
+                                    <div class="col-md-6">
+                                        <fieldset class="mb-0">
+                                            <legend class="form-label mb-2">Days</legend>
+                                            <div class="schedule-day-options">
+                                                @foreach(['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] as $day)
+                                                    <label class="schedule-day-option">
+                                                        <input type="checkbox" name="Day[]" value="{{ $day }}" class="form-check-input">
+                                                        <span>{{ $day }}</span>
+                                                    </label>
+                                                @endforeach
+                                            </div>
+                                        </fieldset>
                                     </div>
                                 </div>
 
                                 <div class="mt-4">
-                                    <button type="submit" class="btn btn-primary w-100">
-                                        Add Schedule
-                                    </button>
+                                    <button type="submit" class="btn btn-primary w-100">Add Schedule</button>
                                 </div>
 
                                 {{-- Conflict modal --}}
@@ -274,6 +286,52 @@ while ($startTime <= $endTimeLimit) {
                                     </div>
                                 </div>
 
+                                @if($errors->any())
+                                    <div class="modal fade" id="scheduleValidationModal" tabindex="-1" aria-labelledby="scheduleValidationModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="scheduleValidationModalLabel">Schedule Not Saved</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Please correct the following before saving:</p>
+                                                    <ul class="mb-0">
+                                                        @foreach($errors->all() as $error)
+                                                            <li>{{ $error }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                @if(session('success') || session('error'))
+                                    @php
+                                        $scheduleResultIsError = session()->has('error');
+                                        $scheduleResultMessage = session('error') ?? session('success');
+                                    @endphp
+                                    <div class="modal fade" id="scheduleResultModal" tabindex="-1" aria-labelledby="scheduleResultModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="scheduleResultModalLabel">
+                                                        {{ $scheduleResultIsError ? 'Schedule Error' : 'Schedule Updated' }}
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">{{ $scheduleResultMessage }}</div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
 
                                 {{-- Conflict checker script --}}
                                 <script>
@@ -281,8 +339,8 @@ while ($startTime <= $endTimeLimit) {
                                         const form = document.querySelector('form[action="{{ route('schedules.store') }}"]');
                                         if (!form) return;
 
-                                        const alertEl = document.getElementById('scheduleConflictAlert');
                                         const apiUrl = '{{ route('schedules.bookingsystem') }}';
+                                        const conflictModal = new bootstrap.Modal(document.getElementById('scheduleConflictModal'));
                                         const confirmationModal = new bootstrap.Modal(document.getElementById('scheduleConfirmationModal'));
                                         const confirmButton = document.getElementById('confirmScheduleButton');
                                         let confirmationAccepted = false;
@@ -335,8 +393,6 @@ while ($startTime <= $endTimeLimit) {
                                         }
 
                                         form.addEventListener('submit', async function (e) {
-                                            alertEl.classList.add('d-none');
-
                                             if (!confirmationAccepted) {
                                                 e.preventDefault();
                                                 populateConfirmation();
@@ -359,7 +415,7 @@ while ($startTime <= $endTimeLimit) {
                                             for (const day of selectedDays) {
                                                 const hasConflict = await checkConflictForDay(day, roomId, startTime, endTime);
                                                 if (hasConflict) {
-                                                    alertEl.classList.remove('d-none');
+                                                    conflictModal.show();
                                                     return;
                                                 }
                                             }
@@ -375,6 +431,20 @@ while ($startTime <= $endTimeLimit) {
                                         });
                                     });
                                 </script>
+                                @if($errors->any())
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function () {
+                                            bootstrap.Modal.getOrCreateInstance(document.getElementById('scheduleValidationModal')).show();
+                                        });
+                                    </script>
+                                @endif
+                                @if(session('success') || session('error'))
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function () {
+                                            bootstrap.Modal.getOrCreateInstance(document.getElementById('scheduleResultModal')).show();
+                                        });
+                                    </script>
+                                @endif
 
                             </form>
                         </div>
@@ -428,7 +498,7 @@ while ($startTime <= $endTimeLimit) {
                                                             <strong>{{ $schedule->course->course_code ?? 'N/A' }}</strong><br>
                                                             <small class="text-muted">
                                                                 {{ $schedule->day ?? ($schedule->Day ?? 'N/A') }} |
-                                                                {{ $schedule->start_time }} - {{ $schedule->end_time }} |
+                                                                {{ \Illuminate\Support\Carbon::parse($schedule->start_time)->format('g:i A') }} - {{ \Illuminate\Support\Carbon::parse($schedule->end_time)->format('g:i A') }} |
                                                                 {{ $schedule->room?->room_name ?? ($schedule->room_id ?? ($schedule->Room ?? 'N/A')) }}
                                                             </small><br>
 
@@ -446,11 +516,11 @@ while ($startTime <= $endTimeLimit) {
                                                                 Edit
                                                             </button>
 
-                                                            <form method="POST" action="{{ route('schedules.destroy', $schedule->id) }}" class="d-block w-100"
-                                                                  onsubmit="return confirm('Delete this schedule?')">
+                                                            <form method="POST" action="{{ route('schedules.archive', $schedule->id) }}" class="d-block w-100"
+                                                                  onsubmit="return confirm('Archive this schedule?')">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button type="submit" class="btn btn-sm btn-outline-danger w-100">Delete</button>
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger w-100">Archive</button>
                                                             </form>
                                                         </div>
                                                     </div>

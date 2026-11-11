@@ -305,7 +305,7 @@ Route::post('/profile/request', [App\Http\Controllers\RequestController::class, 
 
 Route::post('/schedules/store', [App\Http\Controllers\schedulecontroller::class, 'store'])->name('schedules.store');
 Route::put('/schedules/{id}', [App\Http\Controllers\schedulecontroller::class, 'update'])->name('schedules.update');
-Route::delete('/schedules/{id}', [App\Http\Controllers\schedulecontroller::class, 'destroy'])->name('schedules.destroy');
+Route::delete('/schedules/{id}/archive', [App\Http\Controllers\schedulecontroller::class, 'softDelete'])->name('schedules.archive');
 
 // Conflict checker (booking system)
 Route::post('/schedules/bookingsystem', [App\Http\Controllers\schedulecontroller::class, 'bookingsystem'])->name('schedules.bookingsystem');
@@ -314,7 +314,7 @@ Route::get('/programs', [\App\Http\Controllers\ProgramController::class, 'index'
 Route::post('/programs', [\App\Http\Controllers\ProgramController::class, 'store'])->name('programs.store');
 Route::get('/programs/{programs}/edit', [\App\Http\Controllers\ProgramController::class, 'edit'])->name('programs.edit');
 Route::put('/programs/{programs}', [\App\Http\Controllers\ProgramController::class, 'update'])->name('programs.update');
-Route::delete('/programs/{programs}', [\App\Http\Controllers\ProgramController::class, 'destroy'])->name('programs.destroy');
+Route::delete('/programs/{programs}/archive', [\App\Http\Controllers\ProgramController::class, 'softDelete'])->name('programs.archive');
 
 Route::get('/settings', [App\Http\Controllers\AdminController::class, 'settings'])->name('settings');
 Route::post('/settings/assign_rfid', [App\Http\Controllers\AdminController::class, 'assignRfid'])->name('settings.assign_rfid');
@@ -327,20 +327,20 @@ Route::get('/users', [App\Http\Controllers\AdminController::class, 'index'])->na
 Route::post('/users', [App\Http\Controllers\AdminController::class, 'store'])->name('users.store');
 Route::get('/users/{id}/edit', [App\Http\Controllers\userscontroller::class, 'edit'])->name('users.edit');
 Route::put('/users/{id}', [App\Http\Controllers\userscontroller::class, 'update'])->name('users.update');
-Route::delete('/users/{id}', [App\Http\Controllers\userscontroller::class, 'destroy'])->name('users.destroy');
+Route::delete('/users/{id}/archive', [App\Http\Controllers\userscontroller::class, 'softDelete'])->name('users.archive');
 
 Route::get('/course', [App\Http\Controllers\CourseController::class, 'index'])->name('course');
 Route::post('/course', [App\Http\Controllers\CourseController::class, 'store'])->name('course.store');
 Route::get('/course/{course}/edit', [App\Http\Controllers\CourseController::class, 'edit'])->name('course.edit');
 Route::put('/course/{course}', [App\Http\Controllers\CourseController::class, 'update'])->name('course.update');
-Route::delete('/course/{course}', [App\Http\Controllers\CourseController::class, 'destroy'])->name('course.destroy');
+Route::delete('/course/{course}/archive', [App\Http\Controllers\CourseController::class, 'softDelete'])->name('course.archive');
 
 Route::get('/college', [App\Http\Controllers\collegecontroller::class, 'index'])->name('college');
 Route::post('/college', [App\Http\Controllers\collegecontroller::class, 'store'])->name('college.store');
 
 Route::get('/college/{college}/edit', [App\Http\Controllers\collegecontroller::class, 'edit'])->name('college.edit');
 Route::put('/college/{college}', [App\Http\Controllers\collegecontroller::class, 'update'])->name('college.update');
-Route::delete('/college/{college}', [App\Http\Controllers\collegecontroller::class, 'destroy'])->name('college.destroy');
+Route::delete('/college/{college}/archive', [App\Http\Controllers\collegecontroller::class, 'softDelete'])->name('college.archive');
 
 Route::post('/rooms/', [App\Http\Controllers\room_bldg_controller::class, 'storeRoom'])->name('storeRoom.store');
 Route::get('/rooms/', [App\Http\Controllers\room_bldg_controller::class, 'show'])->name('rooms.index');
@@ -348,8 +348,8 @@ Route::get('/dashboard', [App\Http\Controllers\room_bldg_controller::class, 'dis
 
 Route::post('/rooms/store', [App\Http\Controllers\room_bldg_controller::class, 'storeBldg'])->name('storeBldg.store');
 Route::get('/rooms/{id}', [App\Http\Controllers\room_bldg_controller::class, 'show']);
-Route::delete('/rooms/{id}', [App\Http\Controllers\room_bldg_controller::class, 'destroy'])->name('building.destroy');;
-Route::delete('/rooms/', [App\Http\Controllers\room_bldg_controller::class, 'explode'])->name('room.explode');
+Route::delete('/buildings/{id}/archive', [App\Http\Controllers\room_bldg_controller::class, 'softDeleteBuilding'])->name('building.archive');
+Route::delete('/rooms/{id}/archive', [App\Http\Controllers\room_bldg_controller::class, 'softDeleteRoom'])->name('room.archive');
 
 Route::post('/requests/approve/{id}', [App\Http\Controllers\RequestController::class, 'approval'])->name('requests.approve');
 Route::post('/requests/decline/{id}', [App\Http\Controllers\RequestController::class, 'decline'])->name('requests.decline');

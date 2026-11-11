@@ -22,25 +22,33 @@ class userscontroller extends Controller
     {
         $request->validate([
             'first_name' => 'required|string|max:100',
+            'middle_name' => 'nullable|string|max:100',
             'last_name' => 'required|string|max:100',
-            'employee_ID' => 'required|string|max:100',
+            'employee_ID' => 'required|string|max:255|unique:users,employee_ID,' . $id,
             'role' => 'required|integer|in:2,3,4,5',
             'acc_status' => 'nullable|string',
+            'Advisory_class' => 'nullable|string',
+            'class_count' => 'nullable|integer',
+            'Academic_rank' => 'nullable|string|max:100',
         ]);
 
         $user = User::findOrFail($id);
 
         $user->update([
             'first_name' => $request->first_name,
+            'middle_name' => $request->middle_name,
             'last_name' => $request->last_name,
             'employee_ID' => $request->employee_ID,
             'role' => $request->role,
             'acc_status' => $request->acc_status,
+            'Advisory_class' => $request->Advisory_class,
+            'class_count' => $request->class_count,
+            'Academic_rank' => $request->Academic_rank
         ]);
 
         return redirect()->route('users.index')->with('success', 'User updated successfully!');
     }
-     public function destroy($id)
+    public function softDelete($id)
     {
         if (!session('logged_in')) {
             return redirect('/');
@@ -48,6 +56,6 @@ class userscontroller extends Controller
 
         User::findOrFail($id)->delete();
     
-        return back()->with('success', 'User deleted successfully!');
+        return back()->with('success', 'User archived successfully!');
     }
 }

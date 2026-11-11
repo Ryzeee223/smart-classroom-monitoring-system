@@ -49,7 +49,7 @@ body {
                 <div class="card stats-card h-100 shadow-sm">
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
                         <h6 class="text-muted mb-2">Rooms</h6>
-                        <div class="display-4 fw-bold text-primary mb-0"><?php echo e($countRoom ?? 0); ?></div>
+                        <div class="display-4 fw-bold text-success mb-0"><?php echo e($countRoom ?? 0); ?></div>
 
                     </div>
                 </div>
@@ -59,7 +59,7 @@ body {
                 <div class="card stats-card h-100 shadow-sm">
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
                         <h6 class="text-muted mb-2">Occupied</h6>
-                        <div class="display-4 fw-bold text-success mb-0"><?php echo e($occupiedRooms ?? 0); ?></div>
+                        <div class="display-4 fw-bold text-warning mb-0"><?php echo e($occupiedRooms ?? 0); ?></div>
                     </div>
                 </div>
             </div>
@@ -69,7 +69,7 @@ body {
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
                         <h6 class="text-muted mb-2">Faculty</h6>
                         
-                        <div class="display-4 fw-bold text-info mb-0"><?php echo e($facultyCount ?? 0); ?></div>
+                        <div class="display-4 fw-bold text-primary mb-0"><?php echo e($facultyCount ?? 0); ?></div>
                     </div>
                 </div> 
             </div>

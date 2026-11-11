@@ -11,7 +11,7 @@
         body {
             background: #f5f7fb;
             overflow-x: auto;
-            overflow-y:hidden;
+            overflow-y: auto;
         }
 
         .schedule-card {
@@ -67,6 +67,14 @@
             padding: 1rem;
         }
 
+        .room-utilization-progress {
+            height: 0.75rem;
+        }
+
+        .room-utilization-label {
+            font-size: 0.875rem;
+        }
+
         @media (max-width: 767.98px) {
             .schedule-item {
                 padding: 0.85rem;
@@ -77,9 +85,9 @@
 <body>
     @include('sidebar')
 
-    <div class="container-fluid p-5 mt-3 mx-auto " style="max-width: 1200px;">
+    <div class="container-fluid p-5 mt-3">
         <div class="row justify-content-end">
-            <div class="col-xl-10 col-lg-12 col-md-12">
+            <div class="col-md-9">
 
                 <div class="card schedule-card shadow-sm border-1">
                     <div class="schedule-header d-flex justify-content-between align-items-center flex-wrap gap-3">
@@ -155,10 +163,68 @@
                     </div>
                   </div>
                 </div>
+            {{-- Room utilization --}}
+            @php
+                $availableRoomHoursPerWeek = 80.5;
+            @endphp
+            <div class="col-md-9 d-box justify-content-center">
+                <div class="card rooms-card shadow">
+                    <div class="card-header">
+                        <h2 class="h5 mb-1">Room Utilization</h2>
+                        <p class="text-muted mb-0">Scheduled time from 07:00 to 6:30, across all seven days</p>
+                    </div>
+
+                    <div class="card-body">
+                        @forelse($rooms as $room)
+                            <div class="room-utilization-item mb-3">
+                            <div class="room-utilization-label d-flex justify-content-between align-items-baseline gap-2 mb-1">
+                                    <span class="fw-semibold">
+                                        {{ $room->room_name }}
+                                        @if($room->building?->bldg_abbr)
+                                            <span class="text-muted fw-normal">({{ $room->building->bldg_abbr }})</span>
+                                        @endif
+                                    </span>
+                                    <span class="text-muted text-end">
+                                        {{ number_format($room->utilization_percentage, 1) }}%
+                                        ({{ number_format($room->scheduled_hours_per_week, 1) }} of {{ number_format($availableRoomHoursPerWeek, 1) }} hours/week)
+                                    </span>
+                                </div>
+                                <div
+                                    class="progress room-utilization-progress"
+                                    role="progressbar"
+                                    aria-label="Room utilization for {{ $room->room_name }}"
+                                    aria-valuenow="{{ $room->utilization_percentage }}"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                >
+                                    <div
+                                        class="progress-bar"
+                                        style="width: {{ $room->utilization_percentage }}%;"
+                                    ></div>
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-muted mb-0">No rooms available to display.</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
+            {{-- Instructional Faculty Load --}}
+            <div class="col-md-9 d-box justify-content-center mt-5 card">
+                <div class="card-header">
+                    <h5 class="mb-1 fw-bold text-dark">Instructional Faculty Load</h5>
+                    
+                </div>
+                <div class="card-body">
+
+                </div>
+            </div>
+
             </div>
         </div>  
-            </div>
     </div>
+ </div>
     @include('partials.notifications-modal')
 </body>
 

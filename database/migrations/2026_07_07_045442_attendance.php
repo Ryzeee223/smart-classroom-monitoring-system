@@ -22,7 +22,7 @@ return new class extends Migration
         $table->time('time_out')->nullable();
         $table->string('day'); 
         $table->timestamp('attendance_date');
-        $table->enum('status',['attended', 'absent', 'late', 'on_leave', 'waiting'])->default('waiting');
+        $table->enum('status',['attended', 'absent', 'lat   e | attended', 'on_leave', 'waiting'])->default('waiting');
         $table->timestamps();
         });
     }

@@ -29,6 +29,7 @@ class scheduleTester extends Seeder
             'Semester' => '1st Sem', //change me if you want to test different semesters
             // always use: midyear,1st Sem,2nd Sem 
             'School_year' => '2025-2026',
+            'sched_Status' => 'Regular',
             'day' => $now->format('l'),
             'start_time' => $timenow, 
             'end_time' => $endtime,   

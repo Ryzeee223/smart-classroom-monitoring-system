@@ -95,7 +95,7 @@ class schedulecontroller extends Controller
             'Course' => ['required', 'exists:courses,id'],
             'Room' => ['required', 'exists:room,id'],
             'user_id' => ['required', 'exists:users,id'],
-            'sched_Status' => ['required'],
+            'sched_Status' => ['required', 'string', 'max:50'],
             'Semester' => ['required', 'string'],
             'School_year' => ['required', 'string'],
 
@@ -137,6 +137,7 @@ class schedulecontroller extends Controller
                 'year_level'  => $validatedData['year_level'],
                 'section'     => $validatedData['section'],
                 'day'         => $singleDay, // Saves 'Mon', 'Tue', etc.
+                'sched_Status' => $validatedData['sched_Status'],
                 'start_time'  => $validatedData['Start_time'],
                 'end_time'    => $validatedData['End_time'],
                 'Semester'    => $validatedData['Semester'],
@@ -147,7 +148,7 @@ class schedulecontroller extends Controller
 
     }
 
-    public function destroy($id)
+    public function softDelete($id)
     {
         if (!session('logged_in')) {
             return redirect('/');
@@ -159,7 +160,7 @@ class schedulecontroller extends Controller
         }
         $schedule->delete();
 
-        return redirect()->back()->with('success', 'Schedule deleted successfully!');
+        return redirect()->back()->with('success', 'Schedule archived successfully!');
     }
 
     public function update(Request $request, $id)
@@ -206,6 +207,7 @@ class schedulecontroller extends Controller
                 'year_level' => $validatedData['year_level'],
                 'section' => $validatedData['section'],
                 'day' => $singleDay,
+                'sched_Status' => $schedule->sched_Status,
                 'start_time' => $validatedData['Start_time'],
                 'end_time' => $validatedData['End_time'],
                 'Semester' => $validatedData['Semester'],

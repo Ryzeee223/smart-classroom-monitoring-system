@@ -45,6 +45,6 @@
             </div>
         </div>
     @empty
-        <div class="alert alert-secondary mb-0">No requests found.</div>
+        <p class="text-muted mb-0">No requests found.</p>
     @endforelse
 </div>

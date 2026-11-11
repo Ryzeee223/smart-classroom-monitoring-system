@@ -28,8 +28,8 @@ class ProfileController extends Controller
                 'employee_ID',
                 'role',
                 'college_id',
-                'profile_picture_data',
                 'profile_picture_mime',
+                'updated_at',
             ])
             ->with('college')
             ->find($userId) : null;
@@ -88,7 +88,7 @@ class ProfileController extends Controller
 
         return response($image, 200, [
             'Content-Type' => $mime,
-            'Cache-Control' => 'private, max-age=3600',
+            'Cache-Control' => 'private, no-store, no-cache, must-revalidate, max-age=0',
             'X-Content-Type-Options' => 'nosniff',
         ]);
     }
@@ -102,6 +102,7 @@ class ProfileController extends Controller
         $user = User::findOrFail(session('user_id'));
 
         $validated = $request->validate([
+            'profile_picture' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'first_name' => ['required', 'string', 'max:100'],
             'middle_name' => ['required', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
@@ -113,7 +114,17 @@ class ProfileController extends Controller
             ],
         ]);
 
-        $user->update($validated);
+        unset($validated['profile_picture']);
+        $user->fill($validated);
+
+        if ($request->hasFile('profile_picture')) {
+            $file = $request->file('profile_picture');
+            $user->profile_picture_data = base64_encode($file->get());
+            $user->profile_picture_mime = $file->getMimeType();
+            $user->profile_picture = null;
+        }
+
+        $user->save();
 
         return redirect()->route('profile')->with('success', 'Profile updated successfully!');
     }

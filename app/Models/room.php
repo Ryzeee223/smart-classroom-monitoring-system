@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class room extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'room_name',
@@ -29,7 +30,10 @@ class room extends Model
         return $this->building();
     }
 
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class, 'room_id');
+    }
+
 }
-
-
 

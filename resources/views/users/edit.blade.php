@@ -27,16 +27,7 @@
         <main class="container edit-page py-4">
             <h1 class="mb-4">Edit User</h1>
 
-            @if ($errors->any())
-                <div class="alert alert-danger" role="alert">
-                    <strong>Could not save changes:</strong>
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+            @include('partials.feedback-modal')
 
             <form method="POST" action="{{ route('users.update', $user->id) }}">
                 @csrf
@@ -45,6 +36,8 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
                         <div class="row g-3">
+
+                            {{-- basic info --}}
                             <div class="col-md-12">
                                 <label class="form-label form-label-sm">First Name</label>
                                 <input type="text" class="form-control form-control-sm" name="first_name" value="{{ old('first_name', $user->first_name) }}" required>
@@ -63,6 +56,8 @@
                                 <label for="" class="form-label form-label-sm">Employee ID</label>
                                 <input type="text" class="form-control form-control-sm" name="employee_ID" value="{{ old('empoyee_ID', $user->employee_ID) }}" required>
                             </div>
+
+                            {{-- role --}}
                             <div class="col-md-12">
                                 <label class="form-label form-label-sm">Role</label>
                                 <select name="role" class="form-select form-select-sm" required>
@@ -82,6 +77,18 @@
                                 </select>
                             </div>
 
+                            {{-- Academic --}}
+<div class="col-md-12">
+    <label for="AcademicRank" class="form-label">Academic Rank</label>
+        <input type="text" class="form-control form-control-sm" value="{{ old('Academic Rank', $user->Academic_rank) }}">
+   <br>
+        <label for="Advisoryclass" class="form-label">Advisory Class</label>
+    <input type="text" class="form-control form-control-sm" value="{{ old('Advisory_class', $user->Advisory_class) }}">
+    <br>
+    <label for="" class="form-label">Advisory Count</label>
+    <input type="text" class="form-control form-control-sm" value="{{ old('classr_count', $user->class_count) }}">
+</div>
+                            {{-- status --}}
                            <div class="col-md-12">
                             <label class="form-label form-label-sm">Status</label>
                             <select name="acc_status" class="form-select form-select-sm">

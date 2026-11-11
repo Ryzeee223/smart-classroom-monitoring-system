@@ -5,44 +5,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rooms - RFINSIDE</title>
-    
+
     @vite(['resources/sass/app.scss', 'resources/js/bootstrap-vendor.js'])
 </head>
 <body>
 
 <style>
     body {
-        font-family: system-ui , "Segoe UI", Roboto, sans-serif;
+        font-family: system-ui, "Segoe UI", Roboto, sans-serif;
         background-color: #f8f9fa;
-        overflow-x: auto;
-        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .rooms-page {
+        max-width: 1600px;
+    }
+
+    .rooms-card {
+        border: 0;
+        border-radius: 0.75rem;
+        overflow: hidden;
+    }
+
+    .rooms-card > .card-header {
+        padding: 1rem 1.25rem;
+        background: #fff;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .rooms-card > .card-body {
+        padding: 1.25rem;
+    }
+
+    .room-list-section {
+        padding: 1rem;
+        background: #f8f9fa;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 0.625rem;
+    }
+
+    .room-list-item {
+        min-width: 0;
+        gap: 1rem;
+        padding: 0.75rem;
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 0.5rem;
+    }
+
+    .room-list-item__details {
+        min-width: 0;
+    }
+
+    .room-list-item__meta {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+
+    @media (max-width: 575.98px) {
+        .rooms-card > .card-body {
+            padding: 1rem;
+        }
+
+        .room-list-item {
+            align-items: flex-start !important;
+            flex-wrap: wrap;
+        }
+
+        .room-list-item form {
+            margin-left: auto;
+        }
+
     }
 </style>
 
 @include('sidebar')
 
-@php
-    
-@endphp
-
 <div class="page-content">
-    <main class="container py-2">
-        <h1 class="mb-4">Rooms and Buildings</h1>
+    <main class="container-fluid rooms-page px-3 px-lg-4 py-4">
+        <div class="mb-4">
+            <h1 class="h2 mb-1">Rooms and Buildings</h1>
+            <p class="text-muted mb-0">Manage campus buildings and rooms.</p>
+        </div>
 
-        <div class="row g-4 mb-4">
-            {{-- Left column --}}
-            <div class="col-lg-8">
-
+        <div class="row g-4">
+            <div class="col-lg-4">
                 {{-- Create building --}}
-                <div class="card p-3 shadow-sm bg-white border-1 mb-4 ">
-                    <h2 class="h5 mb-3">Create building</h2>
-                    <form method="POST" action="{{ route('storeBldg.store') }}">
-                        @csrf
+                <div class="card rooms-card shadow-sm mb-4">
+                    <div class="card-header">
+                        <h2 class="h5 mb-0">Create Building</h2>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ route('storeBldg.store') }}">
+                            @csrf
 
-                        <div class="row g-3">
-                            <div class="d-grid gap-1 align-items-center">
-                                <label class="form-label form-label-sm">Select College</label>
-                                <select name="college_id" class="form-select form-select-sm" id="college_id">
+                            <div class="mb-3">
+                                <label for="college_id" class="form-label">College</label>
+                                <select name="college_id" class="form-select" id="college_id">
                                     <option value="">Select College</option>
                                     @forelse($colleges ?? [] as $c)
                                         <option value="{{ $c->id }}">{{ $c->college_name ?? $c->abbreviation }}</option>
@@ -50,151 +109,175 @@
                                         <option value="" disabled>No colleges available</option>
                                     @endforelse
                                 </select>
-
-                                <label class="form-label form-label-sm" name="bldg_name">Building name</label>
-                                <input type="text" placeholder="Building name" class="form-control form-control-sm" name="bldg_name" id="bldg_name" required>
-
-                                <label class="form-label form-label-sm" name="bldg_abbr">Building abbreviation</label>
-                                <input type="text" placeholder="Building abbreviation" class="form-control form-control-sm" name="bldg_abbr" id="bldg_abbr" required>
                             </div>
-                        </div>
 
-                        <div class="d-flex justify-content-center mt-3">
-                            <button class="btn btn-primary btn-sm w-100" style="height:50px;">Create Building</button>
-                        </div>
-                    </form>
+                            <div class="mb-3">
+                                <label for="bldg_name" class="form-label">Building name</label>
+                                <input type="text" placeholder="Building name" class="form-control" name="bldg_name" id="bldg_name" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="bldg_abbr" class="form-label">Building abbreviation</label>
+                                <input type="text" placeholder="Building abbreviation" class="form-control" name="bldg_abbr" id="bldg_abbr" required>
+                            </div>
+
+                            <button class="btn btn-primary w-100" type="submit">Create Building</button>
+                        </form>
+                    </div>
                 </div>
 
-                {{-- Create Rooms --}}
-                <div class="card p-3 shadow-sm bg-white border-1 mb-4">
-                    <h2 class="h5 mb-3">Create Rooms</h2>
-
-                    <form method="POST" action="{{ route('storeRoom.store') }}">
-                        <div class="d-grid gap-2 align-items-center">
+                {{-- Create room --}}
+                <div class="card rooms-card shadow-sm">
+                    <div class="card-header">
+                        <h2 class="h5 mb-0">Create Room</h2>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ route('storeRoom.store') }}">
                             @csrf
-                            <select name="bldg_id" class="form-select form-select-sm" id="bldg_id">
-                                <option value="">Select Building</option>
-                                @forelse($bldgModel ?? [] as $bldg)
-                                    <option value="{{ $bldg->id }}">{{ $bldg->bldg_name }} ({{ $bldg->bldg_abbr }})</option>
-                                @empty
-                                    <option value="" disabled>No buildings available</option>
-                                @endforelse
-                            </select>
 
-
-                            <select class="form-select form-select-sm" name="room_type" required>
-                                <option value="">Select Type</option>
-                                <option value="Lec">Lecture</option>
-                                <option value="Lab">Laboratory</option>
-                            </select>
-
-                            <input type="text" placeholder="Enter Classroom code (eg. cc101)" class="form-control form-control-sm" name="room_name" required>
-                        </div>
-
-                        <div class="d-flex justify-content-center mt-3">
-                            <button class="btn btn-primary btn-sm w-100" style="height:50px;">Create Room</button>
-                        </div>
-                    </form>
-                </div>
-
-               
-            </div>
-
-            {{-- Right column --}}
-            <div class="col-lg-4">
-                <div class="card p-3 shadow-sm bg-white border-1 h-100">
-                    <h5 class="mb-3 d-flex justify-content-between align-items-center"> 
-                        <span>Existing buildings and rooms  </span>
-                    </h5>
-
-                        @if(session('error'))
-                            <div class="alert alert-danger alert-sm mb-3">{{ session('error') }}</div>
-                        @endif
-
-                        @if(session('success'))
-                            <div class="alert alert-success alert-sm mb-3">{{ session('success') }}</div>
-                        @endif
-
-                        
-
-                    <div class="table-responsive mb-0">
-                        {{-- slot container --}}
-                        <div class="p-2" style="background:#f8f9fa; border-radius:6px;">
-                            <div class="card-body p-0">
-                                <p class="mb-2 text-muted" style="font-size: 0.9rem;">Existing buildings</p>
-                            </div>
-
-                            <div id="existing-buildings-container">
-                                @forelse($bldgModel ?? [] as $b)
-                                    <div class="d-flex justify-content-between align-items-center border rounded-2 px-2 py-2 mb-2 bg-white"
-                                         data-college-id="{{ $b->college_id ?? '' }}">
-                                        <div>
-                                            <div class="fw-semibold">{{ $b->bldg_name }}</div>
-                                            <div class="text-muted">({{ $b->bldg_abbr }})</div>
-                                        </div>
-
-                                        <form action="{{ route('building.destroy', $b->id) }}" method="POST" onsubmit="return confirm('Delete this building?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
-                                        </form>
-                                    </div>
-                                @empty
-                                    <p class="mb-0 text-muted" style="font-size: 0.9rem;">No buildings available.</p>
-                                @endforelse
-                            </div>
-
-
-                            <div class="mt-4">
-                                <div class="card-body p-0 mb-2">
-                                    <p class="mb-2 text-muted" style="font-size: 0.9rem;">Existing rooms</p>
-                                </div>
-
-                                <div id="existing-rooms-container">
-                                    @forelse($rooms ?? [] as $r)
-                                        @php
-                                            // Filtering should use the PRESENT college_id from related/created records
-                                            $roomCollegeId = $r->college_id ?? (optional($r->building)->college_id ?? '');
-                                            $roomBuildingAbbr = optional($r->building)->bldg_abbr;
-
-                                        @endphp
-
-                                        <div class="d-flex justify-content-between align-items-center border rounded-2 px-2 py-2 mb-2 bg-white"
-                                             data-college-id="{{ $roomCollegeId }}">
-                                            <div>
-                                                <div class="fw-semibold">{{ $r->room_name }}</div>
-                                                <div class="text-muted" style="font-size:0.85rem;">
-                                                    {{ $r->room_type ?? '' }}
-                                                    {{ $roomBuildingAbbr ? '• ' . $roomBuildingAbbr : '' }}
-                                                </div>
-                                                
-                                            </div>
-                                            <div class="text-muted" style="font-size:0.85rem;">
-                                                {{ optional($r->building)->bldg_name ? optional($r->building)->bldg_name : ($roomBuildingAbbr ? '(' . $roomBuildingAbbr . ')' : '') }}
-                                            </div>
-
-
-                                            <form action="{{ route('building.destroy', $r->id) }}" method="POST" onsubmit="return confirm('Delete this room?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
-                                            </form>
-
-
-
-                                     </div>
+                            <div class="mb-3">
+                                <label for="bldg_id" class="form-label">Building</label>
+                                <select name="bldg_id" class="form-select" id="bldg_id">
+                                    <option value="">Select Building</option>
+                                    @forelse($bldgModel ?? [] as $bldg)
+                                        <option value="{{ $bldg->id }}">{{ $bldg->bldg_name }} ({{ $bldg->bldg_abbr }})</option>
                                     @empty
-                                        <p class="mb-0 text-muted" style="font-size: 0.9rem;">No rooms available.</p>
+                                        <option value="" disabled>No buildings available</option>
                                     @endforelse
-                                </div>
+                                </select>
                             </div>
-                        </div>
+
+                            <div class="mb-3">
+                                <label for="room_type" class="form-label">Room type</label>
+                                <select class="form-select" name="room_type" id="room_type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="Lec">Lecture</option>
+                                    <option value="Lab">Laboratory</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="room_name" class="form-label">Room code</label>
+                                <input type="text" placeholder="e.g. CC101" class="form-control" name="room_name" id="room_name" required>
+                            </div>
+
+                            <button class="btn btn-primary w-100" type="submit">Create Room</button>
+                        </form>
                     </div>
                 </div>
             </div>
+
+            {{-- Existing buildings and rooms --}}
+            <div class="col-lg-8">
+                <div class="card rooms-card shadow-sm h-100">
+                    <div class="card-header">
+                        <h2 class="h5 mb-0">Existing Buildings and Rooms</h2>
+                    </div>
+                    <div class="card-body">
+                        <section class="room-list-section mb-4" aria-labelledby="existingBuildingsHeading">
+                            <h3 class="h6 text-muted mb-3" id="existingBuildingsHeading">Buildings</h3>
+                            <div id="existing-buildings-container">
+                                @forelse($bldgModel ?? [] as $b)
+                                    <div class="room-list-item d-flex justify-content-between align-items-center mb-2"
+                                         data-college-id="{{ $b->college_id ?? '' }}">
+                                        <div class="room-list-item__details">
+                                            <div class="fw-semibold">{{ $b->bldg_name }}</div>
+                                            <div class="room-list-item__meta">{{ $b->bldg_abbr }}</div>
+                                        </div>
+
+                                        <form action="{{ route('building.archive', $b->id) }}" method="POST" onsubmit="return confirm('Archive this building?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">Archive</button>
+                                        </form>
+                                    </div>
+                                @empty
+                                    <p class="text-muted mb-0">No buildings available.</p>
+                                @endforelse
+                            </div>
+                        </section>
+
+                        <section class="room-list-section" aria-labelledby="existingRoomsHeading">
+                            <h3 class="h6 text-muted mb-3" id="existingRoomsHeading">Rooms</h3>
+                            <div id="existing-rooms-container">
+                                @forelse($rooms ?? [] as $r)
+                                    @php
+                                        $roomCollegeId = $r->college_id ?? (optional($r->building)->college_id ?? '');
+                                        $roomBuildingAbbr = optional($r->building)->bldg_abbr;
+                                    @endphp
+
+                                    <div class="room-list-item d-flex justify-content-between align-items-center mb-2"
+                                         data-college-id="{{ $roomCollegeId }}">
+                                        <div class="room-list-item__details">
+                                            <div class="fw-semibold">{{ $r->room_name }}</div>
+                                            <div class="room-list-item__meta">
+                                                {{ $r->room_type ?? '' }}
+                                                @if($roomBuildingAbbr)
+                                                    <span aria-hidden="true">·</span> {{ $roomBuildingAbbr }}
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="room-list-item__meta text-end">
+                                            {{ optional($r->building)->bldg_name ?? ($roomBuildingAbbr ? '(' . $roomBuildingAbbr . ')' : '') }}
+                                        </div>
+
+                                        <form action="{{ route('room.archive', $r->id) }}" method="POST" onsubmit="return confirm('Archive this room?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">Archive</button>
+                                        </form>
+                                    </div>
+                                @empty
+                                    <p class="text-muted mb-0">No rooms available.</p>
+                                @endforelse
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 </div>
+
+@if(session('error') || session('success') || $errors->any())
+    @php
+        $roomNotificationIsError = session()->has('error') || $errors->any();
+        $roomNotificationMessage = session('error') ?? session('success');
+    @endphp
+    <div class="modal fade" id="roomNotificationModal" tabindex="-1" aria-labelledby="roomNotificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header {{ $roomNotificationIsError ? 'text-bg-danger' : 'text-bg-success' }}">
+                    <h5 class="modal-title" id="roomNotificationModalLabel">
+                        {{ $roomNotificationIsError ? 'Unable to complete request' : 'Success' }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if($roomNotificationMessage)
+                        <p class="mb-0">{{ $roomNotificationMessage }}</p>
+                    @endif
+                    @if($errors->any())
+                        <ul class="mb-0 {{ $roomNotificationMessage ? 'mt-2' : '' }}">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('roomNotificationModal')).show();
+        });
+    </script>
+@endif
 
 <script>
     function filterBuildingsByCollege() {

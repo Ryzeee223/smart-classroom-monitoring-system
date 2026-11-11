@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit User - RFINSIDE</title>
-    
+    <?php echo $__env->make('partials.favicon', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <?php echo app('Illuminate\Foundation\Vite')(['resources/sass/app.scss', 'resources/js/bootstrap-vendor.js']); ?>
     
 </head>
@@ -27,16 +27,7 @@
         <main class="container edit-page py-4">
             <h1 class="mb-4">Edit User</h1>
 
-            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($errors->any()): ?>
-                <div class="alert alert-danger" role="alert">
-                    <strong>Could not save changes:</strong>
-                    <ul class="mb-0">
-                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
-                            <li><?php echo e($error); ?></li>
-                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
-                    </ul>
-                </div>
-            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php echo $__env->make('partials.feedback-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
             <form method="POST" action="<?php echo e(route('users.update', $user->id)); ?>">
                 <?php echo csrf_field(); ?>
@@ -45,6 +36,8 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
                         <div class="row g-3">
+
+                            
                             <div class="col-md-12">
                                 <label class="form-label form-label-sm">First Name</label>
                                 <input type="text" class="form-control form-control-sm" name="first_name" value="<?php echo e(old('first_name', $user->first_name)); ?>" required>
@@ -63,6 +56,8 @@
                                 <label for="" class="form-label form-label-sm">Employee ID</label>
                                 <input type="text" class="form-control form-control-sm" name="employee_ID" value="<?php echo e(old('empoyee_ID', $user->employee_ID)); ?>" required>
                             </div>
+
+                            
                             <div class="col-md-12">
                                 <label class="form-label form-label-sm">Role</label>
                                 <select name="role" class="form-select form-select-sm" required>
@@ -83,6 +78,18 @@
                                 </select>
                             </div>
 
+                            
+<div class="col-md-12">
+    <label for="AcademicRank" class="form-label">Academic Rank</label>
+        <input type="text" class="form-control form-control-sm" value="<?php echo e(old('Academic Rank', $user->Academic_rank)); ?>">
+   <br>
+        <label for="Advisoryclass" class="form-label">Advisory Class</label>
+    <input type="text" class="form-control form-control-sm" value="<?php echo e(old('Advisory_class', $user->Advisory_class)); ?>">
+    <br>
+    <label for="" class="form-label">Advisory Count</label>
+    <input type="text" class="form-control form-control-sm" value="<?php echo e(old('classr_count', $user->class_count)); ?>">
+</div>
+                            
                            <div class="col-md-12">
                             <label class="form-label form-label-sm">Status</label>
                             <select name="acc_status" class="form-select form-select-sm">

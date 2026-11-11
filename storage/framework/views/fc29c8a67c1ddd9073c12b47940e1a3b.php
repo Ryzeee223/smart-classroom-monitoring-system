@@ -23,9 +23,7 @@
 
     <div class="app-shell">
     <main class="app-shell__content container mt-4 mb-5 p-4 gap-4">  
-        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('success')): ?>
-                                <div class="alert alert-success mt-3"><?php echo e(session('success')); ?></div>
-                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+        <?php echo $__env->make('partials.feedback-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
         <div class="row">
             <div class="col-12 col-lg-6 mb-4">
                 <div class="card shadow">
@@ -83,7 +81,6 @@
 
     <?php echo csrf_field(); ?>
     <button type="submit" class="btn btn-primary">Save Program</button>
-                            
                         </form>
                     </div>
                 </div>
@@ -105,10 +102,10 @@
                                 </div>
                                 <div class="d-flex flex-column gap-1">
                                     <a class="btn btn-sm btn-outline-secondary" href="<?php echo e(route('programs.edit', $program->id)); ?>">Edit</a>
-                                    <form method="POST" action="<?php echo e(route('programs.destroy', $program->id)); ?>">
+                                    <form method="POST" action="<?php echo e(route('programs.archive', $program->id)); ?>">
                                         <?php echo csrf_field(); ?>
                                         <?php echo method_field('DELETE'); ?>
-                                        <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold" onclick="return confirm('Delete this program?')">Delete</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold" onclick="return confirm('Archive this program?')">Archive</button>
                                     </form>
                                 </div>
                             </li>

@@ -59,12 +59,12 @@
                                 </div>
 
                                 <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
                                     <input type="text" name="course_name" placeholder="Course Name" class="form-control" required>
                                 </div>
-
                                 <div class="mb-3">
-                                    <label for="description" class="form-label">Description</label>
-                                    <input type="text" name="description" class="form-control">
+                                    <label for="unit" class="form-label">Unit</label>
+                                    <input type="number" class="form-control">
                                 </div>
 
                                 <button type="submit" class="btn btn-primary">Add Course</button>
@@ -144,20 +144,21 @@
                                             <th>Course</th>
                                             <th>Code</th>
                                             <th>Name</th>
-                                            <th>Desc</th>
+                                            <th>Unit</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {{-- course --}}
                                         @forelse($course as $course)
                                             <tr>
                                                 <td>{{ $course->course_name ?? 'N/A' }}</td>
                                                 <td>{{ $course->course_code }}</td>
                                                 <td>{{ $course->course_name }}</td>
-                                                <td>{{ Str::limit($course->description, 30) }}</td>
+                                                <td>{{ Str::limit($course->unit, 30) }}</td>
                                                 <td class="text-nowrap">
                                                     <a href="{{ route('course.edit', $course->id) }}" class="btn btn-sm btn-outline-primary fw-semibold">Edit</a>
-                                                    <form method="POST" action="{{ route('course.destroy', $course->id) }}" class="d-inline" onsubmit="return confirm('Are you sure?')">
+                                                    <form method="POST" action="{{ route('course.archive', $course->id) }}" class="d-inline" onsubmit="return confirm('Delete this course?')">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>

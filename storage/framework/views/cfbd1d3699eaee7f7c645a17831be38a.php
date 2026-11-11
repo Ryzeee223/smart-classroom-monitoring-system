@@ -17,17 +17,7 @@
                 <div class="col-md-3"><?php echo $__env->make('sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?></div>
 
                 <div class="col-md-9 mt-5">
-                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('success')): ?>
-                                <div class="alert alert-success"><?php echo e(session('success')); ?></div>
-                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-
-                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($errors->any()): ?>
-                                <div class="alert alert-danger">
-                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
-                                        <div><?php echo e($error); ?></div>
-                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
-                                </div>
-                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    <?php echo $__env->make('partials.feedback-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                     <div class="card shadow-sm">
                         <div class="card-body">
                             
@@ -36,7 +26,12 @@
                                 <?php
                                   
                                     $profileUrl = null;
-                                    if (isset($user) && $user && !empty($user->profile_picture)) {
+                                    if (isset($user) && $user && !empty($user->profile_picture_mime)) {
+                                        $profileUrl = route('profile.picture', [
+                                            'user' => $user->id,
+                                            'v' => $user->updated_at?->timestamp,
+                                        ]);
+                                    } elseif (isset($user) && $user && !empty($user->profile_picture)) {
                                         $pic = $user->profile_picture;
 
                                         // If it already contains the directory, use it as-is
@@ -46,8 +41,6 @@
                                             // Assume it's a filename only
                                             $profileUrl = asset('storage/profile_pictures/' . ltrim((string) $pic, '/'));
                                         }
-                                    } elseif (isset($user) && $user && !empty($user->profile_picture_mime)) {
-                                        $profileUrl = route('profile.picture', $user->id);
                                     }
 
 
@@ -76,9 +69,6 @@
                                         alt="Profile picture"
                                         style="width:140px; height:140px; object-fit:cover; border-radius:50%;"
                                     >
-                                    <button class="btn btn-outline-primary btn-sm d-block mt-2 mx-auto" type="button" data-bs-toggle="modal" data-bs-target="#updateProfilePictureModal">
-                                        Change picture
-                                    </button>
                                 </div>
 
                                 <div>
@@ -101,26 +91,31 @@
                                 </div>
                                 
                             </div>
-                            <div class="modal fade" id="updateProfilePictureModal" tabindex="-1" aria-labelledby="updateProfilePictureModalLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <form class="modal-content" action="<?php echo e(route('profile.update')); ?>" method="POST" enctype="multipart/form-data">
+                            <hr>
+                            <div class="d-flex justify-content-center">
+                                <button class="btn btn-primary" id="changeprofilename" type="button" data-bs-toggle="modal" data-bs-target="#updateProfileNameModal">Update Profile</button>
+                            </div>
+                            <div class="modal fade" id="updateProfileNameModal" tabindex="-1" aria-labelledby="updateProfileNameModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <form class="modal-content" action="<?php echo e(route('profile.name.update')); ?>" method="POST" enctype="multipart/form-data">
                                         <?php echo csrf_field(); ?>
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="updateProfilePictureModalLabel">Update profile picture</h5>
+                                            <h5 class="modal-title" id="updateProfileNameModalLabel">Update Profile</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
-                                        <div class="modal-body text-center">
-                                            <img
-                                                id="profilePicturePreview"
-                                                src="<?php echo e($profileUrl ?? asset('images/default-avatar.png')); ?>"
-                                                alt="Selected profile picture preview"
-                                                class="rounded-circle mb-3"
-                                                style="width:140px; height:140px; object-fit:cover;"
-                                            >
-                                            <label for="profilePictureInput" class="form-label d-block text-start">Choose an image</label>
-                                            <input
-                                                type="file"
-                                                class="form-control <?php $__errorArgs = ['profile_picture'];
+                                        <div class="modal-body">
+                                            <div class="mb-3 text-center">
+                                                <img
+                                                    id="profilePicturePreview"
+                                                    src="<?php echo e($profileUrl ?? asset('images/default-avatar.png')); ?>"
+                                                    alt="Profile picture preview"
+                                                    class="rounded-circle mb-2"
+                                                    style="width:120px; height:120px; object-fit:cover;"
+                                                >
+                                                <label for="profilePictureInput" class="form-label d-block text-start">Profile picture <span class="text-muted">(optional)</span></label>
+                                                <input
+                                                    type="file"
+                                                    class="form-control <?php $__errorArgs = ['profile_picture'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -128,43 +123,22 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                                                id="profilePictureInput"
-                                                name="profile_picture"
-                                                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-                                                required
-                                            >
-                                            <div class="form-text text-start">JPG, PNG, or WebP. Maximum file size: 2 MB.</div>
-                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['profile_picture'];
+                                                    id="profilePictureInput"
+                                                    name="profile_picture"
+                                                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                                                >
+                                                <div class="form-text text-start">JPG, PNG, or WebP. Maximum file size: 2 MB. Leave empty to keep your current picture.</div>
+                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['profile_picture'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?>
-                                                <div class="invalid-feedback d-block text-start"><?php echo e($message); ?></div>
-                                            <?php unset($message);
+                                                    <div class="invalid-feedback d-block text-start"><?php echo e($message); ?></div>
+                                                <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                            <button type="submit" class="btn btn-primary">Save picture</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="d-flex justify-content-center">
-                                <button class="btn btn-primary" id="changeprofilename" type="button" data-bs-toggle="modal" data-bs-target="#updateProfileNameModal">Update Profile</button>
-                            </div>
-                            <div class="modal fade" id="updateProfileNameModal" tabindex="-1" aria-labelledby="updateProfileNameModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <form class="modal-content" action="<?php echo e(route('profile.name.update')); ?>" method="POST">
-                                        <?php echo csrf_field(); ?>
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="updateProfileNameModalLabel">Update Profile</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
+                                            </div>
                                             <div class="mb-3">
                                                 <label for="profileFirstName" class="form-label">First name</label>
                                                 <input type="text" class="form-control <?php $__errorArgs = ['first_name'];
@@ -245,12 +219,12 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                            <button type="submit" class="btn btn-primary">Save Name</button>
+                                            <button type="submit" class="btn btn-primary">Save Profile</button>
                                         </div>
                                     </form>
                                 </div>
                             </div>
-                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($errors->hasAny(['first_name', 'middle_name', 'last_name','employee_ID'])): ?>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($errors->hasAny(['first_name', 'middle_name', 'last_name', 'employee_ID', 'profile_picture'])): ?>
                                 <script>
                                     document.addEventListener('DOMContentLoaded', function () {
                                         bootstrap.Modal.getOrCreateInstance(document.getElementById('updateProfileNameModal')).show();
@@ -276,14 +250,6 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                                     });
                                 });
                             </script>
-                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($errors->has('profile_picture')): ?>
-                                <script>
-                                    document.addEventListener('DOMContentLoaded', function () {
-                                        bootstrap.Modal.getOrCreateInstance(document.getElementById('updateProfilePictureModal')).show();
-                                    });
-                                </script>
-                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-
                             
                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($user) && in_array((int) $user->role, [2, 3, 4, 5], true)): ?>
                                 <div class="mt-4">

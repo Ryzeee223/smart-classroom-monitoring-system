@@ -43,7 +43,6 @@
                 <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('dashboard') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('dashboard')); ?>">📊Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('users.index') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('users.index')); ?>">👥Users</a></li>
                 <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('college') ? 'active fw-bold' : ''); ?>" href= "<?php echo e(route('college')); ?>">🏫Colleges</a></li>
-                <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('rooms.index') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('rooms.index')); ?>">🏙Rooms and Buildings</a></li>
                 <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('settings') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('settings')); ?>">⚙️Settings</a></li>
                 
             <?php elseif($role === 2): ?>
@@ -52,15 +51,17 @@
             
             <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('users.index') ? 'active fw-bold' : ''); ?>" href=<?php echo e(route('users.index')); ?>>👥Users</a></li>
             
+            <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('rooms.index') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('rooms.index')); ?>">🏙Rooms and Buildings</a></li>
             <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('myschedule') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('myschedule')); ?>">📆My Schedule</a></li>
             <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('schedules') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('schedules')); ?>">✏️Create Schedules</a></li>
             
-            <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('course') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route ('course')); ?>">📚Course</a></li>
+            <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('course') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route ('course')); ?>">📚Subject</a></li>
             
            
             <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('programs') || request()->routeIs('programs.index') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('programs')); ?>">🎓Programs</a></li>
             
             <li class="nav-item"><a class="nav-link" href="<?php echo e(route('settings')); ?>">⚙️Settings</a></li>
+            <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('reports') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('reports')); ?>">📋Reports</a></li>
 
             <?php elseif($role === 3): ?>
             
@@ -70,7 +71,7 @@
             
             <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('myschedule') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('myschedule')); ?>">📆My Schedule</a></li>
             
-            <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('course') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route ('course')); ?>">📚Course</a></li>
+            <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('course') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route ('course')); ?>">📚Subject</a></li>
             
             <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('schedules') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('schedules')); ?>">✏️Create Schedules</a></li>
            
