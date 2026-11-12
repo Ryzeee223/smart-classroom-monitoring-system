@@ -56,6 +56,128 @@
     .schedule-day-option .form-check-input {
         margin: 0;
     }
+
+    body[data-theme="dark"] .schedules-page .card-header {
+        background: linear-gradient(135deg, rgba(47,143,98,0.2), rgba(46,111,181,0.2));
+        border-bottom-color: rgba(148, 163, 184, 0.2);
+        color: #edf2f7;
+    }
+
+    body[data-theme="dark"] .schedules-page .schedule-term-panel {
+        background: #172233;
+        border-color: rgba(148, 163, 184, 0.22);
+        color: #edf2f7;
+    }
+
+    body[data-theme="dark"] .schedules-page .schedule-day-option {
+        background: #1f2937;
+        border-color: rgba(148, 163, 184, 0.28);
+        color: #e2e8f0;
+    }
+
+    body[data-theme="dark"] .schedules-page .bg-light {
+        background: #1f2937 !important;
+        border-color: rgba(148, 163, 184, 0.24) !important;
+        color: #edf2f7 !important;
+    }
+
+    body[data-theme="dark"] .schedules-page .text-muted {
+        color: #b6c2d1 !important;
+    }
+
+    body[data-theme="dark"] .schedules-page .btn-link {
+        color: #7dbdf6;
+    }
+
+    body[data-theme="dark"] .schedules-page .btn-outline-primary {
+        background: rgba(46,111,181,0.2);
+        border-color: rgba(125,211,252,0.55);
+        color: #e0f2fe;
+    }
+
+    body[data-theme="dark"] .schedules-page .btn-outline-danger {
+        background: rgba(190,24,93,0.16);
+        border-color: rgba(251,113,133,0.55);
+        color: #fecdd3;
+    }
+
+    body[data-theme="dark"] .schedules-page .btn-outline-primary:hover,
+    body[data-theme="dark"] .schedules-page .btn-outline-danger:hover {
+        color: #fff;
+        box-shadow: 0 0 18px rgba(47,143,98,0.18), 0 0 24px rgba(46,111,181,0.15);
+    }
+
+    .schedules-page .schedule-faculty-toggle {
+        width: 100%;
+        min-height: 2.75rem;
+        padding: .6rem .85rem !important;
+        border: 1px solid rgba(47,143,98,0.2);
+        border-radius: .5rem;
+        background: rgba(47,143,98,0.07);
+        color: #1f6d4a;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background-color .18s ease, box-shadow .18s ease;
+    }
+
+    .schedules-page .schedule-faculty-toggle::after {
+        content: "";
+        width: .55rem;
+        height: .55rem;
+        margin-left: .75rem;
+        border-right: 2px solid currentColor;
+        border-bottom: 2px solid currentColor;
+        transform: rotate(45deg) translateY(-2px);
+        transition: transform .18s ease;
+    }
+
+    .schedules-page .schedule-faculty-toggle[aria-expanded="true"]::after {
+        transform: rotate(225deg) translate(-2px, -1px);
+    }
+
+    .schedules-page .schedule-faculty-toggle:hover,
+    .schedules-page .schedule-faculty-toggle:focus-visible {
+        background: rgba(47,143,98,0.13);
+        box-shadow: 0 0 0 2px rgba(47,143,98,0.12), 0 6px 16px rgba(46,111,181,0.12);
+    }
+
+    .schedules-page .schedule-actions .btn {
+        min-height: 2.25rem;
+        border-radius: .45rem;
+        font-weight: 600;
+        transition: background-color .18s ease, box-shadow .18s ease;
+    }
+
+    .schedules-page .schedule-actions .btn-outline-primary {
+        background: rgba(46,111,181,0.08);
+        color: #245c98;
+    }
+
+    .schedules-page .schedule-actions .btn-outline-danger {
+        background: rgba(190,24,93,0.06);
+        color: #a61b42;
+    }
+
+    body[data-theme="dark"] .schedules-page .schedule-faculty-toggle {
+        background: rgba(47,143,98,0.17);
+        border-color: rgba(110,231,168,0.28);
+        color: #d1fae5;
+    }
+
+    body[data-theme="dark"] .schedules-page .schedule-faculty-toggle:hover,
+    body[data-theme="dark"] .schedules-page .schedule-faculty-toggle:focus-visible {
+        background: rgba(47,143,98,0.27);
+        box-shadow: 0 0 0 2px rgba(243,214,93,0.12), 0 0 18px rgba(47,143,98,0.2), 0 0 22px rgba(46,111,181,0.16);
+    }
+
+    body[data-theme="dark"] .schedules-page .schedule-actions .btn-outline-primary {
+        color: #e0f2fe;
+    }
+
+    body[data-theme="dark"] .schedules-page .schedule-actions .btn-outline-danger {
+        color: #fecdd3;
+    }
+
     @media (max-width: 575.98px) {
         .schedule-form-card > .card-body {
             padding: 1rem;
@@ -90,7 +212,7 @@ while ($startTime <= $endTimeLimit) {
 <div class="app-shell">
     <?php echo $__env->make('sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-    <main class="app-shell__content d-flex justify-content-center">
+    <main class="app-shell__content schedules-page d-flex justify-content-center">
         <div class="container-fluid px-3 px-lg-4 py-4">
             <div class="row align-items-start">
 
@@ -482,7 +604,7 @@ while ($startTime <= $endTimeLimit) {
 
                                 <div class="border-bottom pb-3 mb-2 text-start">
                                     <div class="d-flex justify-content-between align-items-start">
-                                        <button class="btn btn-link px-0 text-start" type="button"
+                                        <button class="btn btn-link schedule-faculty-toggle d-flex justify-content-between align-items-center text-start" type="button"
                                                 data-bs-toggle="collapse"
                                                 data-bs-target="#<?php echo e($collapseId); ?>"
                                                 aria-expanded="false"
@@ -515,19 +637,19 @@ while ($startTime <= $endTimeLimit) {
 
                                                             </small>
                                                         </div>
-                                                        <div class="text-end pt-1">
-                                                            <button class="btn btn-sm btn-outline-primary mb-1 d-block w-100"
+                                                        <div class="schedule-actions text-end pt-1">
+                                                            <button class="btn btn-sm btn-outline-primary btn-edit mb-1 d-block w-100" title="Edit" aria-label="Edit"
                                                                     type="button"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#editModal<?php echo e($schedule->id); ?>">
-                                                                Edit
+                                                                ✏️
                                                             </button>
 
                                                             <form method="POST" action="<?php echo e(route('schedules.archive', $schedule->id)); ?>" class="d-block w-100"
                                                                   onsubmit="return confirm('Archive this schedule?')">
                                                                 <?php echo csrf_field(); ?>
                                                                 <?php echo method_field('DELETE'); ?>
-                                                                <button type="submit" class="btn btn-sm btn-outline-danger w-100">Archive</button>
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger w-100" title="Archive" aria-label="Archive">🗑</button>
                                                             </form>
                                                         </div>
                                                     </div>

@@ -62,6 +62,38 @@
         font-size: 0.875rem;
     }
 
+    body[data-theme="dark"] .rooms-card > .card-header {
+        background: #172233;
+        border-bottom-color: rgba(148, 163, 184, 0.2);
+        color: #edf2f7;
+    }
+
+    body[data-theme="dark"] .room-list-section {
+        background: #141f2e;
+        border-color: rgba(148, 163, 184, 0.2);
+    }
+
+    body[data-theme="dark"] .room-list-item {
+        background: #1f2937;
+        border-color: rgba(148, 163, 184, 0.22);
+        color: #edf2f7;
+    }
+
+    body[data-theme="dark"] .room-list-item__meta {
+        color: #b6c2d1;
+    }
+
+    body[data-theme="dark"] .room-list-item .btn-outline-danger {
+        background: rgba(190, 24, 93, 0.16);
+        border-color: rgba(251, 113, 133, 0.55);
+        color: #fecdd3;
+    }
+
+    body[data-theme="dark"] .room-list-item .btn-outline-danger:hover {
+        background: rgba(190, 24, 93, 0.32);
+        color: #fff;
+    }
+
     @media (max-width: 575.98px) {
         .rooms-card > .card-body {
             padding: 1rem;
@@ -91,7 +123,7 @@
         <div class="row g-4">
             <div class="col-lg-4">
                 {{-- Create building --}}
-                <div class="card rooms-card shadow-sm mb-4">
+                <div class="card rooms-card shadow-lg mb-4">
                     <div class="card-header">
                         <h2 class="h5 mb-0">Create Building</h2>
                     </div>
@@ -127,7 +159,7 @@
                 </div>
 
                 {{-- Create room --}}
-                <div class="card rooms-card shadow-sm">
+                <div class="card rooms-card shadow-lg">
                     <div class="card-header">
                         <h2 class="h5 mb-0">Create Room</h2>
                     </div>
@@ -169,7 +201,7 @@
 
             {{-- Existing buildings and rooms --}}
             <div class="col-lg-8">
-                <div class="card rooms-card shadow-sm h-100">
+                <div class="card rooms-card shadow-lg h-100">
                     <div class="card-header">
                         <h2 class="h5 mb-0">Existing Buildings and Rooms</h2>
                     </div>
@@ -188,7 +220,7 @@
                                         <form action="{{ route('building.archive', $b->id) }}" method="POST" onsubmit="return confirm('Archive this building?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger btn-sm">Archive</button>
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Archive building" aria-label="Archive building">🗑</button>
                                         </form>
                                     </div>
                                 @empty
@@ -224,7 +256,7 @@
                                         <form action="{{ route('room.archive', $r->id) }}" method="POST" onsubmit="return confirm('Archive this room?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger btn-sm">Archive</button>
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Archive room" aria-label="Archive room">🗑</button>
                                         </form>
                                     </div>
                                 @empty

@@ -10,24 +10,285 @@
 </head>
 <body>
 <style>
+:root {
+    --college-green: #2f8f62;
+    --college-green-deep: #1f6d4a;
+    --college-yellow: #f3d65d;
+    --college-yellow-soft: #fff4bf;
+    --college-blue: #2e6fb5;
+    --college-blue-soft: #dfeefb;
+    --college-bg: #f4f9f6;
+    --college-panel: #ffffff;
+    --college-text: #1b2e2b;
+    --college-muted: #5b6f6a;
+    --success-soft: rgba(47, 143, 98, 0.12);
+    --warning-soft: rgba(243, 214, 93, 0.2);
+    --danger-soft: rgba(175, 52, 52, 0.12);
+    --shadow-soft: 0 18px 36px rgba(20, 55, 80, 0.10);
+}
+
 body {
-    background:#f5f7fb;
+    background: linear-gradient(180deg, #f5fbf8 0%, #eef5ff 100%);
+    color: var(--college-text);
     overflow-x:hidden;
     overflow-y:auto;
 }
+
 .dashboard-container {
     padding-top:16px;
     padding-bottom:32px;
 }
+
 .dashboard-container .card {
     border:0;
-    border-radius:10px;
+    border-radius:18px;
+    background: rgba(255,255,255,0.9);
+    box-shadow: var(--shadow-soft);
 }
+
 .dashboard-container .card-header {
-    border-bottom:1px solid rgba(0,0,0,.06);
+    border-bottom:1px solid rgba(25, 52, 58, 0.06);
+    background: linear-gradient(135deg, rgba(47,143,98,0.12), rgba(46,111,181,0.10));
+    padding: 1rem 1.25rem;
 }
+
 .dashboard-container .stats-card {
-    min-height:132px;
+    min-height: 160px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(243,247,255,0.90));
+    border:1px solid rgba(42, 98, 116, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-container .stats-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 6px;
+    background: linear-gradient(180deg, var(--college-green), var(--college-yellow), var(--college-blue));
+}
+
+.stats-card-green::before {
+    background: linear-gradient(180deg, var(--college-green), rgba(47,143,98,0.25));
+}
+
+.stats-card-yellow::before {
+    background: linear-gradient(180deg, var(--college-yellow), rgba(243,214,93,0.25));
+}
+
+.stats-card-blue::before {
+    background: linear-gradient(180deg, var(--college-blue), rgba(46,111,181,0.25));
+}
+
+.dashboard-container .stats-card .display-4 {
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    line-height: 1;
+}
+
+.dashboard-container .stats-card .text-success { color: var(--college-green-deep) !important; }
+.dashboard-container .stats-card .text-warning { color: #b18800 !important; }
+.dashboard-container .stats-card .text-primary { color: var(--college-blue) !important; }
+
+.dashboard-container .stats-card h6 {
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--college-muted);
+    font-size: 0.72rem;
+}
+
+.classroom-shell {
+    background: linear-gradient(180deg, rgba(255,255,255,0.65), rgba(236,245,252,0.76));
+    border-radius: 18px;
+    border: 1px solid rgba(46,111,181,0.08);
+    overflow: hidden;
+}
+
+.building-tab {
+    border: 1px solid rgba(46,111,181,0.10);
+    background: linear-gradient(180deg, #f4f8fb 0%, #edf6f0 100%);
+    color: var(--college-text);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    border-radius: 12px !important;
+    padding: 0.75rem 1.1rem;
+    transition: all 0.2s ease;
+    min-width: 96px;
+}
+
+.building-tab:hover {
+    transform: translateY(-1px);
+    border-color: rgba(47,143,98,0.28);
+    box-shadow: 0 0 0 3px rgba(47,143,98,0.08), 0 10px 22px rgba(46,111,181,0.18), 0 0 18px rgba(47,143,98,0.18);
+}
+
+.building-tab.active {
+    background: linear-gradient(135deg, var(--college-green) 0%, var(--college-blue) 100%);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 0 0 3px rgba(243,214,93,0.20), 0 14px 28px rgba(31,109,74,0.28), 0 0 28px rgba(46,111,181,0.30);
+}
+
+.building-tab.active::after {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--college-yellow);
+    margin-left: 0.6rem;
+    vertical-align: middle;
+    box-shadow: 0 0 0 3px rgba(243,214,93,0.15);
+}
+
+.building-title {
+    margin: 0;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: var(--college-green-deep);
+    background: linear-gradient(90deg, rgba(47,143,98,0.12), rgba(46,111,181,0.08), rgba(243,214,93,0.12));
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
+    display: inline-block;
+}
+
+#classroomGrid .col {
+    min-width: 0;
+}
+
+#classroomGrid .card {
+    border-radius: 16px;
+    border: 1px solid rgba(47,143,98,0.08);
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(246,251,249,0.96));
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#classroomGrid .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(31,109,74,0.10);
+}
+
+#classroomGrid .card .card-body {
+    background: linear-gradient(90deg, rgba(47,143,98,0.05), rgba(255,255,255,0));
+    border-bottom: 1px solid rgba(46,111,181,0.08);
+}
+
+#classroomGrid .card h6 {
+    font-size: 1.05rem;
+    color: var(--college-text);
+}
+
+#classroomGrid .card .badge {
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.5rem 0.75rem;
+    border-radius: 999px;
+}
+
+#classroomGrid .badge.bg-success {
+    background: linear-gradient(135deg, var(--college-green), var(--college-green-deep)) !important;
+}
+
+#classroomGrid .badge.bg-danger {
+    background: linear-gradient(135deg, #d76464, #a63d3d) !important;
+}
+
+#classroomGrid .badge.bg-secondary {
+    background: linear-gradient(135deg, #6d8490, #4d646d) !important;
+}
+
+#classroomGrid .card-footer {
+    background: rgba(255,255,255,0.4);
+    border: 0;
+}
+
+#classroomGrid .card-footer p {
+    line-height: 1.55;
+}
+
+.alert-light {
+    background: rgba(255,255,255,0.75);
+    border: 1px dashed rgba(47,143,98,0.28);
+    color: var(--college-text);
+    border-radius: 14px;
+}
+
+body[data-theme="dark"] .dashboard-container .card {
+    background: #111827;
+    color: #edf2f7;
+    border-color: rgba(148, 163, 184, 0.22);
+}
+
+body[data-theme="dark"] .dashboard-container .card-header {
+    background: linear-gradient(135deg, rgba(47,143,98,0.2), rgba(46,111,181,0.2));
+    border-bottom-color: rgba(148, 163, 184, 0.18);
+}
+
+body[data-theme="dark"] .dashboard-container .stats-card {
+    background: linear-gradient(135deg, #172233, #111827);
+    border-color: rgba(148, 163, 184, 0.2);
+}
+
+body[data-theme="dark"] .dashboard-container .stats-card h6 {
+    color: #cbd5e1;
+}
+
+body[data-theme="dark"] .dashboard-container .stats-card .text-success {
+    color: #6ee7a8 !important;
+}
+
+body[data-theme="dark"] .dashboard-container .stats-card .text-warning {
+    color: #f7dc6f !important;
+}
+
+body[data-theme="dark"] .dashboard-container .stats-card .text-primary {
+    color: #7dbdf6 !important;
+}
+
+body[data-theme="dark"] .classroom-shell {
+    background: #141f2e;
+    border-color: rgba(148, 163, 184, 0.2);
+}
+
+body[data-theme="dark"] .building-tab {
+    background: linear-gradient(135deg, #1f2937, #253449);
+    border-color: rgba(148, 163, 184, 0.24);
+    color: #e2e8f0;
+}
+
+body[data-theme="dark"] .building-tab.active {
+    background: linear-gradient(135deg, var(--college-green), var(--college-blue));
+    color: #fff;
+}
+
+body[data-theme="dark"] .building-title {
+    background: linear-gradient(90deg, rgba(47,143,98,0.2), rgba(46,111,181,0.2), rgba(243,214,93,0.12));
+    color: #86efac;
+}
+
+body[data-theme="dark"] #classroomGrid .card {
+    background: linear-gradient(180deg, #1b2839, #172233);
+    border-color: rgba(148, 163, 184, 0.22);
+}
+
+body[data-theme="dark"] #classroomGrid .card .card-body {
+    background: linear-gradient(90deg, rgba(47,143,98,0.1), rgba(23,34,51,0.2));
+    border-bottom-color: rgba(148, 163, 184, 0.18);
+}
+
+body[data-theme="dark"] #classroomGrid .card h6 {
+    color: #f1f5f9;
+}
+
+body[data-theme="dark"] #classroomGrid .card-footer {
+    background: rgba(15, 23, 42, 0.58);
+}
+
+body[data-theme="dark"] .dashboard-container .alert-light {
+    background: #1f2937;
+    border-color: rgba(47,143,98,0.4);
+    color: #e2e8f0;
 }
 </style>
 
@@ -46,7 +307,7 @@ body {
             <div class="row justify-content-center row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
 
             <div class="col">
-                <div class="card stats-card h-100 shadow-sm">
+                <div class="card stats-card stats-card-green h-100 shadow-lg">
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
                         <h6 class="text-muted mb-2">Rooms</h6>
                         <div class="display-4 fw-bold text-success mb-0">{{ $countRoom ?? 0}}</div>
@@ -56,7 +317,7 @@ body {
             </div>
 
             <div class="col">
-                <div class="card stats-card h-100 shadow-sm">
+                <div class="card stats-card stats-card-yellow h-100 shadow-lg">
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
                         <h6 class="text-muted mb-2">Occupied</h6>
                         <div class="display-4 fw-bold text-warning mb-0">{{$occupiedRooms ?? 0}}</div>
@@ -64,7 +325,7 @@ body {
                 </div>
             </div>
             <div class="col">
-                <div class="card stats-card h-100 shadow-sm">
+                <div class="card stats-card stats-card-blue h-100 shadow-lg">
 
                     <div class="card-body d-flex flex-column align-items-center text-center p-4">
                         <h6 class="text-muted mb-2">Faculty</h6>
@@ -83,14 +344,14 @@ body {
 
             <!-- Live Classroom Status -->
             <div class="col-12">
-                <div class="card shadow-lg">
-                    <div class="card-header bg-primary bg-opacity-10">
+                <div class="card shadow-lg classroom-shell">
+                    <div class="card-header">
                         <h5 class="mb-0 fw-bold text-dark">Live Classroom Status</h5>
                     </div>
 
                     {{-- add a navbar of buildings (click to filter classrooms) --}}
                     <div class="card-body p-0">
-                        <p class="p-4 pb-3 text-muted small">Rooms update automatically as Faculty tap registered RFID Cards.</p>
+                        <p class="p-4 pb-3 text-muted small mb-0">Rooms update automatically as Faculty tap registered RFID Cards.</p>
 
                         {{-- Building selector --}}
                         <div class="px-3 pb-2">
@@ -123,7 +384,7 @@ body {
                         </div>
 
                         {{-- Building header --}}
-                        <div class="card-body" style="">
+                        <div class="px-4 pb-2 pt-1">
                             <h3 class="building-title"></h3>
                         </div>
 
@@ -209,7 +470,7 @@ body {
                                 : '<p class="mb-0 text-muted fs-6"><small class="fw-bold text-uppercase">Faculty:</small> None</p>';
                             return `
                                 <div class="col">
-                                    <div class="card shadow-sm h-100 border-1">
+                                    <div class="card shadow-lg h-100 border-1">
                                         <div class="card-body p-3">
                                             <div class="d-flex justify-content-between align-items-start mb-1">
                                                 <div>

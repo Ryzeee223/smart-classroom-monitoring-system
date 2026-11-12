@@ -80,7 +80,7 @@ body {
         </div>
 
         <!-- main content -->
-        <main class="container py-2 bg-light rounded-3">
+        <main class="">
 
             <h1 class="mb-4">Users Management</h1>
 
@@ -379,7 +379,7 @@ body {
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex align-items-center gap-2">
-                                        <button type="button" class="btn btn-sm btn-outline-primary" title="Edit"
+                                        <button type="button" class="btn btn-sm btn-outline-primary btn-edit" title="Edit" aria-label="Edit"
                                                 data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">
                                             ✏️
                                         </button>
@@ -387,7 +387,7 @@ body {
                                         <form method="POST" action="{{ route('users.archive', $user->id) }}" onsubmit="return confirm('Archive this user?')" class="m-0">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Archive">🗑</button>
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Archive" aria-label="Archive">🗑</button>
                                         </form>
                                     </div>
                                 </td>

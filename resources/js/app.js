@@ -3,7 +3,29 @@ import './bootstrap';
 
 // RFINSIDE Custom JavaScript
 
+function applyTheme(theme) {
+    const nextTheme = theme === 'dark' ? 'dark' : 'light';
+    document.body.setAttribute('data-theme', nextTheme);
+    document.documentElement.style.colorScheme = nextTheme;
+    localStorage.setItem('rfinside-theme', nextTheme);
+
+    const toggle = document.getElementById('darkModeToggle');
+    if (toggle) {
+        toggle.checked = nextTheme === 'dark';
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function () {
+    const savedTheme = localStorage.getItem('rfinside-theme') || 'light';
+    applyTheme(savedTheme);
+
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', function () {
+            applyTheme(this.checked ? 'dark' : 'light');
+        });
+    }
+
     // Password Toggle Functionality
     const passwordToggles = document.querySelectorAll("[data-password-toggle]");
 
@@ -34,10 +56,12 @@ document.addEventListener("DOMContentLoaded", function () {
     if (navbar) {
         window.addEventListener("scroll", () => {
             if (window.scrollY > 50) {
-                navbar.style.background = "rgba(13, 110, 253, 0.95)";
+                navbar.style.background = "linear-gradient(135deg, rgba(47, 143, 98, 0.96), rgba(46, 111, 181, 0.96))";
+                navbar.style.boxShadow = "0 0 18px rgba(47, 143, 98, 0.20), 0 0 24px rgba(46, 111, 181, 0.18)";
                 navbar.style.backdropFilter = "blur(10px)";
             } else {
-                navbar.style.background = "rgba(13, 110, 253, 1)";
+                navbar.style.background = "linear-gradient(135deg, #2f8f62, #2e6fb5)";
+                navbar.style.boxShadow = "0 0 18px rgba(47, 143, 98, 0.18), 0 0 22px rgba(46, 111, 181, 0.14)";
                 navbar.style.backdropFilter = "none";
             }
         });
@@ -62,17 +86,6 @@ document.addEventListener("DOMContentLoaded", function () {
             row.style.opacity = "1";
             row.style.transform = "translateY(0)";
         }, index * 100);
-    });
-
-    // Card hover scale effect
-    const cards = document.querySelectorAll(".card, .hero-card");
-    cards.forEach((card) => {
-        card.addEventListener("mouseenter", function () {
-            this.style.transform = "translateY(-8px) scale(1.02)";
-        });
-        card.addEventListener("mouseleave", function () {
-            this.style.transform = "translateY(0) scale(1)";
-        });
     });
 
     // Form validation styling

@@ -16,13 +16,41 @@
         /* match dashboard-admin layout so sidebar occupies its space */
         .app-shell{display:flex;}
         .app-shell__content{flex:1; min-width:0; margin-left:260px;}
+        .programs-page .btn-primary { color: #fff; }
+        .programs-page .btn-outline-secondary { color: #344256; }
+        .programs-page .btn-outline-danger { color: #b02a37; }
+        body[data-theme="dark"] .programs-page .list-group-item {
+            --bs-list-group-bg: #1f2937;
+            --bs-list-group-color: #edf2f7;
+            --bs-list-group-border-color: rgba(148, 163, 184, 0.18);
+            background: #1f2937;
+            color: #edf2f7;
+        }
+        body[data-theme="dark"] .programs-page .btn-outline-secondary {
+            background: rgba(46,111,181,0.2);
+            border-color: rgba(125,211,252,0.55);
+            color: #e0f2fe;
+        }
+        body[data-theme="dark"] .programs-page .btn-outline-secondary:hover {
+            background: rgba(46,111,181,0.38);
+            color: #fff;
+        }
+        body[data-theme="dark"] .programs-page .btn-outline-danger {
+            background: rgba(190,24,93,0.16);
+            border-color: rgba(251,113,133,0.55);
+            color: #fecdd3;
+        }
+        body[data-theme="dark"] .programs-page .btn-outline-danger:hover {
+            background: rgba(190,24,93,0.32);
+            color: #fff;
+        }
         @media (max-width: 767.98px){
             .app-shell__content{margin-left:0;}
         }
     </style>
 
     <div class="app-shell">
-    <main class="app-shell__content container mt-4 mb-5 p-4 gap-4">  
+    <main class="app-shell__content programs-page container mt-4 mb-5 p-4 gap-4">  
         <?php echo $__env->make('partials.feedback-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
         <div class="row">
             <div class="col-12 col-lg-6 mb-4">
@@ -101,11 +129,11 @@
                                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($program->description): ?><br><small><?php echo e($program->description); ?></small><?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                 </div>
                                 <div class="d-flex flex-column gap-1">
-                                    <a class="btn btn-sm btn-outline-secondary" href="<?php echo e(route('programs.edit', $program->id)); ?>">Edit</a>
+                                    <a class="btn btn-sm btn-outline-secondary btn-edit" href="<?php echo e(route('programs.edit', $program->id)); ?>" title="Edit" aria-label="Edit">✏️</a>
                                     <form method="POST" action="<?php echo e(route('programs.archive', $program->id)); ?>">
                                         <?php echo csrf_field(); ?>
                                         <?php echo method_field('DELETE'); ?>
-                                        <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold" onclick="return confirm('Archive this program?')">Archive</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold" title="Archive" aria-label="Archive" onclick="return confirm('Archive this program?')">🗑</button>
                                     </form>
                                 </div>
                             </li>

@@ -1,28 +1,21 @@
 {
-  "_bootstrap.esm-CiZvvyki.js": {
-    "file": "assets/bootstrap.esm-CiZvvyki.js",
-    "name": "bootstrap.esm"
-  },
   "resources/js/app.js": {
-    "file": "assets/app-BOdu4wmg.js",
+    "file": "assets/app-Bw0UH_Hq.js",
     "name": "app",
     "src": "resources/js/app.js",
-    "isEntry": true,
-    "imports": [
-      "_bootstrap.esm-CiZvvyki.js"
-    ]
+    "isEntry": true
   },
   "resources/js/bootstrap-vendor.js": {
-    "file": "assets/bootstrap-vendor-D5-L5l7Y.js",
+    "file": "assets/bootstrap-vendor-2UC4I4MA.js",
     "name": "bootstrap-vendor",
     "src": "resources/js/bootstrap-vendor.js",
     "isEntry": true,
     "imports": [
-      "_bootstrap.esm-CiZvvyki.js"
+      "resources/js/app.js"
     ]
   },
   "resources/sass/app.scss": {
-    "file": "assets/app-Rx9I6QyL.css",
+    "file": "assets/app-BwhpKD3n.css",
     "src": "resources/sass/app.scss",
     "isEntry": true,
     "name": "app",

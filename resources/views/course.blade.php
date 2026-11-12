@@ -157,11 +157,11 @@
                                                 <td>{{ $course->course_name }}</td>
                                                 <td>{{ Str::limit($course->unit, 30) }}</td>
                                                 <td class="text-nowrap">
-                                                    <a href="{{ route('course.edit', $course->id) }}" class="btn btn-sm btn-outline-primary fw-semibold">Edit</a>
+                                                    <a href="{{ route('course.edit', $course->id) }}" class="btn btn-sm btn-outline-primary btn-edit fw-semibold" title="Edit" aria-label="Edit">✏️</a>
                                                     <form method="POST" action="{{ route('course.archive', $course->id) }}" class="d-inline" onsubmit="return confirm('Delete this course?')">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete">🗑</button>
                                                     </form>
                                                 </td>
                                             </tr>

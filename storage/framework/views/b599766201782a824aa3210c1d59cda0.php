@@ -62,11 +62,11 @@
                                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($college->description): ?><br><small><?php echo e($college->description); ?></small><?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                 </div>
                                 <div class="d-flex flex-column gap-1">
-                                    <a class="btn btn-sm btn-outline-secondary" href="<?php echo e(route('college.edit', $college->id)); ?>">Edit</a>
+                                    <a class="btn btn-sm btn-outline-secondary btn-edit" href="<?php echo e(route('college.edit', $college->id)); ?>" title="Edit" aria-label="Edit">✏️</a>
                                     <form method="POST" action="<?php echo e(route('college.archive', $college->id)); ?>">
                                         <?php echo csrf_field(); ?>
                                         <?php echo method_field('DELETE'); ?>
-                                        <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold" onclick="return confirm('Archive this college?')">Archive</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold" title="Archive" aria-label="Archive" onclick="return confirm('Archive this college?')">🗑</button>
                                     </form>
                                 </div>
                             </li>

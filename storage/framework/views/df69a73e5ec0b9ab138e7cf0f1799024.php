@@ -158,11 +158,11 @@
                                                 <td><?php echo e($course->course_name); ?></td>
                                                 <td><?php echo e(Str::limit($course->unit, 30)); ?></td>
                                                 <td class="text-nowrap">
-                                                    <a href="<?php echo e(route('course.edit', $course->id)); ?>" class="btn btn-sm btn-outline-primary fw-semibold">Edit</a>
+                                                    <a href="<?php echo e(route('course.edit', $course->id)); ?>" class="btn btn-sm btn-outline-primary btn-edit fw-semibold" title="Edit" aria-label="Edit">✏️</a>
                                                     <form method="POST" action="<?php echo e(route('course.archive', $course->id)); ?>" class="d-inline" onsubmit="return confirm('Delete this course?')">
                                                         <?php echo csrf_field(); ?>
                                                         <?php echo method_field('DELETE'); ?>
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete">🗑</button>
                                                     </form>
                                                 </td>
                                             </tr>

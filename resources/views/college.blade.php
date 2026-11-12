@@ -62,11 +62,11 @@
                                     @if($college->description)<br><small>{{ $college->description }}</small>@endif
                                 </div>
                                 <div class="d-flex flex-column gap-1">
-                                    <a class="btn btn-sm btn-outline-secondary" href="{{ route('college.edit', $college->id) }}">Edit</a>
+                                    <a class="btn btn-sm btn-outline-secondary btn-edit" href="{{ route('college.edit', $college->id) }}" title="Edit" aria-label="Edit">✏️</a>
                                     <form method="POST" action="{{ route('college.archive', $college->id) }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold" onclick="return confirm('Archive this college?')">Archive</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold" title="Archive" aria-label="Archive" onclick="return confirm('Archive this college?')">🗑</button>
                                     </form>
                                 </div>
                             </li>

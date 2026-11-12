@@ -14,7 +14,165 @@
 <style>
    body{
     overflow-x: hidden;
+    background: #f4f7fb;
+    color: #1f2937;
+    transition: background 0.25s ease, color 0.25s ease;
    }
+
+   body[data-theme="dark"] {
+    background: #0b1220;
+    color: #edf2f7;
+   }
+
+   body[data-theme="dark"] .card,
+   body[data-theme="dark"] .card-body,
+   body[data-theme="dark"] .card-header,
+   body[data-theme="dark"] .form-control,
+   body[data-theme="dark"] .form-select,
+   body[data-theme="dark"] .table,
+   body[data-theme="dark"] .modal-content {
+    background: #111827;
+    color: #edf2f7;
+    border-color: rgba(148, 163, 184, 0.22);
+   }
+
+   body[data-theme="dark"] .text-muted,
+   body[data-theme="dark"] .form-label,
+   body[data-theme="dark"] label,
+   body[data-theme="dark"] .small,
+   body[data-theme="dark"] h4,
+   body[data-theme="dark"] h5,
+   body[data-theme="dark"] h3 {
+    color: #e2e8f0 !important;
+   }
+
+   body[data-theme="dark"] .bg-light,
+   body[data-theme="dark"] .table-light {
+    background: #1f2937 !important;
+    color: #edf2f7 !important;
+   }
+
+   body[data-theme="dark"] .form-control,
+   body[data-theme="dark"] .form-select {
+    background-color: #0f172a;
+    border-color: rgba(148, 163, 184, 0.26);
+    color: #f8fafc;
+   }
+
+   body[data-theme="dark"] .btn-outline-danger,
+   body[data-theme="dark"] .btn-primary,
+   body[data-theme="dark"] .btn-warning {
+    box-shadow: 0 0 18px rgba(59, 130, 246, 0.12);
+   }
+
+    .settings-header {
+     flex-wrap: wrap;
+     gap: .75rem;
+    }
+
+    .theme-mode-toggle {
+     display: inline-flex;
+     align-items: center;
+     gap: .75rem;
+     margin: 0;
+     padding: .45rem .75rem;
+     border: 1px solid rgba(46, 111, 181, .2);
+     border-radius: 999px;
+     background: rgba(46, 111, 181, .06);
+    }
+
+    .theme-mode-toggle .form-check-label {
+     cursor: pointer;
+     white-space: nowrap;
+    }
+
+    .theme-mode-toggle .form-check-input {
+     float: none;
+     width: 2.7rem;
+     height: 1.5rem;
+     margin: 0;
+     cursor: pointer;
+     background-color: #d7e0e5;
+     border: 1px solid #9aadb7;
+     box-shadow: none;
+     transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .theme-mode-toggle .form-check-input:checked {
+     background-color: #2f8f62;
+     border-color: #2f8f62;
+     box-shadow: 0 0 0 2px rgba(243, 214, 93, .2), 0 0 16px rgba(47, 143, 98, .28);
+    }
+
+    .theme-mode-toggle .form-check-input:focus-visible {
+     border-color: #2e6fb5;
+     box-shadow: 0 0 0 3px rgba(46, 111, 181, .24);
+    }
+
+    body[data-theme="dark"] .theme-mode-toggle {
+     background: rgba(46, 111, 181, .14);
+     border-color: rgba(125, 211, 252, .28);
+    }
+
+    body[data-theme="dark"] .theme-mode-toggle .form-check-input {
+     background-color: #334155;
+     border-color: #64748b;
+    }
+
+    body[data-theme="dark"] .theme-mode-toggle .form-check-input:checked {
+     background-color: #2f8f62;
+     border-color: #6ee7a8;
+     box-shadow: 0 0 0 2px rgba(243, 214, 93, .18), 0 0 18px rgba(47, 143, 98, .35), 0 0 22px rgba(46, 111, 181, .22);
+    }
+
+    .settings-page .card {
+     overflow: hidden;
+     border: 1px solid rgba(46, 111, 181, .12);
+     border-radius: .75rem;
+     background: #fff;
+    }
+
+    .settings-page .card-header {
+     padding: 1rem 1.25rem;
+     background: linear-gradient(135deg, rgba(47, 143, 98, .13), rgba(46, 111, 181, .12));
+     border-bottom: 1px solid rgba(46, 111, 181, .12);
+    }
+
+    .settings-page .card-body {
+     padding: 1.25rem;
+    }
+
+    .settings-page .settings-panel {
+     margin-top: 1rem;
+     border-color: rgba(46, 111, 181, .16);
+     background: linear-gradient(145deg, rgba(47, 143, 98, .035), rgba(46, 111, 181, .045));
+    }
+
+    .settings-page .settings-section-title {
+     padding-left: .7rem;
+     border-left: 4px solid #2f8f62;
+     color: #1f6d4a;
+    }
+
+    body[data-theme="dark"] .settings-page .card {
+     border-color: rgba(148, 163, 184, .22);
+     background: #111827;
+    }
+
+    body[data-theme="dark"] .settings-page .card-header {
+     background: linear-gradient(135deg, rgba(47, 143, 98, .24), rgba(46, 111, 181, .24));
+     border-bottom-color: rgba(148, 163, 184, .2);
+    }
+
+    body[data-theme="dark"] .settings-page .settings-panel {
+     background: linear-gradient(145deg, rgba(47, 143, 98, .08), rgba(46, 111, 181, .1));
+    }
+
+    body[data-theme="dark"] .settings-page .settings-section-title {
+     border-left-color: #f3d65d;
+     color: #b7f0ce !important;
+    }
+
    /* desktop offset provided by sidebar.blade.php styles */
    .page-content{
         margin-left: 260px;
@@ -28,13 +186,17 @@
 @include('sidebar')
 
 <div class="page-content">
-    <main class="container mt-4 mb-5">
+    <main class="container settings-page mt-4 mb-5">
 
         @include('partials.feedback-modal')
 
-        <div class="card">
-            <div class="card-header">
-                <h3>Settings</h3>
+        <div class="card settings-shell shadow-lg">
+            <div class="card-header settings-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Settings</h3>
+                <div class="form-check form-switch theme-mode-toggle">
+                    <label class="form-check-label fw-semibold" for="darkModeToggle">Dark mode</label>
+                    <input class="form-check-input theme-mode-toggle__input" type="checkbox" role="switch" id="darkModeToggle" aria-label="Toggle dark mode" />
+                </div>
             </div>
 
             <div class="card-body">
@@ -43,7 +205,7 @@
 
                     <!-- RFID Assign -->
                     <br>
-                    <h4 class="mb-3">Assign RFID</h4>
+                    <h4 class="settings-section-title mb-3">Assign RFID</h4>
                     <form action="{{ route('settings.assign_rfid') }}" method="POST">
                         @csrf
 
@@ -122,9 +284,9 @@
                 <br>
 
                 
-                <div class="card">
+                <div class="card settings-panel">
                     <div class="card-body mb-0">
-                        <h5 class="form-label">Reset my password</h5>
+                        <h5 class="settings-section-title">Reset my password</h5>
                         <form action="{{ route('settings.reset_password') }}" method="POST" class="mt-3">
                             @csrf
 
@@ -145,9 +307,9 @@
 
                 {{-- Admin-only: reset another user's password --}}
                 @if ((int) (session('user_role') ?? 0) === 1)
-                    <div class="card mt-3">
+                    <div class="card settings-panel mt-3">
                         <div class="card-body">
-                            <h4>Reset password (Admin)</h4>
+                            <h4 class="settings-section-title">Reset password (Admin)</h4>
 
                             {{-- Reset another user's password --}}
                             <form action="{{ route('settings.reset_user_password') }}" method="POST" class="mt-3">

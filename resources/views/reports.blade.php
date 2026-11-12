@@ -89,7 +89,7 @@
         <div class="row justify-content-end">
             <div class="col-md-9  shadow">
 
-                <div class="card schedule-card shadow-sm border-1">
+                <div class="card schedule-card shadow-lg border-1">
                     <div class="schedule-header d-flex justify-content-between align-items-center flex-wrap gap-3 ">
                         <div>
                             <h5 class="mb-1 fw-bold text-dark">Faculty Schedule Overview</h5>

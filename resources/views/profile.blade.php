@@ -18,7 +18,7 @@
 
                 <div class="col-md-9 mt-5">
                     @include('partials.feedback-modal')
-                    <div class="card shadow-sm">
+                    <div class="card shadow-lg">
                         <div class="card-body">
                             
                                             

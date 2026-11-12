@@ -18,7 +18,7 @@
 
                 <div class="col-md-9 mt-5">
                     <?php echo $__env->make('partials.feedback-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-                    <div class="card shadow-sm">
+                    <div class="card shadow-lg">
                         <div class="card-body">
                             
                                             

@@ -3,6 +3,17 @@
 ?>
 
 <style>
+    :root {
+        --college-green: #2f8f62;
+        --college-green-deep: #1d6a47;
+        --college-yellow: #f3d65d;
+        --college-blue: #2e6fb5;
+        --college-bg: #f5faf7;
+        --college-panel: #ffffff;
+        --college-text: #1d2a2a;
+        --college-muted: #5e6d71;
+    }
+
     .content-scroll {
         overflow-y: auto;
         overflow-x: hidden;
@@ -60,7 +71,7 @@
            
             <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('programs') || request()->routeIs('programs.index') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('programs')); ?>">🎓Programs</a></li>
             
-            <li class="nav-item"><a class="nav-link" href="<?php echo e(route('settings')); ?>">⚙️Settings</a></li>
+            <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('settings') || request()->is('settings*') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('settings')); ?>">⚙️Settings</a></li>
             <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('reports') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('reports')); ?>">📋Reports</a></li>
 
             <?php elseif($role === 3): ?>
@@ -77,7 +88,7 @@
            
             <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('programs') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('programs')); ?>">🎓Programs</a></li>
             
-            <li class="nav-item"><a class="nav-link" href="<?php echo e(route('settings')); ?>">🎓Settings</a></li>
+            <li class="nav-item"><a class="nav-link <?php echo e(request()->routeIs('settings') || request()->is('settings*') ? 'active fw-bold' : ''); ?>" href="<?php echo e(route('settings')); ?>">⚙️Settings</a></li>
 
             
         <?php elseif($role === 4): ?>
@@ -137,14 +148,14 @@
         width:260px;
         height:100%;
         position:fixed;
-
         top:0;
         left:0;
-        background:#f8f9fa;
-        border-right:1px solid #e9ecef;
+        background: linear-gradient(180deg, #f4fbf7 0%, #f5f9ff 100%);
+        border-right:1px solid rgba(47,143,98,0.12);
         padding:16px;
         display:flex;
         flex-direction:column;
+        box-shadow: 0 12px 30px rgba(20, 42, 55, 0.06);
     }
 
     body > .app-sidebar + * {
@@ -158,6 +169,8 @@
         justify-content:space-between;
         gap:12px;
         margin-bottom:16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(46,111,181,0.08);
     }
 
     /* default desktop content offset (safe on mobile via media query below) */
@@ -171,27 +184,200 @@
         font-weight:800;
         font-size:1.25rem;
         text-decoration:none;
-        color:inherit;
+        color: var(--college-green-deep);
+        letter-spacing: 0.03em;
     }
-    .app-sidebar__user{font-size:.85rem;color:#6c757d;margin-top:4px;}
+    .app-sidebar__user{font-size:.85rem;color: var(--college-muted); margin-top:4px;}
     .app-sidebar__notifications{
         width:36px;
         height:36px;
         padding:0;
         flex:0 0 auto;
+        background: linear-gradient(135deg, var(--college-yellow-soft), #fff);
+        border: 1px solid rgba(243,214,93,0.38);
+        color: var(--college-text);
     }
     .notification-icon{
         display:inline-block;
         line-height:1;
     }
     .app-sidebar__notifications:focus-visible{
-        outline:3px solid #0d6efd;
+        outline:3px solid rgba(46,111,181,0.35);
         outline-offset:2px;
     }
     .app-sidebar__body{flex:1; overflow:auto; padding-right:6px;}
-    .app-sidebar__body .nav-link{border-radius:10px; margin:2px 0; color:#212529;}
-    .app-sidebar__body .nav-link.active{background:#0d6efd22; color:#0d6efd;}
+    .app-sidebar__body .nav-link{
+        border-radius:12px; 
+        margin:2px 0; 
+        color: var(--college-text);
+        font-weight: 600;
+        padding: 0.7rem 0.8rem;
+        transition: 0.2s ease;
+    }
+    .app-sidebar__body .nav-link:hover{
+        background: linear-gradient(135deg, rgba(243,214,93,0.18), rgba(46,111,181,0.12));
+        transform: translateX(2px);
+        box-shadow: 0 0 0 2px rgba(243,214,93,0.12), 0 8px 18px rgba(46,111,181,0.14), 0 0 18px rgba(47,143,98,0.10);
+    }
+    .app-sidebar__body .nav-link.active{
+        background: linear-gradient(135deg, var(--college-green) 0%, var(--college-blue) 100%);
+        color:#fff;
+        box-shadow: 0 0 0 2px rgba(243,214,93,0.16), 0 12px 22px rgba(47,143,98,0.28), 0 0 22px rgba(46,111,181,0.22);
+    }
     .app-sidebar__footer{padding-top:12px;}
+
+    body[data-theme="dark"] {
+        background: #0b1220;
+        color: #edf2f7;
+    }
+
+    body[data-theme="dark"] .page-content,
+    body[data-theme="dark"] .app-shell__content,
+    body[data-theme="dark"] main,
+    body[data-theme="dark"] .container,
+    body[data-theme="dark"] .container-fluid {
+        background: transparent;
+    }
+
+    body[data-theme="dark"] .app-sidebar {
+        background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+        border-right: 1px solid rgba(148, 163, 184, 0.16);
+        box-shadow: 0 12px 28px rgba(2, 6, 23, 0.45);
+    }
+
+    body[data-theme="dark"] .app-sidebar__notifications {
+        background: linear-gradient(135deg, rgba(243,214,93,0.95), rgba(125,211,252,0.9));
+        border-color: rgba(243,214,93,0.8);
+        color: #0f172a;
+        box-shadow: 0 0 18px rgba(243,214,93,0.35), 0 0 24px rgba(96,165,250,0.22);
+    }
+
+    body[data-theme="dark"] .app-sidebar__notifications .notification-icon {
+        filter: none;
+    }
+
+    body[data-theme="dark"] .app-sidebar .btn-outline-dark {
+        background: linear-gradient(135deg, rgba(47,143,98,0.16), rgba(46,111,181,0.16));
+        border-color: rgba(148, 163, 184, 0.2);
+        color: #edf2f7;
+    }
+
+    body[data-theme="dark"] .app-sidebar .btn-outline-dark .nav-link,
+    body[data-theme="dark"] .app-sidebar .btn-outline-dark a {
+        color: #edf2f7 !important;
+    }
+
+    body[data-theme="dark"] .btn,
+    body[data-theme="dark"] .btn-outline-dark,
+    body[data-theme="dark"] .btn-light,
+    body[data-theme="dark"] .btn-outline-primary,
+    body[data-theme="dark"] .btn-outline-secondary,
+    body[data-theme="dark"] .btn-primary,
+    body[data-theme="dark"] .btn-warning,
+    body[data-theme="dark"] .btn-danger {
+        border-color: rgba(148, 163, 184, 0.24);
+        box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.08);
+    }
+
+    body[data-theme="dark"] .btn-outline-dark,
+    body[data-theme="dark"] .btn-outline-primary,
+    body[data-theme="dark"] .btn-outline-secondary {
+        background: linear-gradient(135deg, rgba(47,143,98,0.18), rgba(46,111,181,0.18));
+        color: #edf2f7;
+    }
+
+    body[data-theme="dark"] .btn-outline-dark:hover,
+    body[data-theme="dark"] .btn-outline-primary:hover,
+    body[data-theme="dark"] .btn-outline-secondary:hover {
+        background: linear-gradient(135deg, rgba(47,143,98,0.28), rgba(46,111,181,0.28));
+        border-color: rgba(243,214,93,0.38);
+        box-shadow: 0 0 18px rgba(47,143,98,0.18), 0 0 24px rgba(46,111,181,0.15);
+    }
+
+    body[data-theme="dark"] .app-sidebar__brand-link,
+    body[data-theme="dark"] .app-sidebar__user,
+    body[data-theme="dark"] .app-sidebar__body .nav-link,
+    body[data-theme="dark"] .app-sidebar__body .nav-link.active,
+    body[data-theme="dark"] .app-sidebar__body .nav-link:hover {
+        color: #e2e8f0;
+    }
+
+    body[data-theme="dark"] .app-sidebar__body .nav-link {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.08);
+    }
+
+    body[data-theme="dark"] .app-sidebar__body .nav-link:hover {
+        background: linear-gradient(135deg, rgba(243,214,93,0.14), rgba(46,111,181,0.14));
+    }
+
+    body[data-theme="dark"] .card,
+    body[data-theme="dark"] .card-body,
+    body[data-theme="dark"] .card-header,
+    body[data-theme="dark"] .form-control,
+    body[data-theme="dark"] .form-select,
+    body[data-theme="dark"] .table,
+    body[data-theme="dark"] .table-responsive,
+    body[data-theme="dark"] .alert,
+    body[data-theme="dark"] .modal-content {
+        background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+        color: #edf2f7;
+        border-color: rgba(148, 163, 184, 0.22);
+    }
+
+    body[data-theme="dark"] .dropdown-menu {
+        background: #111827;
+        border-color: rgba(148, 163, 184, 0.22);
+        box-shadow: 0 0 0 2px rgba(243,214,93,0.16), 0 12px 22px rgba(47,143,98,0.28), 0 0 22px rgba(46,111,181,0.22);
+    }
+
+    body[data-theme="dark"] .dropdown-item {
+        color: #e2e8f0;
+    }
+
+    body[data-theme="dark"] .dropdown-item:hover,
+    body[data-theme="dark"] .dropdown-item:focus {
+        background: linear-gradient(135deg, rgba(47,143,98,0.22), rgba(46,111,181,0.22));
+        color: #fff;
+    }
+
+    body[data-theme="dark"] .form-select:focus,
+    body[data-theme="dark"] .dropdown-toggle:focus-visible {
+        border-color: rgba(243,214,93,0.55);
+        box-shadow: 0 0 0 2px rgba(243,214,93,0.16), 0 12px 22px rgba(47,143,98,0.28), 0 0 22px rgba(46,111,181,0.22);
+    }
+
+    body[data-theme="dark"] .text-muted,
+    body[data-theme="dark"] .form-label,
+    body[data-theme="dark"] label,
+    body[data-theme="dark"] .small,
+    body[data-theme="dark"] h1,
+    body[data-theme="dark"] h2,
+    body[data-theme="dark"] h3,
+    body[data-theme="dark"] h4,
+    body[data-theme="dark"] h5,
+    body[data-theme="dark"] h6,
+    body[data-theme="dark"] .fw-semibold,
+    body[data-theme="dark"] .card-title {
+        color: #e2e8f0 !important;
+    }
+
+    body[data-theme="dark"] .bg-light,
+    body[data-theme="dark"] .alert-light {
+        background: #1f2937 !important;
+        color: #edf2f7 !important;
+    }
+
+    body[data-theme="dark"] .form-control,
+    body[data-theme="dark"] .form-select {
+        background-color: #0f172a;
+        border-color: rgba(148, 163, 184, 0.26);
+        color: #f8fafc;
+    }
+
+    body[data-theme="dark"] .form-control::placeholder {
+        color: rgba(226, 232, 240, 0.7);
+    }
 
     
     .app-shell{display:block; min-height:100vh;}
