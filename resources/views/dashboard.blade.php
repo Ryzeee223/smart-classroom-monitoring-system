@@ -537,11 +537,11 @@ body[data-theme="dark"] .dashboard-container .alert-light {
 
 
 
-            <div class="row g-3 mb-5">
+            <div class="row g-3 mb-5 justify-content-center">
 
             <!-- Attendance -->
             @if (in_array(session('user_role'), [2,3,4,5]))
-                <div class="col-lg-11  d-box mt-2 mx-5 justify-content-center">
+                <div class="col-12 col-xl-11 mt-2">
                         <div class="card shadow ">
                             <div class="card-header">
                                 <h5 class="mb-0 fw-bold">My Attendance</h5>

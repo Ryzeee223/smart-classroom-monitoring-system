@@ -147,6 +147,134 @@ html body[data-theme="dark"] .table.table-hover > tbody > tr:hover > * {
     color: #fff !important;
 }
 
+.badge,
+.status-badge {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 999px;
+    font-weight: 700;
+    box-shadow: 0 0 0 1px rgba(46, 111, 181, 0.1), 0 3px 10px rgba(15, 23, 42, 0.16);
+    transition: box-shadow .18s ease, filter .18s ease;
+}
+
+.badge.bg-success,
+.status-badge.bg-success {
+    border-color: rgba(110, 231, 168, 0.55);
+    box-shadow: 0 0 0 1px rgba(47, 143, 98, 0.18), 0 4px 12px rgba(47, 143, 98, 0.28), 0 0 16px rgba(47, 143, 98, 0.16);
+}
+
+.badge.bg-warning,
+.status-badge.bg-warning {
+    border-color: rgba(243, 214, 93, 0.72);
+    box-shadow: 0 0 0 1px rgba(243, 214, 93, 0.2), 0 4px 12px rgba(193, 149, 24, 0.24), 0 0 16px rgba(243, 214, 93, 0.18);
+}
+
+.badge.bg-primary,
+.badge.bg-info,
+.status-badge.bg-primary,
+.status-badge.bg-info {
+    border-color: rgba(125, 211, 252, 0.58);
+    box-shadow: 0 0 0 1px rgba(46, 111, 181, 0.18), 0 4px 12px rgba(46, 111, 181, 0.26), 0 0 16px rgba(46, 111, 181, 0.18);
+}
+
+.badge.bg-danger,
+.status-badge.bg-danger {
+    border-color: rgba(251, 113, 133, 0.58);
+    box-shadow: 0 0 0 1px rgba(220, 53, 69, 0.16), 0 4px 12px rgba(220, 53, 69, 0.26), 0 0 16px rgba(225, 29, 72, 0.16);
+}
+
+.badge.bg-secondary,
+.status-badge.bg-secondary {
+    border-color: rgba(191, 219, 254, 0.42);
+    box-shadow: 0 0 0 1px rgba(46, 111, 181, 0.14), 0 4px 12px rgba(71, 85, 105, 0.2), 0 0 14px rgba(46, 111, 181, 0.12);
+}
+
+.badge:hover,
+.status-badge:hover {
+    filter: brightness(1.06);
+}
+
+body[data-theme="dark"] .badge,
+body[data-theme="dark"] .status-badge {
+    border-color: rgba(226, 232, 240, 0.3);
+    box-shadow: 0 0 0 1px rgba(243, 214, 93, 0.1), 0 4px 12px rgba(46, 111, 181, 0.22);
+}
+
+body[data-theme="dark"] .badge.bg-success,
+body[data-theme="dark"] .status-badge.bg-success {
+    border-color: rgba(110, 231, 168, 0.68);
+    box-shadow: 0 0 0 1px rgba(243, 214, 93, 0.12), 0 4px 14px rgba(47, 143, 98, 0.36), 0 0 18px rgba(47, 143, 98, 0.22);
+}
+
+body[data-theme="dark"] .badge.bg-warning,
+body[data-theme="dark"] .status-badge.bg-warning {
+    border-color: rgba(243, 214, 93, 0.78);
+    box-shadow: 0 0 0 1px rgba(243, 214, 93, 0.18), 0 4px 14px rgba(193, 149, 24, 0.32), 0 0 18px rgba(243, 214, 93, 0.22);
+}
+
+body[data-theme="dark"] .badge.bg-primary,
+body[data-theme="dark"] .badge.bg-info,
+body[data-theme="dark"] .status-badge.bg-primary,
+body[data-theme="dark"] .status-badge.bg-info {
+    border-color: rgba(125, 211, 252, 0.72);
+    box-shadow: 0 0 0 1px rgba(243, 214, 93, 0.1), 0 4px 14px rgba(46, 111, 181, 0.34), 0 0 18px rgba(46, 111, 181, 0.22);
+}
+
+body[data-theme="dark"] .badge.bg-danger,
+body[data-theme="dark"] .status-badge.bg-danger {
+    border-color: rgba(251, 113, 133, 0.72);
+    box-shadow: 0 0 0 1px rgba(251, 113, 133, 0.16), 0 4px 14px rgba(220, 53, 69, 0.34), 0 0 18px rgba(225, 29, 72, 0.22);
+}
+
+body[data-theme="dark"] #notificationsModal .modal-content,
+body[data-theme="dark"] #notificationsModal .modal-body {
+    background: #111827;
+    color: #e2e8f0;
+}
+
+body[data-theme="dark"] #notificationsModal .modal-header {
+    border-bottom-color: rgba(148, 163, 184, 0.2);
+}
+
+body[data-theme="dark"] #notificationsModal .modal-title,
+body[data-theme="dark"] #notificationsModal h6,
+body[data-theme="dark"] #notificationsModal .fw-bold {
+    color: #f1f5f9;
+}
+
+body[data-theme="dark"] #notificationsModal .list-group-item {
+    --bs-list-group-bg: #172233;
+    --bs-list-group-color: #e2e8f0;
+    --bs-list-group-border-color: rgba(148, 163, 184, 0.2);
+    background: #172233 !important;
+    border-color: rgba(148, 163, 184, 0.2);
+    color: #e2e8f0 !important;
+}
+
+body[data-theme="dark"] #notificationsModal .list-group-item-action:hover,
+body[data-theme="dark"] #notificationsModal .list-group-item-action:focus {
+    background: linear-gradient(135deg, rgba(47, 143, 98, 0.2), rgba(46, 111, 181, 0.2)) !important;
+    color: #fff !important;
+}
+
+body[data-theme="dark"] #notificationsModal .collapse {
+    background: #111827;
+    border-color: rgba(148, 163, 184, 0.22) !important;
+    color: #e2e8f0;
+}
+
+body[data-theme="dark"] #notificationsModal .collapse .p-3 {
+    border-top-color: rgba(148, 163, 184, 0.2) !important;
+}
+
+body[data-theme="dark"] #notificationsModal .text-muted {
+    color: #b6c2d1 !important;
+}
+
+body[data-theme="dark"] #notificationsModal .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+    opacity: .9;
+}
+
 .modal.fade {
     opacity: 0;
     transition: opacity .3s ease-in-out;

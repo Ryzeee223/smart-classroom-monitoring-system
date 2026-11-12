@@ -151,15 +151,15 @@
                                     </thead>
                                     <tbody>
                                         
-                                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $course; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $course; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $courseItem): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                                             <tr>
-                                                <td><?php echo e($course->course_name ?? 'N/A'); ?></td>
-                                                <td><?php echo e($course->course_code); ?></td>
-                                                <td><?php echo e($course->course_name); ?></td>
-                                                <td><?php echo e(Str::limit($course->unit, 30)); ?></td>
+                                                <td><?php echo e($courseItem->course_name ?? 'N/A'); ?></td>
+                                                <td><?php echo e($courseItem->course_code); ?></td>
+                                                <td><?php echo e($courseItem->course_name); ?></td>
+                                                <td><?php echo e(Str::limit($courseItem->unit, 30)); ?></td>
                                                 <td class="text-nowrap">
-                                                    <a href="<?php echo e(route('course.edit', $course->id)); ?>" class="btn btn-sm btn-outline-primary btn-edit fw-semibold" title="Edit" aria-label="Edit">✏️</a>
-                                                    <form method="POST" action="<?php echo e(route('course.archive', $course->id)); ?>" class="d-inline" onsubmit="return confirm('Delete this course?')">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary btn-edit fw-semibold" title="Edit" aria-label="Edit <?php echo e($courseItem->course_code); ?>" data-bs-toggle="modal" data-bs-target="#editCourseModal<?php echo e($courseItem->id); ?>">✏️</button>
+                                                    <form method="POST" action="<?php echo e(route('course.archive', $courseItem->id)); ?>" class="d-inline" onsubmit="return confirm('Delete this course?')">
                                                         <?php echo csrf_field(); ?>
                                                         <?php echo method_field('DELETE'); ?>
                                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete">🗑</button>
@@ -178,6 +178,44 @@
                     </div>
                 </div>
             </div>
+
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $course; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $courseItem): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                <div class="modal fade" id="editCourseModal<?php echo e($courseItem->id); ?>" tabindex="-1" aria-labelledby="editCourseModalLabel<?php echo e($courseItem->id); ?>" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editCourseModalLabel<?php echo e($courseItem->id); ?>">Edit Subject</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form method="POST" action="<?php echo e(route('course.update', $courseItem->id)); ?>">
+                                <?php echo csrf_field(); ?>
+                                <?php echo method_field('PUT'); ?>
+                                <input type="hidden" name="college_id" value="<?php echo e($courseItem->college_id); ?>">
+
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="editCourseCode<?php echo e($courseItem->id); ?>">Course Code</label>
+                                        <input type="text" class="form-control" id="editCourseCode<?php echo e($courseItem->id); ?>" name="course_code" value="<?php echo e($courseItem->course_code); ?>" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" for="editCourseName<?php echo e($courseItem->id); ?>">Course Name</label>
+                                        <input type="text" class="form-control" id="editCourseName<?php echo e($courseItem->id); ?>" name="course_name" value="<?php echo e($courseItem->course_name); ?>" required>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label" for="editCourseDescription<?php echo e($courseItem->id); ?>">Description</label>
+                                        <textarea class="form-control" id="editCourseDescription<?php echo e($courseItem->id); ?>" name="description" rows="3"><?php echo e($courseItem->description); ?></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Update Subject</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
         </main>
         <?php echo $__env->make('partials.notifications-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     </div>

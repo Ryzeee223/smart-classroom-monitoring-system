@@ -18,6 +18,17 @@
     body {
         overflow-x: hidden;
     }
+    .schedules-page .collapsing {
+        transition: height 1.1s ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .schedules-page .collapsing {
+            transition-duration: .01ms;
+        }
+        .schedules-page .schedule-glass-item {
+            animation: none;
+        }
+    }
     .schedule-form-card {
         border: 0;
         border-radius: 0.75rem;
@@ -57,6 +68,39 @@
         margin: 0;
     }
 
+    .schedules-page .schedule-dropdown {
+        padding: .45rem;
+        border: 1px solid rgba(46, 111, 181, .18);
+        border-radius: .75rem;
+        background: rgba(235, 245, 250, .48);
+        -webkit-backdrop-filter: blur(14px);
+        backdrop-filter: blur(14px);
+        box-shadow: 0 10px 24px rgba(46, 111, 181, .12), 0 0 18px rgba(47, 143, 98, .08);
+    }
+
+    .schedules-page .schedule-glass-item {
+        border: 1px solid rgba(255, 255, 255, .62);
+        border-radius: .65rem;
+        background: rgba(255, 255, 255, .58);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .68), 0 6px 16px rgba(31, 109, 74, .1);
+        animation: scheduleGlassReveal .75s cubic-bezier(.2, .75, .3, 1) both;
+    }
+
+    @keyframes scheduleGlassReveal {
+        from {
+            opacity: 0;
+            filter: blur(6px);
+            transform: translateY(6px);
+        }
+        to {
+            opacity: 1;
+            filter: blur(0);
+            transform: translateY(0);
+        }
+    }
+
     body[data-theme="dark"] .schedules-page .card-header {
         background: linear-gradient(135deg, rgba(47,143,98,0.2), rgba(46,111,181,0.2));
         border-bottom-color: rgba(148, 163, 184, 0.2);
@@ -69,10 +113,43 @@
         color: #edf2f7;
     }
 
+    body[data-theme="dark"] .schedules-page .schedule-dropdown {
+        border-color: rgba(125, 211, 252, .22);
+        background: rgba(15, 23, 42, .42);
+        box-shadow: 0 12px 28px rgba(2, 6, 23, .3), 0 0 20px rgba(46, 111, 181, .12);
+    }
+
+    body[data-theme="dark"] .schedules-page .schedule-glass-item {
+        border-color: rgba(125, 211, 252, .2);
+        background: rgba(31, 41, 55, .62);
+        box-shadow: inset 0 1px 0 rgba(226, 232, 240, .1), 0 8px 18px rgba(47, 143, 98, .12), 0 0 16px rgba(46, 111, 181, .1);
+        color: #edf2f7;
+    }
+
     body[data-theme="dark"] .schedules-page .schedule-day-option {
         background: #1f2937;
         border-color: rgba(148, 163, 184, 0.28);
         color: #e2e8f0;
+    }
+
+    body[data-theme="dark"] .schedules-page input[type="checkbox"].form-check-input {
+        width: 1.15rem;
+        height: 1.15rem;
+        border-color: #7c93a8;
+        background-color: #0f172a;
+        box-shadow: 0 0 0 1px rgba(125, 211, 252, 0.16), 0 0 10px rgba(46, 111, 181, 0.2);
+        cursor: pointer;
+    }
+
+    body[data-theme="dark"] .schedules-page input[type="checkbox"].form-check-input:checked {
+        border-color: #86efac;
+        background-color: #2f8f62;
+        box-shadow: 0 0 0 2px rgba(243, 214, 93, 0.18), 0 0 16px rgba(47, 143, 98, 0.38), 0 0 20px rgba(46, 111, 181, 0.2);
+    }
+
+    body[data-theme="dark"] .schedules-page input[type="checkbox"].form-check-input:focus-visible {
+        border-color: #7dd3fc;
+        box-shadow: 0 0 0 3px rgba(46, 111, 181, 0.34), 0 0 16px rgba(47, 143, 98, 0.24);
     }
 
     body[data-theme="dark"] .schedules-page .bg-light {
@@ -611,10 +688,10 @@ while ($startTime <= $endTimeLimit) {
                                         </button>
                                     </div>
 
-                                    <div class="collapse mt-2" id="{{ $collapseId }}">
+                                    <div class="collapse schedule-dropdown mt-2" id="{{ $collapseId }}">
                                         <div class="d-flex flex-column gap-2">
                                 @foreach($userSchedules as $schedule)
-                                                <div class="p-2 border rounded bg-light">
+                                                <div class="schedule-glass-item p-2">
                                                     <div class="d-flex justify-content-between align-items-start">
                                                         <div>
 
@@ -652,34 +729,50 @@ while ($startTime <= $endTimeLimit) {
                                                 </div>
 
                                                 {{-- EDIT MODAL --}}
-                                                <div class="modal fade" id="editModal{{ $schedule->id }}" tabindex="-1" aria-hidden="true">
+                                                <div class="modal fade schedule-edit-modal" id="editModal{{ $schedule->id }}" tabindex="-1" aria-labelledby="editModalLabel{{ $schedule->id }}" aria-hidden="true">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
-                                                                <h5 class="modal-title">Edit Schedule</h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                <h5 class="modal-title" id="editModalLabel{{ $schedule->id }}">Edit Schedule</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                             </div>
 
                                                             <form method="POST" action="{{ route('schedules.update', $schedule->id) }}">
                                                                 @csrf
                                                                 @method('PUT')
-                                                                
+
+                                                                @php
+                                                                    $editStartTime = $schedule->start_time ?? ($schedule->Start_time ?? '');
+                                                                    $editEndTime = $schedule->end_time ?? ($schedule->End_time ?? '');
+                                                                    $editStartTime = $editStartTime ? \Illuminate\Support\Carbon::parse($editStartTime)->format('H:i:s') : '';
+                                                                    $editEndTime = $editEndTime ? \Illuminate\Support\Carbon::parse($editEndTime)->format('H:i:s') : '';
+                                                                    $editDay = $schedule->day ?? ($schedule->Day ?? '');
+                                                                @endphp
+                                                                <input type="hidden" name="Semester" value="{{ $schedule->Semester ?? '' }}">
+                                                                <input type="hidden" name="School_year" value="{{ $schedule->School_year ?? '' }}">
+
                                                                 <div class="modal-body text-start">
                                                                     <div class="row">
                                                                         <div class="col-md-12 mb-3">
-                                                                            <label class="form-label">Course</label>
-                                                                            <input type="text" class="form-control" name="Course" value="{{ $schedule->course_id }}">
-
+                                                                            <label class="form-label" for="editCourse{{ $schedule->id }}">Course</label>
+                                                                            <select class="form-select" id="editCourse{{ $schedule->id }}" name="Course" required>
+                                                                                <option value="">Select Course</option>
+                                                                                @foreach($courses as $courseOption)
+                                                                                    <option value="{{ $courseOption->id }}" @selected((int) $schedule->course_id === (int) $courseOption->id)>
+                                                                                        {{ $courseOption->course_code }} - {{ $courseOption->course_name }}
+                                                                                    </option>
+                                                                                @endforeach
+                                                                            </select>
                                                                         </div>
                                                                     </div>
 
                                                                     <div class="row">
                                                                         <div class="col-md-12 mb-3">
-                                                                            <label class="form-label">Program</label>
-                                                                            <select class="form-select" name="program_id" required>
+                                                                            <label class="form-label" for="editProgram{{ $schedule->id }}">Program</label>
+                                                                            <select class="form-select" id="editProgram{{ $schedule->id }}" name="program_id" required>
                                                                                 <option value="">Select Program</option>
                                                                                 @foreach($programs as $program)
-                                                                                    <option value="{{ $program->id }}" {{ (isset($schedule->program_id) && (int)$schedule->program_id === (int)$program->id) ? 'selected' : '' }}>
+                                                                                    <option value="{{ $program->id }}" @selected((int) $schedule->program_id === (int) $program->id)>
                                                                                         {{ $program->program_abbr }}
                                                                                     </option>
                                                                                 @endforeach
@@ -687,13 +780,12 @@ while ($startTime <= $endTimeLimit) {
                                                                         </div>
                                                                     </div>
 
-
                                                                     <div class="row">
-                                                                    <div class="col-md-6 mb-3">
-                                                                            <label class="form-label">Start Time</label>
-                                                                            <select class="form-select" name="Start_time" required>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label class="form-label" for="editStartTime{{ $schedule->id }}">Start Time</label>
+                                                                            <select class="form-select" id="editStartTime{{ $schedule->id }}" name="Start_time" required>
                                                                                 @foreach($startTimes as $index => $start)
-                                                                                    <option value="{{ $start }}" {{ $schedule->Start_time == $start ? 'selected' : '' }}>
+                                                                                    <option value="{{ $start }}" @selected($editStartTime === $start)>
                                                                                         {{ $startTimesDisplay[$index] }}
                                                                                     </option>
                                                                                 @endforeach
@@ -701,10 +793,10 @@ while ($startTime <= $endTimeLimit) {
                                                                         </div>
 
                                                                         <div class="col-md-6 mb-3">
-                                                                            <label class="form-label">End Time</label>
-                                                                            <select class="form-select" name="End_time" required>
+                                                                            <label class="form-label" for="editEndTime{{ $schedule->id }}">End Time</label>
+                                                                            <select class="form-select" id="editEndTime{{ $schedule->id }}" name="End_time" required>
                                                                                 @foreach($endTimes as $index => $end)
-                                                                                    <option value="{{ $end }}" {{ $schedule->End_time == $end ? 'selected' : '' }}>
+                                                                                    <option value="{{ $end }}" @selected($editEndTime === $end)>
                                                                                         {{ $endTimesDisplay[$index] }}
                                                                                     </option>
                                                                                 @endforeach
@@ -713,19 +805,35 @@ while ($startTime <= $endTimeLimit) {
                                                                     </div>
 
                                                                     <div class="row">
-                                                                        <label class="form-label">Day</label>
-                                        <div class="d-flex flex-wrap gap-3 mt-1">
-                                            @foreach(['Mon','Tue','Wed','Thu','Fri'] as $day)
-                                                <label class="d-flex align-items-center gap-1">
-                                                    <input type="checkbox" name="Day[]" value="{{ $day }}" class="form-check-input">
-                                                    <span>{{ $day }}</span>
-                                                </label>
-                                            @endforeach
-                                        </div>
+                                                                        <div class="col-12 mb-3">
+                                                                            <span class="form-label d-block">Days</span>
+                                                                            <div class="d-flex flex-wrap gap-3 mt-1">
+                                                                                @foreach(['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] as $day)
+                                                                                    <label class="d-flex align-items-center gap-1">
+                                                                                        <input type="checkbox" name="Day[]" value="{{ $day }}" class="form-check-input" @checked($editDay === $day)>
+                                                                                        <span>{{ $day }}</span>
+                                                                                    </label>
+                                                                                @endforeach
+                                                                            </div>
+                                                                        </div>
                                                                         <div class="col-md-6 mb-3">
-                                                                            <label class="form-label">Room</label>
-                                                                            <input type="text" class="form-control" name="Room" value="{{ $schedule->room_id }}">
-
+                                                                            <label class="form-label" for="editYearLevel{{ $schedule->id }}">Year Level</label>
+                                                                            <input type="text" class="form-control" id="editYearLevel{{ $schedule->id }}" name="year_level" value="{{ $schedule->year_level }}" required maxlength="50">
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label class="form-label" for="editSection{{ $schedule->id }}">Section</label>
+                                                                            <input type="text" class="form-control" id="editSection{{ $schedule->id }}" name="section" value="{{ $schedule->section }}" required maxlength="1">
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label class="form-label" for="editRoom{{ $schedule->id }}">Room</label>
+                                                                            <select class="form-select" id="editRoom{{ $schedule->id }}" name="Room" required>
+                                                                                <option value="">Select Room</option>
+                                                                                @foreach($rooms as $roomOption)
+                                                                                    <option value="{{ $roomOption->id }}" @selected((int) $schedule->room_id === (int) $roomOption->id)>
+                                                                                        {{ $roomOption->room_name }}
+                                                                                    </option>
+                                                                                @endforeach
+                                                                            </select>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -757,5 +865,13 @@ while ($startTime <= $endTimeLimit) {
         </div>
     </main>
     @include('partials.notifications-modal')
+    <script>
+        document.addEventListener('show.bs.modal', (event) => {
+            const modal = event.target;
+            if (modal instanceof HTMLElement && modal.matches('.schedule-edit-modal') && modal.parentElement !== document.body) {
+                document.body.append(modal);
+            }
+        });
+    </script>
 </div>
 </body>

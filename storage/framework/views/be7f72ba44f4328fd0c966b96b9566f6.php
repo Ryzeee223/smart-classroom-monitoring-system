@@ -18,6 +18,17 @@
     body {
         overflow-x: hidden;
     }
+    .schedules-page .collapsing {
+        transition: height 1.1s ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .schedules-page .collapsing {
+            transition-duration: .01ms;
+        }
+        .schedules-page .schedule-glass-item {
+            animation: none;
+        }
+    }
     .schedule-form-card {
         border: 0;
         border-radius: 0.75rem;
@@ -57,6 +68,39 @@
         margin: 0;
     }
 
+    .schedules-page .schedule-dropdown {
+        padding: .45rem;
+        border: 1px solid rgba(46, 111, 181, .18);
+        border-radius: .75rem;
+        background: rgba(235, 245, 250, .48);
+        -webkit-backdrop-filter: blur(14px);
+        backdrop-filter: blur(14px);
+        box-shadow: 0 10px 24px rgba(46, 111, 181, .12), 0 0 18px rgba(47, 143, 98, .08);
+    }
+
+    .schedules-page .schedule-glass-item {
+        border: 1px solid rgba(255, 255, 255, .62);
+        border-radius: .65rem;
+        background: rgba(255, 255, 255, .58);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .68), 0 6px 16px rgba(31, 109, 74, .1);
+        animation: scheduleGlassReveal .75s cubic-bezier(.2, .75, .3, 1) both;
+    }
+
+    @keyframes scheduleGlassReveal {
+        from {
+            opacity: 0;
+            filter: blur(6px);
+            transform: translateY(6px);
+        }
+        to {
+            opacity: 1;
+            filter: blur(0);
+            transform: translateY(0);
+        }
+    }
+
     body[data-theme="dark"] .schedules-page .card-header {
         background: linear-gradient(135deg, rgba(47,143,98,0.2), rgba(46,111,181,0.2));
         border-bottom-color: rgba(148, 163, 184, 0.2);
@@ -69,10 +113,43 @@
         color: #edf2f7;
     }
 
+    body[data-theme="dark"] .schedules-page .schedule-dropdown {
+        border-color: rgba(125, 211, 252, .22);
+        background: rgba(15, 23, 42, .42);
+        box-shadow: 0 12px 28px rgba(2, 6, 23, .3), 0 0 20px rgba(46, 111, 181, .12);
+    }
+
+    body[data-theme="dark"] .schedules-page .schedule-glass-item {
+        border-color: rgba(125, 211, 252, .2);
+        background: rgba(31, 41, 55, .62);
+        box-shadow: inset 0 1px 0 rgba(226, 232, 240, .1), 0 8px 18px rgba(47, 143, 98, .12), 0 0 16px rgba(46, 111, 181, .1);
+        color: #edf2f7;
+    }
+
     body[data-theme="dark"] .schedules-page .schedule-day-option {
         background: #1f2937;
         border-color: rgba(148, 163, 184, 0.28);
         color: #e2e8f0;
+    }
+
+    body[data-theme="dark"] .schedules-page input[type="checkbox"].form-check-input {
+        width: 1.15rem;
+        height: 1.15rem;
+        border-color: #7c93a8;
+        background-color: #0f172a;
+        box-shadow: 0 0 0 1px rgba(125, 211, 252, 0.16), 0 0 10px rgba(46, 111, 181, 0.2);
+        cursor: pointer;
+    }
+
+    body[data-theme="dark"] .schedules-page input[type="checkbox"].form-check-input:checked {
+        border-color: #86efac;
+        background-color: #2f8f62;
+        box-shadow: 0 0 0 2px rgba(243, 214, 93, 0.18), 0 0 16px rgba(47, 143, 98, 0.38), 0 0 20px rgba(46, 111, 181, 0.2);
+    }
+
+    body[data-theme="dark"] .schedules-page input[type="checkbox"].form-check-input:focus-visible {
+        border-color: #7dd3fc;
+        box-shadow: 0 0 0 3px rgba(46, 111, 181, 0.34), 0 0 16px rgba(47, 143, 98, 0.24);
     }
 
     body[data-theme="dark"] .schedules-page .bg-light {
@@ -613,10 +690,10 @@ while ($startTime <= $endTimeLimit) {
                                         </button>
                                     </div>
 
-                                    <div class="collapse mt-2" id="<?php echo e($collapseId); ?>">
+                                    <div class="collapse schedule-dropdown mt-2" id="<?php echo e($collapseId); ?>">
                                         <div class="d-flex flex-column gap-2">
                                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $userSchedules; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $schedule): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
-                                                <div class="p-2 border rounded bg-light">
+                                                <div class="schedule-glass-item p-2">
                                                     <div class="d-flex justify-content-between align-items-start">
                                                         <div>
 
@@ -656,34 +733,51 @@ while ($startTime <= $endTimeLimit) {
                                                 </div>
 
                                                 
-                                                <div class="modal fade" id="editModal<?php echo e($schedule->id); ?>" tabindex="-1" aria-hidden="true">
+                                                <div class="modal fade schedule-edit-modal" id="editModal<?php echo e($schedule->id); ?>" tabindex="-1" aria-labelledby="editModalLabel<?php echo e($schedule->id); ?>" aria-hidden="true">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
-                                                                <h5 class="modal-title">Edit Schedule</h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                <h5 class="modal-title" id="editModalLabel<?php echo e($schedule->id); ?>">Edit Schedule</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                             </div>
 
                                                             <form method="POST" action="<?php echo e(route('schedules.update', $schedule->id)); ?>">
                                                                 <?php echo csrf_field(); ?>
                                                                 <?php echo method_field('PUT'); ?>
-                                                                
+
+                                                                <?php
+                                                                    $editStartTime = $schedule->start_time ?? ($schedule->Start_time ?? '');
+                                                                    $editEndTime = $schedule->end_time ?? ($schedule->End_time ?? '');
+                                                                    $editStartTime = $editStartTime ? \Illuminate\Support\Carbon::parse($editStartTime)->format('H:i:s') : '';
+                                                                    $editEndTime = $editEndTime ? \Illuminate\Support\Carbon::parse($editEndTime)->format('H:i:s') : '';
+                                                                    $editDay = $schedule->day ?? ($schedule->Day ?? '');
+                                                                ?>
+                                                                <input type="hidden" name="Semester" value="<?php echo e($schedule->Semester ?? ''); ?>">
+                                                                <input type="hidden" name="School_year" value="<?php echo e($schedule->School_year ?? ''); ?>">
+
                                                                 <div class="modal-body text-start">
                                                                     <div class="row">
                                                                         <div class="col-md-12 mb-3">
-                                                                            <label class="form-label">Course</label>
-                                                                            <input type="text" class="form-control" name="Course" value="<?php echo e($schedule->course_id); ?>">
+                                                                            <label class="form-label" for="editCourse<?php echo e($schedule->id); ?>">Course</label>
+                                                                            <select class="form-select" id="editCourse<?php echo e($schedule->id); ?>" name="Course" required>
+                                                                                <option value="">Select Course</option>
+                                                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $courses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $courseOption): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                                                                    <option value="<?php echo e($courseOption->id); ?>" <?php if((int) $schedule->course_id === (int) $courseOption->id): echo 'selected'; endif; ?>>
+                                                                                        <?php echo e($courseOption->course_code); ?> - <?php echo e($courseOption->course_name); ?>
 
+                                                                                    </option>
+                                                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                                                                            </select>
                                                                         </div>
                                                                     </div>
 
                                                                     <div class="row">
                                                                         <div class="col-md-12 mb-3">
-                                                                            <label class="form-label">Program</label>
-                                                                            <select class="form-select" name="program_id" required>
+                                                                            <label class="form-label" for="editProgram<?php echo e($schedule->id); ?>">Program</label>
+                                                                            <select class="form-select" id="editProgram<?php echo e($schedule->id); ?>" name="program_id" required>
                                                                                 <option value="">Select Program</option>
                                                                                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $programs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $program): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
-                                                                                    <option value="<?php echo e($program->id); ?>" <?php echo e((isset($schedule->program_id) && (int)$schedule->program_id === (int)$program->id) ? 'selected' : ''); ?>>
+                                                                                    <option value="<?php echo e($program->id); ?>" <?php if((int) $schedule->program_id === (int) $program->id): echo 'selected'; endif; ?>>
                                                                                         <?php echo e($program->program_abbr); ?>
 
                                                                                     </option>
@@ -692,13 +786,12 @@ while ($startTime <= $endTimeLimit) {
                                                                         </div>
                                                                     </div>
 
-
                                                                     <div class="row">
-                                                                    <div class="col-md-6 mb-3">
-                                                                            <label class="form-label">Start Time</label>
-                                                                            <select class="form-select" name="Start_time" required>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label class="form-label" for="editStartTime<?php echo e($schedule->id); ?>">Start Time</label>
+                                                                            <select class="form-select" id="editStartTime<?php echo e($schedule->id); ?>" name="Start_time" required>
                                                                                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $startTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $start): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
-                                                                                    <option value="<?php echo e($start); ?>" <?php echo e($schedule->Start_time == $start ? 'selected' : ''); ?>>
+                                                                                    <option value="<?php echo e($start); ?>" <?php if($editStartTime === $start): echo 'selected'; endif; ?>>
                                                                                         <?php echo e($startTimesDisplay[$index]); ?>
 
                                                                                     </option>
@@ -707,10 +800,10 @@ while ($startTime <= $endTimeLimit) {
                                                                         </div>
 
                                                                         <div class="col-md-6 mb-3">
-                                                                            <label class="form-label">End Time</label>
-                                                                            <select class="form-select" name="End_time" required>
+                                                                            <label class="form-label" for="editEndTime<?php echo e($schedule->id); ?>">End Time</label>
+                                                                            <select class="form-select" id="editEndTime<?php echo e($schedule->id); ?>" name="End_time" required>
                                                                                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $endTimes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $end): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
-                                                                                    <option value="<?php echo e($end); ?>" <?php echo e($schedule->End_time == $end ? 'selected' : ''); ?>>
+                                                                                    <option value="<?php echo e($end); ?>" <?php if($editEndTime === $end): echo 'selected'; endif; ?>>
                                                                                         <?php echo e($endTimesDisplay[$index]); ?>
 
                                                                                     </option>
@@ -720,19 +813,36 @@ while ($startTime <= $endTimeLimit) {
                                                                     </div>
 
                                                                     <div class="row">
-                                                                        <label class="form-label">Day</label>
-                                        <div class="d-flex flex-wrap gap-3 mt-1">
-                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = ['Mon','Tue','Wed','Thu','Fri']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $day): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
-                                                <label class="d-flex align-items-center gap-1">
-                                                    <input type="checkbox" name="Day[]" value="<?php echo e($day); ?>" class="form-check-input">
-                                                    <span><?php echo e($day); ?></span>
-                                                </label>
-                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
-                                        </div>
+                                                                        <div class="col-12 mb-3">
+                                                                            <span class="form-label d-block">Days</span>
+                                                                            <div class="d-flex flex-wrap gap-3 mt-1">
+                                                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $day): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                                                                    <label class="d-flex align-items-center gap-1">
+                                                                                        <input type="checkbox" name="Day[]" value="<?php echo e($day); ?>" class="form-check-input" <?php if($editDay === $day): echo 'checked'; endif; ?>>
+                                                                                        <span><?php echo e($day); ?></span>
+                                                                                    </label>
+                                                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                                                                            </div>
+                                                                        </div>
                                                                         <div class="col-md-6 mb-3">
-                                                                            <label class="form-label">Room</label>
-                                                                            <input type="text" class="form-control" name="Room" value="<?php echo e($schedule->room_id); ?>">
+                                                                            <label class="form-label" for="editYearLevel<?php echo e($schedule->id); ?>">Year Level</label>
+                                                                            <input type="text" class="form-control" id="editYearLevel<?php echo e($schedule->id); ?>" name="year_level" value="<?php echo e($schedule->year_level); ?>" required maxlength="50">
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label class="form-label" for="editSection<?php echo e($schedule->id); ?>">Section</label>
+                                                                            <input type="text" class="form-control" id="editSection<?php echo e($schedule->id); ?>" name="section" value="<?php echo e($schedule->section); ?>" required maxlength="1">
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label class="form-label" for="editRoom<?php echo e($schedule->id); ?>">Room</label>
+                                                                            <select class="form-select" id="editRoom<?php echo e($schedule->id); ?>" name="Room" required>
+                                                                                <option value="">Select Room</option>
+                                                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $rooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $roomOption): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                                                                                    <option value="<?php echo e($roomOption->id); ?>" <?php if((int) $schedule->room_id === (int) $roomOption->id): echo 'selected'; endif; ?>>
+                                                                                        <?php echo e($roomOption->room_name); ?>
 
+                                                                                    </option>
+                                                                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                                                                            </select>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -764,6 +874,14 @@ while ($startTime <= $endTimeLimit) {
         </div>
     </main>
     <?php echo $__env->make('partials.notifications-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <script>
+        document.addEventListener('show.bs.modal', (event) => {
+            const modal = event.target;
+            if (modal instanceof HTMLElement && modal.matches('.schedule-edit-modal') && modal.parentElement !== document.body) {
+                document.body.append(modal);
+            }
+        });
+    </script>
 </div>
 </body>
 <?php /**PATH /Volumes/shared file/4th year/capstone project/RFInsiDe/resources/views/schedules.blade.php ENDPATH**/ ?>

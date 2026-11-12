@@ -150,15 +150,15 @@
                                     </thead>
                                     <tbody>
                                         {{-- course --}}
-                                        @forelse($course as $course)
+                                        @forelse($course as $courseItem)
                                             <tr>
-                                                <td>{{ $course->course_name ?? 'N/A' }}</td>
-                                                <td>{{ $course->course_code }}</td>
-                                                <td>{{ $course->course_name }}</td>
-                                                <td>{{ Str::limit($course->unit, 30) }}</td>
+                                                <td>{{ $courseItem->course_name ?? 'N/A' }}</td>
+                                                <td>{{ $courseItem->course_code }}</td>
+                                                <td>{{ $courseItem->course_name }}</td>
+                                                <td>{{ Str::limit($courseItem->unit, 30) }}</td>
                                                 <td class="text-nowrap">
-                                                    <a href="{{ route('course.edit', $course->id) }}" class="btn btn-sm btn-outline-primary btn-edit fw-semibold" title="Edit" aria-label="Edit">✏️</a>
-                                                    <form method="POST" action="{{ route('course.archive', $course->id) }}" class="d-inline" onsubmit="return confirm('Delete this course?')">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary btn-edit fw-semibold" title="Edit" aria-label="Edit {{ $courseItem->course_code }}" data-bs-toggle="modal" data-bs-target="#editCourseModal{{ $courseItem->id }}">✏️</button>
+                                                    <form method="POST" action="{{ route('course.archive', $courseItem->id) }}" class="d-inline" onsubmit="return confirm('Delete this course?')">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete">🗑</button>
@@ -177,6 +177,44 @@
                     </div>
                 </div>
             </div>
+
+            @foreach($course as $courseItem)
+                <div class="modal fade" id="editCourseModal{{ $courseItem->id }}" tabindex="-1" aria-labelledby="editCourseModalLabel{{ $courseItem->id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editCourseModalLabel{{ $courseItem->id }}">Edit Subject</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form method="POST" action="{{ route('course.update', $courseItem->id) }}">
+                                @csrf
+                                @method('PUT')
+                                <input type="hidden" name="college_id" value="{{ $courseItem->college_id }}">
+
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="editCourseCode{{ $courseItem->id }}">Course Code</label>
+                                        <input type="text" class="form-control" id="editCourseCode{{ $courseItem->id }}" name="course_code" value="{{ $courseItem->course_code }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" for="editCourseName{{ $courseItem->id }}">Course Name</label>
+                                        <input type="text" class="form-control" id="editCourseName{{ $courseItem->id }}" name="course_name" value="{{ $courseItem->course_name }}" required>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label" for="editCourseDescription{{ $courseItem->id }}">Description</label>
+                                        <textarea class="form-control" id="editCourseDescription{{ $courseItem->id }}" name="description" rows="3">{{ $courseItem->description }}</textarea>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Update Subject</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
         </main>
         @include('partials.notifications-modal')
     </div>
